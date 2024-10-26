@@ -1,0 +1,191 @@
+/* 
+ Localizable.strings
+ VirtuAI
+ 
+ Created by Murat ÖZTÜRK on 4.06.2023.
+ 
+ */
+"app_name" = "VirtuAI";
+"chat" = "Chat";
+"ai_assistants" = "KI-Assistenten";
+"history" = "Verlauf";
+"account" = "Konto";
+"app_icon" = "App-Symbol";
+"welcome" = "Willkommen";
+"start_chat" = "Chat starten";
+"welcome_to" = "Willkommen bei";
+"welcome_app_name" = "VirtuAI 👋";
+"welcome_description" = "Beginnen Sie jetzt mit VirtuAI zu chatten.\nSie können mich alles fragen.";
+"ask_me_anything" = "Fragen Sie mich alles...";
+"back_icon" = "Zurück-Symbol";
+"share" = "Teilen";
+"capabilities" = "Fähigkeiten";
+"capabilities_1" = "Beantworte alle deine Fragen.\n(Frage mich einfach nach allem, was du magst!)";
+"capabilities_2" = "Erzeuge jeden Text, den du möchtest.\n(Aufsätze, Artikel, Berichte, Geschichten und mehr)";
+"capabilities_3" = "Konversations-KI\n(Ich kann mit dir wie ein natürlicher Mensch sprechen)";
+"capabilities_desc" = "Dies sind nur einige Beispiele dafür, was ich kann";
+"stop_generating" = "Generierung stoppen…";
+"copy" = "Kopieren";
+"type_something_like" = "Tippen Sie etwas Ähnliches wie:";
+"empty" = "Leer";
+"no_history" = "Sie haben keinen Verlauf.";
+"clear_all_history" = "Verlauf löschen";
+"are_you_sure_delete_all_history" = "Sind Sie sicher, dass Sie den gesamten Verlauf löschen möchten?";
+"cancel" = "Abbrechen";
+"yes_clear_all" = "Ja, alles löschen";
+"search_conversation" = "Suche…";
+"upgrade_to_pro" = "Upgrade auf PRO!";
+"upgrade_to_pro_description" = "Genießen Sie alle Vorteile ohne Einschränkungen";
+"language" = "Sprache";
+"general" = "Allgemein";
+"dark_theme" = "Dunkler Modus";
+"help_center" = "Hilfe-Center";
+"about" = "Über";
+"privacy_policy" = "Datenschutzrichtlinie";
+"about_us" = "Über VirtuAI";
+"logout" = "Abmelden";
+"are_you_sure_logout" = "Sind Sie sicher, dass Sie sich abmelden möchten?";
+"yes_logout" = "Ja, abmelden";
+"settings" = "Einstellungen";
+"restore_purchase" = "Kauf wiederherstellen";
+"purchase" = "Kaufen";
+"pro" = "PRO";
+"powered_by_chat_gpt" = "Angetrieben von ChatGPT 4";
+"remove_ads" = "Werbung entfernen";
+"unlimited_messages" = "Unbegrenzte Nachrichten";
+"cancel_anytime" = "Jederzeit kündbar";
+"restore" = "Wiederherstellen";
+"weekly" = "Wöchentlich";
+"monthly" = "Monatlich";
+"yearly" = "Jährlich";
+"per_week" = "Pro Woche";
+"per_month" = "Pro Monat";
+"per_year" = "Pro Jahr";
+"save85" = "85 % sparen";
+"secured_by_app_store" = "Gesichert durch den App Store. Jederzeit kündbar";
+"watch_ad" = "Kurze Anzeige ansehen";
+"you_reach_free_message_limit" = "Sie haben das kostenlose Nachrichtenlimit erreicht. Sie können auf die PRO-Version upgraden oder eine weitere kostenlose Nachricht anzeigen, indem Sie eine kurze Anzeige ansehen.";
+"welcome_to_pro_version" = "Willkommen in der Pro-Version!";
+"pro_version_not_purchased" = "Pro-Version nicht gekauft";
+"network_error" = "Netzwerkfehler";
+"no_conection_try_again" = "Bitte verbinden Sie sich mit dem Internet und versuchen Sie es erneut.";
+"update" = "Aktualisieren";
+"there_is_new_version" = "Es gibt eine neue Version dieser App. Bitte aktualisieren Sie.";
+
+"login_with_google" = "Mit Google anmelden";
+"cannot_login" = "Beim Anmelden ist ein Fehler aufgetreten";
+
+"explain" = "Erklären";
+"explain_example_1" = "Ist Zeitreisen möglich?";
+"explain_example_2" = "Was ist déjà vu und warum tritt es auf?";
+"explain_example_3" = "Welche Rolle wird künstliche Intelligenz in der Zukunft spielen?";
+
+"create" = "Erstellen";
+"create_example_1" = "Geben Sie eine idee für KI-bezogenen YouTube-Inhalt";
+"create_example_2" = "Texte für ein Rap-Lied über die Straßen schreiben";
+
+"translate" = "Übersetzen";
+"translate_example_1" = "Wie sagt man ''Hallo'' auf Spanisch?";
+"translate_example_2" = "Was bedeutet 'entdecken' auf Japanisch?";
+
+"email" = "Schreiben Sie eine E-Mail";
+"email_example_1" = "Schreiben Sie eine Dankes-E-Mail an meine Kunden";
+"email_example_2" = "Verfassen Sie eine positive Antwort auf ein Kooperationsangebot";
+
+"recommend" = "Empfehlung";
+"recommend_example_1" = "Empfehlen Sie eine Science-Fiction-Serie";
+"recommend_example_2" = "Empfehlen Sie Musiktitel, um die Motivation zu steigern";
+
+"history_main" = "Verlauf";
+"history_example_1" = "Wie und wo haben die ersten Menschen gelebt?";
+"history_example_2" = "Was ist die Geschichte und die Auswirkungen der Seidenstraße?";
+
+"recipe" = "Holen Sie sich ein Rezept";
+"recipe_example_1" = "Empfehlen Sie eine Mahlzeit unter 250 Kalorien";
+"recipe_example_2" = "Wie macht man Pizza?";
+
+"math" = "Mathe machen";
+"math_example_1" = "Was ist Mathematisch Zufälligkeit?";
+"math_example_2" = "Lösen Sie diese Mathematische Aufgabe: 12^(3)÷12^(1)";
+
+"social" = "Sozial";
+"social_example_1" = "Geben Sie eine Bildunterschrift für mein Instagram-Foto am Eiffelturm";
+"social_example_2" = "Schreiben Sie einen lustigen Tweet über Tiere";
+"social_example_3" = "Bereiten Sie eine Bildunterschrift für ein KI-Themen TikTok-Video vor";
+
+"web_page" = "Web";
+"web_url_content" = "Dieser Text ist ein Inhalt einer Web-URL. Bitte fassen Sie diesen Text zusammen und antworten Sie, als hätten Sie den gesamten Inhalt der Website gelesen. Inhalt = %@";
+"flagged_message_content" = "Ihre Nachricht wurde als unangemessen markiert. Bitte versuchen Sie es erneut.";
+"rate_us" = "Bewerten Sie uns";
+"generate_image" = "Bild erstellen";
+"image" = "Bild";
+"tts" = "Text zu Sprache";
+"audio" = "Audio";
+"error_occurred" = "Es ist ein Fehler aufgetreten";
+"enter_description" = "Detaillierte Beschreibung bearbeiten";
+"generated_image" = "Generiertes Bild";
+"download" = "Herunterladen";
+"downloaded" = "Heruntergeladen";
+"done" = "Fertig";
+"please_enter_prompt" = "Bitte geben Sie einen Hinweis ein";
+"discard_generate" = "Generierung verwerfen";
+"discard_generate_desc" = "Sind Sie sicher, dass Sie abbrechen möchten? Das generierte Bild wird verworfen.";
+"discard" = "Verwerfen";
+"none" = "Keine";
+"realistic" = "Realistisch";
+"cartoon" = "Cartoon";
+"pencil_sketch" = "Bleistiftzeichnung";
+"oil_painting" = "Ölgemälde";
+"water_color" = "Aquarell";
+"pop_art" = "Pop Art";
+"surrealist" = "Surrealistisch";
+"pixel_art" = "Pixelkunst";
+"nouveau" = "Neu";
+"abstract_art" = "Abstrakte Kunst";
+"no_style" = "Kein Stil";
+"prompt_1" = "Eine moderne Stadtsilhouette unter einem sternklaren Nachthimmel, die städtische Architektur mit einem kosmischen Hintergrund verschmilzt";
+"prompt_2" = "Ein futuristischer Bahnhof mit schlanken, hochmodernen Designelementen, belebt von vielfältigen Pendlern";
+"prompt_3" = "Versunkene antike Ruinen auf dem Meeresboden, die von marinem Leben und bunten Korallenformationen wimmeln";
+"prompt_4" = "Ein Roboterkoch, der in einer hochmodernen Küche ein Gourmetessen zubereitet, umgeben von verschiedenen futuristischen Kochgadgets";
+"prompt_5" = "Ein mystischer Wald in der Abenddämmerung, mit leuchtenden Pflanzen, magischen Kreaturen und einem verschlungenen Pfad, der in die Tiefe führt";
+"prompt_6" = "Eine Szene eines Vintage-Autorennens, mit klassischen Autos aus verschiedenen Epochen, die auf einer malerischen Straße aufgereiht sind";
+"prompt_7" = "Ein eleganter Loungebereich im Art-Déco-Stil, mit geometrischen Mustern, luxuriösen Möbeln und einem anspruchsvollen Ambiente";
+"prompt_8" = "Ein geschäftiger Cyberpunk-Straßenmarkt bei Nacht, der von Neonlichtern beleuchtet und von futuristischen Verkäufern und Einkäufern bevölkert ist";
+"prompt_9" = "Eine friedliche Wüstenoase bei Sonnenuntergang, mit einem ruhigen Teich, Palmen und dem warmen Glanz der untergehenden Sonne auf dem Sand";
+"convert_to_speech" = "In Sprache umwandeln";
+"alloy" = "Legierung";
+"fable" = "Fabel";
+"echo" = "Echo";
+"onyx" = "Onyx";
+"nova" = "Nova";
+"shimmer" = "Schimmer";
+"created_speech" = "Erstellte Sprache";
+"enter_prompt" = "Bitte geben Sie Ihre Eingabe ein";
+"invalid_url" = "Ungültige URL";
+
+"unlock_url" = "URL-Zusammenfassung freischalten";
+"unlock_scan" = "Text-Scan per Kamera & Galerie freischalten";
+"regenerate" = "Neu generieren";
+"feedback" = "Feedback";
+"widgets" = "Widgets";
+"add_to_home_screen" = "+ Zur Startseite hinzufügen";
+"choose_media_source" = "Medienquelle auswählen";
+"camera" = "Text scannen";
+"link" = "Web-URL zusammenfassen";
+"upgrade_info_description" = "Die KI von VirtuAI benötigt eine immense Rechenleistung, weshalb VirtuAI auf ein Kreditsystem basiert. Jede Anfrage an VirtuAI zieht einen Kredit von Ihrem Guthaben ab. Sie können auf das Pro-Abonnement upgraden, um unbegrenzte Credits zu erhalten.";
+"enter_or_paste_link" = "URL eingeben oder einfügen";
+"https" = "https://";
+"add" = "Hinzufügen";
+"gallery" = "Galerie";
+"camera_scan" = "Kamera-Scan";
+"text_to_speech" = "Text zu Sprache";
+"text_to_speech_description" = "Die Aktivierung der Text-zu-Sprache-Funktion kann die Reaktionszeit von GPT verlangsamen. Um die Geschwindigkeit zu verbessern, sollten Sie diese Funktion möglicherweise deaktivieren.";
+"scan_description" = "Worum handelt es sich bei diesem Bild?";
+"summarize_this_webpage" = "Diese Webseite zusammenfassen";
+"add_url" = "URL hinzufügen";
+"close" = "Schließen";
+"model" = "Modell";
+"gpt_35" = "ChatGPT 3.5";
+"choose_model" = "Modell auswählen";
+"please_check_permisson" = "Bitte überprüfen Sie die Berechtigung für die Foto-Bibliothek";
+"terms_and_policy" = "Nutzungsbedingungen";

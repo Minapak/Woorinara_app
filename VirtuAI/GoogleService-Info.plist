@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>990154980130-6p6krksnfg95phg3p9c5tmguaielbiq1.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.990154980130-6p6krksnfg95phg3p9c5tmguaielbiq1</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>990154980130-2h7f1oip13hvgtf231dk7sejogp1odgn.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDIJrZYQMX23r03Gj1RPKhIodsNrDFJGa8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>990154980130</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.muratozturk.VirtuAI</string>
+	<key>PROJECT_ID</key>
+	<string>virtuai-7ee19</string>
+	<key>STORAGE_BUCKET</key>
+	<string>virtuai-7ee19.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:990154980130:ios:8b7ba270d1205822c0037b</string>
+</dict>
+</plist>

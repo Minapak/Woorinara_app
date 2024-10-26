@@ -1,0 +1,201 @@
+/*
+ Localizable.strings
+ VirtuAI
+ 
+ Created by Murat ÖZTÜRK on 4.06.2023.
+ 
+ */
+
+
+"app_name" = "Woorinara";
+"chat" = "Chat";
+"ai_assistants" = "AI 어시스턴트";
+"history" = "기록";
+"account" = "계정";
+"app_icon" = "앱 아이콘";
+"welcome" = "환영합니다";
+"start_chat" = "채팅 시작";
+"welcome_to" = "~에 오신 것을 환영합니다";
+"welcome_app_name" = "Woorinara 👋";
+"welcome_description" = "지금 VirtuAI와 채팅을 시작하세요.\n무엇이든 물어보세요";
+"ask_me_anything" = "무엇이든 물어보세요...";
+"back_icon" = "뒤로 아이콘";
+"share" = "공유";
+"capabilities" = "능력";
+"capabilities_1" = "모든 질문에 답해드립니다.\n(궁금한 것을 물어보세요!)";
+"capabilities_2" = "모든 종류의 텍스트를 생성합니다.\n(에세이, 기사, 보고서, 이야기 등)";
+"capabilities_3" = "대화형 AI\n(사람처럼 자연스럽게 대화할 수 있습니다)";
+"capabilities_desc" = "이것은 제가 할 수 있는 일의 몇 가지 예입니다";
+"stop_generating" = "생성 중지…";
+"copy" = "복사";
+"type_something_like" = "이런 식으로 입력해보세요:";
+"empty" = "비어 있음";
+"no_history" = "기록이 없습니다.";
+"clear_all_history" = "모든 기록 삭제";
+"are_you_sure_delete_all_history" = "모든 기록을 삭제하시겠습니까?";
+"cancel" = "취소";
+"yes_clear_all" = "네, 삭제합니다";
+"search_conversation" = "검색…";
+"upgrade_to_pro" = "PRO로 업그레이드!";
+"upgrade_to_pro_description" = "제한 없이 모든 혜택을 누리세요";
+"language" = "언어";
+"general" = "일반";
+"dark_theme" = "다크 모드";
+"help_center" = "도움말 센터";
+"about" = "정보";
+"privacy_policy" = "개인정보 보호 정책";
+"about_us" = "VirtuAI 정보";
+"logout" = "로그아웃";
+"are_you_sure_logout" = "정말 로그아웃 하시겠습니까?";
+"yes_logout" = "네, 로그아웃합니다";
+"settings" = "설정";
+"restore_purchase" = "구매 복원";
+"purchase" = "구매";
+"pro" = "PRO";
+"powered_by_chat_gpt" = "ChatGPT 4 제공";
+"remove_ads" = "광고 제거";
+"unlimited_messages" = "무제한 메시지";
+"cancel_anytime" = "언제든 취소 가능";
+"restore" = "복원";
+"weekly" = "주간";
+"monthly" = "월간";
+"yearly" = "연간";
+"per_week" = "주당";
+"per_month" = "월당";
+"per_year" = "연당";
+"save85" = "85% 절약";
+"secured_by_app_store" = "App Store에서 보안 제공. 언제든 취소 가능";
+"watch_ad" = "짧은 광고 보기";
+"you_reach_free_message_limit" = "무료 메시지 한도에 도달했습니다. PRO 버전으로 업그레이드하거나 짧은 광고를 시청하여 1개의 무료 메시지를 추가로 받을 수 있습니다.";
+"welcome_to_pro_version" = "Pro 버전에 오신 것을 환영합니다!";
+"pro_version_not_purchased" = "Pro 버전 미구매";
+"network_error" = "네트워크 오류";
+"no_conection_try_again" = "인터넷에 연결한 후 다시 시도해주세요.";
+"update" = "업데이트";
+"there_is_new_version" = "이 앱의 새로운 버전이 있습니다, 업데이트 해주세요";
+
+"login_with_apple" = "Apple로 로그인";
+"login_with_google" = "Google로 로그인";
+"cannot_login" = "로그인 중 오류가 발생했습니다";
+
+"explain" = "Woorinara 챗봇";
+"explain_example_1" = "Extend Visa";
+"explain_example_2" = "Change Visa";
+"explain_example_3" = "Change of Residence";
+"explain_example_4" = "Fill Application";
+"explain_example_5" = "Office Location";
+
+"create" = "창작";
+"create_example_1" = "AI 관련 YouTube 콘텐츠 아이디어 제공";
+"create_example_2" = "거리 주제를 다룬 랩 가사 작성";
+
+"translate" = "번역";
+"translate_example_1" = "'hello'를 스페인어로 어떻게 말하나요?";
+"translate_example_2" = "'discover'는 일본어로 무엇을 의미하나요?";
+
+"email" = "이메일 작성";
+"email_example_1" = "고객에게 보내는 감사 이메일 작성";
+"email_example_2" = "협업 제안에 대한 긍정적인 답장 작성";
+
+"recommend" = "추천";
+"recommend_example_1" = "SF 시리즈 추천";
+"recommend_example_2" = "동기 부여를 높일 수 있는 음악 트랙 추천";
+
+"history_main" = "역사";
+"history_example_1" = "최초의 인류가 어떻게, 어디서 살았는가?";
+"history_example_2" = "실크로드의 역사와 영향은 무엇인가?";
+
+"recipe" = "레시피 추천";
+"recipe_example_1" = "250칼로리 이하의 식사 추천";
+"recipe_example_2" = "피자 만드는 법?";
+
+"math" = "수학 문제 해결";
+"math_example_1" = "수학적으로 무작위란 무엇인가?";
+"math_example_2" = "이 수학 문제를 풀어주세요: 12^(3) ÷ 12^(1)";
+
+"social" = "소셜";
+"social_example_1" = "에펠탑에서 찍은 인스타그램 사진 캡션 제공";
+"social_example_2" = "동물에 관한 재미있는 트윗 작성";
+"social_example_3" = "AI 테마의 틱톡 비디오 캡션 작성";
+
+"web_page" = "웹";
+"web_url_content" = "이 텍스트는 웹 URL 콘텐츠입니다. 이 텍스트를 요약하고 웹사이트의 전체 내용을 읽은 것처럼 응답하세요, 콘텐츠 = %@";
+"flagged_message_content" = "귀하의 메시지가 부적절한 내용으로 표시되었습니다. 다시 시도해주세요.";
+"rate_us" = "평가하기";
+"generate_image" = "이미지 생성";
+"image" = "이미지";
+"tts" = "텍스트 음성 변환";
+"audio" = "오디오";
+"error_occurred" = "오류 발생";
+"enter_description" = "상세 설명 편집";
+"generated_image" = "생성된 이미지";
+"download" = "다운로드";
+"downloaded" = "다운로드됨";
+"done" = "완료";
+"please_enter_prompt" = "프롬프트를 입력하세요";
+"discard_generate" = "생성 취소";
+"discard_generate_desc" = "생성된 이미지를 삭제하고 나가시겠습니까?";
+"discard" = "삭제";
+"none" = "없음";
+"realistic" = "사실적";
+"cartoon" = "만화";
+"pencil_sketch" = "연필 스케치";
+"oil_painting" = "유화";
+"water_color" = "수채화";
+"pop_art" = "팝 아트";
+"surrealist" = "초현실주의";
+"pixel_art" = "픽셀 아트";
+"nouveau" = "누보";
+"abstract_art" = "추상";
+"no_style" = "스타일 없음";
+"prompt_1" = "현대 도시 스카이라인이 별이 빛나는 밤하늘과 어우러진 장면";
+"prompt_2" = "세련되고 첨단 기술이 도입된 기차역에서 다양한 승객들이 바쁘게 움직이는 장면";
+"prompt_3" = "고대 유적이 가라앉은 해저, 해양 생물과 다채로운 산호들로 가득한 장면";
+"prompt_4" = "미래적인 주방에서 요리를 준비하는 로봇 셰프와 다양한 첨단 조리 도구들";
+"prompt_5" = "황혼에 빛나는 신비로운 숲, 빛나는 식물들과 마법 생물들이 있고 숲의 깊은 곳으로 이어지는 구불구불한 길";
+"prompt_6" = "고전적인 자동차들이 그림 같은 거리에서 줄지어 있는 빈티지 자동차 랠리";
+"prompt_7" = "복잡한 기어와 증기 엔진이 특징인 증기선이 구름 속을 날아다니는 장면";
+"prompt_8" = "아르데코 스타일의 라운지, 기하학적 패턴과 고급스러운 가구, 세련된 분위기가 돋보이는 장면";
+"prompt_9" = "사이버펑크 스타일의 번화한 야간 거리 시장, 네온 불빛이 반짝이며 미래적인 상인들과 쇼핑객들로 가득한 장면";
+"prompt_10" = "노을이 지는 고요한 사막 오아시스, 고요한 연못과 야자수, 모래 위에 비치는 따뜻한 석양";
+
+"convert_to_speech" = "음성으로 변환";
+"alloy" = "Alloy";
+"fable" = "Fable";
+"echo" = "Echo";
+"onyx" = "Onyx";
+"nova" = "Nova";
+"shimmer" = "Shimmer";
+"created_speech" = "생성된 음성";
+"enter_prompt" = "입력 내용을 입력하세요";
+"invalid_url" = "잘못된 URL";
+
+"unlock_url" = "URL 요약 잠금 해제";
+"unlock_scan" = "카메라 및 갤러리에서 텍스트 스캔 잠금 해제";
+"regenerate" = "다시 생성";
+"feedback" = "피드백";
+"widgets" = "위젯";
+"add_to_home_screen" = "홈 화면에 추가";
+"choose_media_source" = "미디어 소스 선택";
+"camera" = "텍스트 스캔";
+"link" = "웹 URL 요약";
+"upgrade_info_description" = "VirtuAI의 AI는 막대한 계산 능력을 필요로 하므로 VirtuAI는 크레딧 시스템을 기반으로 운영됩니다. VirtuAI에 보낸 각 요청은 잔액에서 하나의 크레딧을 차감합니다. 무제한 크레딧을 제공하는 Pro 플랜으로 업그레이드할 수 있습니다.";
+"enter_or_paste_link" = "URL 입력 또는 붙여넣기";
+"https" = "https://";
+"add" = "추가";
+"gallery" = "갤러리";
+"camera_scan" = "카메라 스캔";
+"text_to_speech" = "텍스트 음성 변환";
+"text_to_speech_description" = "텍스트 음성 변환 기능을 활성화하면 GPT의 응답 속도가 느려질 수 있습니다. 속도를 개선하려면 이 기능을 비활성화하는 것을 고려하세요";
+"scan_description" = "이 이미지는 무엇에 관한 것인가요?";
+"summarize_this_webpage" = "이 웹 페이지 요약";
+"add_url" = "URL 추가";
+"close" = "닫기";
+"model" = "모델";
+"gpt_35" = "ChatGPT 3.5";
+"choose_model" = "모델 선택";
+"gpt_4" = "GPT 4";
+"please_check_permisson" = "사진 라이브러리 권한을 확인하세요";
+"copied_successfully" = "성공적으로 복사됨";
+"login_with_apple" = "Apple로 로그인";
+"terms_and_policy" = "사용 약관";
