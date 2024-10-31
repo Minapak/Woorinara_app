@@ -19,6 +19,7 @@ struct PDFOverlayView: View {
                             .scaledToFit()
                             .frame(width: scaledWidth, height: scaledHeight)
                             .offset(y: -15 * scaleFactor)
+                        
                         Image("af_ex")
                             .resizable()
                             .scaledToFit()

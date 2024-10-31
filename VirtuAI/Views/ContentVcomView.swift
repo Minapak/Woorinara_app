@@ -1,10 +1,3 @@
-//
-//  ContentVcomView.swift
-//  Demo-iOS
-//
-//  Created by 박은민 on 10/18/24.
-//
-
 import SwiftUI
 import VComponents
 import VCore
@@ -21,62 +14,27 @@ struct ContentVcomView: View {
                     
                     VStack(alignment: .leading, spacing: 0) {
                         List {
-                            NavigationLink("내 정보", destination: ContentTFView())
-                            NavigationLink("PDF 문서", destination: PDFViewer())
-                            NavigationLink("PNG 사진", destination: ImageViewer())
-                            NavigationLink("여권 정보 발췌", destination: ContentPView())
-                            NavigationLink("정보 텍스트 뷰 전달", destination: ContentPView1())
-                            NavigationLink("챗봇", destination: ContentMView())
+                            NavigationLink("여권 / 외국인 등록증 프로세스", destination: ScanView())
+                            NavigationLink("통합 신청서 좌표 뷰", destination: PDFOverlayView())
+                            NavigationLink("사인 이미지 저장 및 업로드", destination: ContentSignView())
+                            
+                            // 여권 정보 데이터를 예시로 전달하여 NavigationLink 생성
+                            NavigationLink("정보 텍스트 뷰 전달", destination: {
+                                let sampleResult = OCRPassResult(status: 200, message: "Success", data: OCRPassData(dateOfExpiry: "20300101", inferResult: "Detected", surName: "Kim", nationality: "Korea", gender: "M", documentNumber: "12345678", givenName: "Eunmin", issueCountry: "Korea", middleName: nil, dateOfBirth: "19900101", message: nil, userId: nil))
+                                ScanPassView(result: sampleResult)
+                            })
+
                             NavigationLink("셋팅", destination: SettingsView())
                         }
                         .navigationTitle("My Page")
                     }
-//                    Spacer()
-//                    Image("af")
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 200, height: 300)
-//                        .background(Color.gray.opacity(0.3))
-//                        .cornerRadius(8)
-//                        .padding()
                     Spacer()
-
-                    HStack {
-//                        // Translation 버튼
-//                        Button("Translation") {
-//                            showTranslationView = true
-//                        }
-//                        .frame(width: 150, height: 50) // 버튼 크기 지정
-//                        .font(.system(size: 16, weight: .bold))
-//                        .background(Color.blue)
-//                        .foregroundColor(.white)
-//                        .cornerRadius(16)
-//
-//                        // Auto-Fill 버튼
-//                        Button("Auto-Fill") {
-//                            showAutoFillView = true
-//                        }
-//                        .frame(width: 150, height: 50) // 버튼 크기 지정
-//                        .font(.system(size: 16, weight: .bold))
-//                        .background(Color.blue)
-//                        .foregroundColor(.white)
-//                        .cornerRadius(16)
-                    }
                 }.padding(.bottom, 5)
                 .padding(16)
             }
-            // NavigationLink를 사용하여 뷰 전환
-//            .background(
-//                NavigationLink(destination: PDFClickViewer(), isActive: $showTranslationView) { EmptyView() }
-//            )
-//            .background(
-//                NavigationLink(destination: PDFViewer(), isActive: $showAutoFillView) { EmptyView() }
-//            )
         }
     }
 }
-
-
 
 // MARK: Modals Examples
 struct ModalsView: View {
@@ -108,13 +66,8 @@ struct IndicatorsView: View {
     }
 }
 
-// MARK: Notifications Examples
-
-
-
 struct ContentVcomView_Previews: PreviewProvider {
     static var previews: some View {
         ContentVcomView()
     }
 }
-

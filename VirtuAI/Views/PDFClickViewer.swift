@@ -89,13 +89,14 @@ struct ModalView1: View {
                             // Toggle selection state
                             selectedItems[index, default: false].toggle()
                         }) {
-                            HStack {
+                            HStack(spacing: 10) {
                                 Image(systemName: selectedItems[index, default: false] ? "checkmark.circle.fill" : "checkmark.circle")
                                     .foregroundColor(selectedItems[index, default: false] ? .blue : .gray)
                                 Text(items[index])
                                     .foregroundColor(.black)
                             }
                             .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(PlainButtonStyle()) // To remove button styling
                     }
@@ -119,6 +120,7 @@ struct ModalView1: View {
         .background(Color.white)
     }
 }
+
 
 // PDF view representation
 struct PDFModalViewRepresentable: UIViewRepresentable {

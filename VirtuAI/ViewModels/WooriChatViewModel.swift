@@ -3,7 +3,13 @@ import Combine
 import SwiftUI
 import SQLite
 import AVFoundation
+import SwiftKeychainWrapper
 
+struct UserInfo: Codable, Equatable {
+    var latitude: String
+    var longitude: String
+    var memberId: String?
+}
 class WooriChatViewModel: ObservableObject {
     // Using WooriChatAPI for chat functionalities
     let api = WooriChatAPI()
@@ -49,29 +55,30 @@ class WooriChatViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self)
     }
 
-    func fetchMessages() {
-        api.fetchWMessages { result in
-            switch result {
-            case .success(let fetchedMessages):
-                DispatchQueue.main.async {
-                    self.messages = fetchedMessages.map { WooriMessageData -> MessageModel in
-                        MessageModel(content: WooriMessageData.content, type: .text, isUserMessage: WooriMessageData.sender != "BOT", conversationId: self.conversationId)
-                    }
-                }
-            case .failure(let error):
-                print("Error fetching messages: \(error.localizedDescription)")
-            }
-        }
-    }
+//    func fetchMessages() {
+//        api.fetchWMessages { result in
+//            switch result {
+//            case .success(let fetchedMessages):
+//                DispatchQueue.main.async {
+//                    self.messages = fetchedMessages.map { WooriMessageData -> MessageModel in
+//                        MessageModel(content: WooriMessageData.content, type: .text, isUserMessage: WooriMessageData.sender != "BOT", conversationId: self.conversationId)
+//                    }
+//                }
+//            case .failure(let error):
+//                print("Error fetching messages: \(error.localizedDescription)")
+//            }
+//        }
+//    }
 
     func sendMessage(_ messageContent: String) {
-        let newMessage = WooriMessageData(content: messageContent, sender: "User", createdAt: Date().description, quickReplyButtons: nil)
-        api.addWooriMessage(newMessage)
+        var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
+        let userInfo = UserInfo(latitude: "37.5655981161314", longitude: "126.9749287001093", memberId: username)  // 올바른 UserInfo 객체 생성
+        let newMessage = WooriMessageData(content: messageContent, sender: username, createdAt: Date().description, quickReplyButtons: nil)
+        
+        // api.addWooriMessage(newMessage) 호출 부분이 주석 처리되어 있으므로 API 전송은 생략됨
         self.messages.append(MessageModel(content: messageContent, type: .text, isUserMessage: true, conversationId: self.conversationId))
     }
-    func saveMessageToHistory(message : MessageModel){
-        sql.addMessage(item: message)
-    }
+
     
     // Functions for handling free message count and other interactions using MembersViewModel
     func getFreeMessageCount() {

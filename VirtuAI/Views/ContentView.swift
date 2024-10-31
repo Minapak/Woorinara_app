@@ -23,7 +23,7 @@ struct ContentView: View {
             {
                 TabView(selection: $selectedIndex)
                 {
-                    StartChatView(typingMessageCurrent: ContentView.$typingMessageCurrent).tag(0)
+                    StartChatView(typingMessage: ContentView.$typingMessageCurrent).tag(0)
                     ImageViewer().tag(1)
                     ContentWebView().tag(2)
                     ContentVcomView().tag(3)

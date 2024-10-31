@@ -16,16 +16,16 @@ struct PDFViewer: View {
     
     let checkBoxSize = CGSize(width: 49, height: 56)
     let checkBoxTexts = [
-        "1. 외국인 등록 FOREIGN RESIDENT REGISTRATION",
-        "2. 등록증 재발급 REISSUANCE OF REGISTRATION CARD",
-        "3. 체류기간 연장허가 EXTENSION OF SOJOURN PERIOD",
-        "4. 체류자격 변경허가 CHANGE OF STATUS OF SOJOURN",
-        "5. 체류자격 부여 GRANTING STATUS OF SOJOURN",
-        "6. 체류자격외 활동허가 ENGAGE IN ACTIVITIES NOT COVERED BY THE STATUS OF SOJOURN",
-        "7. 근무처변경 • 추가허가 CHANGE OR ADDITION OF WORKPLACE",
-        "8. 재입국허가 REENTRY PERMIT",
-        "9. 체류지 변경신고 ALTERATION OF RESIDENCE",
-        "10. 등록사항 변경신고 CHANGE OF INFORMATION ON FOREIGN RESIDENT REGISTRATION"
+        "FOREIGN RESIDENT REGISTRATION",
+        "ENGAGE IN ACTIVITIES NOT COVERED BY THE STATUS OF SOJOURN",
+        "REISSUANCE OF REGISTRATION CARD",
+        "CHANGE OR ADDITION OF WORKPLACE",
+        "EXTENSION OF SOJOURN PERIOD",
+        "REENTRY PERMIT (SINGLE, MULTIPLE)",
+        "CHANGE OF STATUS OF SOJOURN",
+        "ALTERATION OF RESIDENCE",
+        "GRANTING STATUS OF SOJOURN",
+        "CHANGE OF INFORMATION ON REGISTRATION"
     ]
     
     @State private var selectedLanguage: String? = nil

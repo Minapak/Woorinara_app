@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NMFClientId</key>
+	<string>hs8ew2g3al</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to your photo library to save your signature.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required to scan the ID.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

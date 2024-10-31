@@ -10,4 +10,5 @@ import SwiftUI
 
 class AppState: ObservableObject {
     @Published var hideBottomNav: Bool = false
+
 }

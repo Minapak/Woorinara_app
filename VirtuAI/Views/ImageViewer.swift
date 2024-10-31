@@ -74,19 +74,19 @@ struct ImageViewer: View {
     }
 }
 
-// 예시 뷰 (Translation 기능을 위한 뷰)
-struct TranslationView: View {
-    var body: some View {
-        Text("Translation View")
-    }
-}
-
-// 예시 뷰 (Auto-Fill 기능을 위한 뷰)
-struct AutoFillView: View {
-    var body: some View {
-        Text("Auto-Fill View")
-    }
-}
+//// 예시 뷰 (Translation 기능을 위한 뷰)
+//struct TranslationView: View {
+//    var body: some View {
+//        Text("Translation View")
+//    }
+//}
+//
+//// 예시 뷰 (Auto-Fill 기능을 위한 뷰)
+//struct AutoFillView: View {
+//    var body: some View {
+//        Text("Auto-Fill View")
+//    }
+//}
 
 struct ContentImageView: View {
     var body: some View {

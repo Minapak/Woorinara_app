@@ -112,17 +112,26 @@
 		27F311842A37410500BB399B /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 27F311832A37410500BB399B /* PopupView */; };
 		27F311872A375F7A00BB399B /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 27F311862A375F7A00BB399B /* AppsFlyerLib */; };
 		27F311892A37902900BB399B /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F311882A37902900BB399B /* SplashView.swift */; };
-		540B9AFB2CCA620200760AC1 /* WooriChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540B9AFA2CCA620200760AC1 /* WooriChatView.swift */; };
 		540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFD2CCB134A00760AC1 /* SwiftyChat */; };
 		540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */; };
+		541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */; };
+		541F49B42CD1E632004D4D20 /* ScanPassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B02CD1E632004D4D20 /* ScanPassView.swift */; };
+		541F49B52CD1E632004D4D20 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49AF2CD1E632004D4D20 /* ScanView.swift */; };
+		541F49B62CD1E632004D4D20 /* ScanARCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B12CD1E632004D4D20 /* ScanARCView.swift */; };
+		541F49B72CD1E632004D4D20 /* ScanPrePassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B22CD1E632004D4D20 /* ScanPrePassView.swift */; };
+		541F49B82CD1E632004D4D20 /* ScanPreARCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B32CD1E632004D4D20 /* ScanPreARCView.swift */; };
 		542117282CC666A800D32E21 /* VComponents in Frameworks */ = {isa = PBXBuildFile; productRef = 542117272CC666A800D32E21 /* VComponents */; };
-		5421172B2CC6674000D32E21 /* RSFUIPassportScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 5421172A2CC6674000D32E21 /* RSFUIPassportScanner */; };
+		5426B3A62CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 5421172A2CC6674000D32E21 /* RSFUIPassportScanner */; };
+		5426B3A72CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CB82CC668AD00A64B86 /* RSFUIPassportScanner */; };
+		5426B3A82CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 541F49BA2CD1EF87004D4D20 /* RSFUIPassportScanner */; };
+		5426B3AA2CD2048F00BDD084 /* SkipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5426B3A92CD2048F00BDD084 /* SkipView.swift */; };
+		5426B3B22CD2AB2E00BDD084 /* AppChatState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5426B3B12CD2AB2D00BDD084 /* AppChatState.swift */; };
+		5426B3B62CD2FD5300BDD084 /* AFCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */; };
 		546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DEAD82CCB893B00823A00 /* TranslateView.swift */; };
 		54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */; };
 		54A43CB42CC6686700A64B86 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB32CC6686700A64B86 /* Helper.swift */; };
 		54A43CB52CC6686700A64B86 /* AppConst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB22CC6686700A64B86 /* AppConst.swift */; };
 		54A43CB62CC6686700A64B86 /* UIHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB12CC6686700A64B86 /* UIHelper.swift */; };
-		54A43CB92CC668AD00A64B86 /* RSFUIPassportScanner in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CB82CC668AD00A64B86 /* RSFUIPassportScanner */; };
 		54A43CC02CC668F600A64B86 /* AppButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CBA2CC668F600A64B86 /* AppButton.swift */; };
 		54A43CC12CC668F600A64B86 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CBC2CC668F600A64B86 /* SignUpView.swift */; };
 		54A43CC22CC668F600A64B86 /* Login2View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CBD2CC668F600A64B86 /* Login2View.swift */; };
@@ -138,9 +147,7 @@
 		54A43CD72CC6787700A64B86 /* SwiftUIDigitalSignature in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD62CC6787700A64B86 /* SwiftUIDigitalSignature */; };
 		54A43CDA2CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD92CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI */; };
 		54E0BE2B2CC7ABE800D41163 /* WooriChatAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE2A2CC7ABE800D41163 /* WooriChatAPI.swift */; };
-		54E0BE2D2CC84FC600D41163 /* ContentPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE2C2CC84FC600D41163 /* ContentPView.swift */; };
 		54E0BE2F2CC8789900D41163 /* ContentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE2E2CC8789900D41163 /* ContentResultView.swift */; };
-		54E0BE312CC878EA00D41163 /* ContentPView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE302CC878EA00D41163 /* ContentPView1.swift */; };
 		54E0BE332CC892FE00D41163 /* PDFClickViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE322CC892FE00D41163 /* PDFClickViewer.swift */; };
 		54E0BE352CC8C48A00D41163 /* WooriChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE342CC8C48900D41163 /* WooriChatViewModel.swift */; };
 		54E0BE372CC8CE9C00D41163 /* MembersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE362CC8CE9C00D41163 /* MembersViewModel.swift */; };
@@ -305,7 +312,15 @@
 		27F311802A37096600BB399B /* GenericDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDialogs.swift; sourceTree = "<group>"; };
 		27F311882A37902900BB399B /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		27F3118A2A37B23C00BB399B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		540B9AFA2CCA620200760AC1 /* WooriChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooriChatView.swift; sourceTree = "<group>"; };
+		541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOverlayView.swift; sourceTree = "<group>"; };
+		541F49AF2CD1E632004D4D20 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
+		541F49B02CD1E632004D4D20 /* ScanPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPassView.swift; sourceTree = "<group>"; };
+		541F49B12CD1E632004D4D20 /* ScanARCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanARCView.swift; sourceTree = "<group>"; };
+		541F49B22CD1E632004D4D20 /* ScanPrePassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPrePassView.swift; sourceTree = "<group>"; };
+		541F49B32CD1E632004D4D20 /* ScanPreARCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPreARCView.swift; sourceTree = "<group>"; };
+		5426B3A92CD2048F00BDD084 /* SkipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkipView.swift; sourceTree = "<group>"; };
+		5426B3B12CD2AB2D00BDD084 /* AppChatState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChatState.swift; sourceTree = "<group>"; };
+		5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFCenterView.swift; sourceTree = "<group>"; };
 		546DEAD82CCB893B00823A00 /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
 		54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		54A43CB12CC6686700A64B86 /* UIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIHelper.swift; sourceTree = "<group>"; };
@@ -323,9 +338,7 @@
 		54A43CC92CC6695900A64B86 /* ContentTFView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentTFView.swift; sourceTree = "<group>"; };
 		54A43CCA2CC6695900A64B86 /* ContentMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMapView.swift; sourceTree = "<group>"; };
 		54E0BE2A2CC7ABE800D41163 /* WooriChatAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooriChatAPI.swift; sourceTree = "<group>"; };
-		54E0BE2C2CC84FC600D41163 /* ContentPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPView.swift; sourceTree = "<group>"; };
 		54E0BE2E2CC8789900D41163 /* ContentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentResultView.swift; sourceTree = "<group>"; };
-		54E0BE302CC878EA00D41163 /* ContentPView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPView1.swift; sourceTree = "<group>"; };
 		54E0BE322CC892FE00D41163 /* PDFClickViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFClickViewer.swift; sourceTree = "<group>"; };
 		54E0BE342CC8C48900D41163 /* WooriChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooriChatViewModel.swift; sourceTree = "<group>"; };
 		54E0BE362CC8CE9C00D41163 /* MembersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersViewModel.swift; sourceTree = "<group>"; };
@@ -348,19 +361,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5426B3A82CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */,
+				5426B3A72CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */,
+				5426B3A62CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */,
 				276E06BC2B175AD900E75DF5 /* GoogleSignInSwift in Frameworks */,
 				27F311842A37410500BB399B /* PopupView in Frameworks */,
 				27F3115D2A33510A00BB399B /* Lottie in Frameworks */,
 				27B0E02F2A312F15002CDA33 /* SQLite in Frameworks */,
 				277A65812B227FAE0057D146 /* CropViewController in Frameworks */,
 				27F311762A362AB200BB399B /* RevenueCat in Frameworks */,
-				54A43CB92CC668AD00A64B86 /* RSFUIPassportScanner in Frameworks */,
 				276E06AF2B16836C00E75DF5 /* FirebaseFirestore in Frameworks */,
 				542117282CC666A800D32E21 /* VComponents in Frameworks */,
 				276E069D2B166FDF00E75DF5 /* GPTEncoder in Frameworks */,
 				277A65832B227FAE0057D146 /* TOCropViewController in Frameworks */,
 				54A43CDA2CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI in Frameworks */,
-				5421172B2CC6674000D32E21 /* RSFUIPassportScanner in Frameworks */,
 				27B0E0202A30FF6C002CDA33 /* GoogleMobileAds in Frameworks */,
 				276E06AD2B16836C00E75DF5 /* FirebaseAuth in Frameworks */,
 				27F296832A2F429F002470C5 /* MarkdownUI in Frameworks */,
@@ -502,6 +516,14 @@
 		27F2960F2A2B9BD9002470C5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */,
+				5426B3A92CD2048F00BDD084 /* SkipView.swift */,
+				541F49AF2CD1E632004D4D20 /* ScanView.swift */,
+				541F49B02CD1E632004D4D20 /* ScanPassView.swift */,
+				541F49B12CD1E632004D4D20 /* ScanARCView.swift */,
+				541F49B22CD1E632004D4D20 /* ScanPrePassView.swift */,
+				541F49B32CD1E632004D4D20 /* ScanPreARCView.swift */,
+				541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */,
 				54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */,
 				54A43CC72CC6695900A64B86 /* ContentSignView.swift */,
 				54A43CC82CC6695900A64B86 /* ContentVcomView.swift */,
@@ -524,11 +546,8 @@
 				27F311882A37902900BB399B /* SplashView.swift */,
 				276E06B42B174E8F00E75DF5 /* LoginView.swift */,
 				27C423A22B21F07D0065C328 /* VoiceView.swift */,
-				54E0BE2C2CC84FC600D41163 /* ContentPView.swift */,
 				54E0BE2E2CC8789900D41163 /* ContentResultView.swift */,
-				54E0BE302CC878EA00D41163 /* ContentPView1.swift */,
 				54E0BE322CC892FE00D41163 /* PDFClickViewer.swift */,
-				540B9AFA2CCA620200760AC1 /* WooriChatView.swift */,
 				546DEAD82CCB893B00823A00 /* TranslateView.swift */,
 			);
 			path = Views;
@@ -559,6 +578,7 @@
 				277A657B2B22389E0057D146 /* ScanDocumentView.swift */,
 				277A657D2B225C710057D146 /* ImagePicker.swift */,
 				277D36282B38D93B00BD9E16 /* BannerAd.swift */,
+				5426B3B12CD2AB2D00BDD084 /* AppChatState.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -707,6 +727,7 @@
 				540B9AFD2CCB134A00760AC1 /* SwiftyChat */,
 				540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */,
 				54F1CD382CCB513B0018B30E /* WebView */,
+				541F49BA2CD1EF87004D4D20 /* RSFUIPassportScanner */,
 			);
 			productName = ConversAI;
 			productReference = 27F295E12A2B9966002470C5 /* VirtuAI.app */;
@@ -806,7 +827,6 @@
 				277A657F2B227FAE0057D146 /* XCRemoteSwiftPackageReference "TOCropViewController" */,
 				277A65842B2289170057D146 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				542117262CC666A800D32E21 /* XCRemoteSwiftPackageReference "VComponents" */,
-				54A43CB72CC668AD00A64B86 /* XCLocalSwiftPackageReference "../zypher/RSFUIPassportScanner-main" */,
 				54A43CCF2CC6768B00A64B86 /* XCRemoteSwiftPackageReference "SwiftKeychainWrapper" */,
 				54A43CD22CC677AF00A64B86 /* XCRemoteSwiftPackageReference "AlertToast" */,
 				54A43CD52CC6787700A64B86 /* XCRemoteSwiftPackageReference "swiftui-digital-signature" */,
@@ -814,6 +834,7 @@
 				54E7FCAF2CC69CD600D1D098 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				540B9AFC2CCB134A00760AC1 /* XCRemoteSwiftPackageReference "SwiftyChat" */,
 				54F1CD372CCB513B0018B30E /* XCRemoteSwiftPackageReference "WebView" */,
+				541F49B92CD1EF87004D4D20 /* XCLocalSwiftPackageReference "../zypher/RSFUIPassportScanner-main" */,
 			);
 			productRefGroup = 27F295E22A2B9966002470C5 /* Products */;
 			projectDirPath = "";
@@ -901,6 +922,7 @@
 				27F311892A37902900BB399B /* SplashView.swift in Sources */,
 				27F3116D2A3396D600BB399B /* LanguagesView.swift in Sources */,
 				27F3117F2A36438200BB399B /* UpgradeViewModel.swift in Sources */,
+				5426B3B22CD2AB2E00BDD084 /* AppChatState.swift in Sources */,
 				277A657E2B225C710057D146 /* ImagePicker.swift in Sources */,
 				27BC92C92A3134010031070B /* SQliteDatabase.swift in Sources */,
 				277A657A2B2237FB0057D146 /* InterstitialAd.swift in Sources */,
@@ -909,9 +931,9 @@
 				27F311702A339E0400BB399B /* LanguagesViewModel.swift in Sources */,
 				274DBA662A2FE5B100F9C712 /* ChipItem.swift in Sources */,
 				277D36292B38D93B00BD9E16 /* BannerAd.swift in Sources */,
+				5426B3AA2CD2048F00BDD084 /* SkipView.swift in Sources */,
 				27F296872A2F6D2F002470C5 /* AIAssistantsModel.swift in Sources */,
 				277A657C2B22389E0057D146 /* ScanDocumentView.swift in Sources */,
-				54E0BE312CC878EA00D41163 /* ContentPView1.swift in Sources */,
 				27F295E72A2B9966002470C5 /* ContentView.swift in Sources */,
 				276E06A82B1681E800E75DF5 /* FirebaseViewModel.swift in Sources */,
 				27F296662A2CE3BD002470C5 /* LanguageManager.swift in Sources */,
@@ -920,7 +942,6 @@
 				276E06A62B1672F800E75DF5 /* Models.swift in Sources */,
 				54E0BE2F2CC8789900D41163 /* ContentResultView.swift in Sources */,
 				27F2964F2A2BE2AA002470C5 /* ShimmerEffect.swift in Sources */,
-				54E0BE2D2CC84FC600D41163 /* ContentPView.swift in Sources */,
 				27BC92C72A3130430031070B /* ConverstionsModel.swift in Sources */,
 				27C423A32B21F07D0065C328 /* VoiceView.swift in Sources */,
 				27F3116B2A338EF100BB399B /* SettingsViewModel.swift in Sources */,
@@ -947,8 +968,14 @@
 				54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */,
 				27B0E0222A30FFEE002CDA33 /* RewardedAd.swift in Sources */,
 				27F3117D2A362D6B00BB399B /* UpgradeView.swift in Sources */,
+				541F49B42CD1E632004D4D20 /* ScanPassView.swift in Sources */,
+				541F49B52CD1E632004D4D20 /* ScanView.swift in Sources */,
+				541F49B62CD1E632004D4D20 /* ScanARCView.swift in Sources */,
+				541F49B72CD1E632004D4D20 /* ScanPrePassView.swift in Sources */,
+				541F49B82CD1E632004D4D20 /* ScanPreARCView.swift in Sources */,
 				274DBA642A2FE3D800F9C712 /* GenerateImageViewModel.swift in Sources */,
 				27F2967A2A2F3C77002470C5 /* ChatViewModel.swift in Sources */,
+				5426B3B62CD2FD5300BDD084 /* AFCenterView.swift in Sources */,
 				27B0E0292A312E3F002CDA33 /* HistoryViewModel.swift in Sources */,
 				54A43CB42CC6686700A64B86 /* Helper.swift in Sources */,
 				54A43CB52CC6686700A64B86 /* AppConst.swift in Sources */,
@@ -973,10 +1000,10 @@
 				27F311782A362B5200BB399B /* ViewExtensions.swift in Sources */,
 				27F296242A2BA23E002470C5 /* ColorExtension.swift in Sources */,
 				27367B5D2B1A0FE600E2AA14 /* AppState.swift in Sources */,
-				540B9AFB2CCA620200760AC1 /* WooriChatView.swift in Sources */,
 				54E0BE2B2CC7ABE800D41163 /* WooriChatAPI.swift in Sources */,
 				27F296802A2F3D41002470C5 /* MessageModel.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
+				541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */,
 				27F2965A2A2CCA16002470C5 /* GenerateImageView.swift in Sources */,
 				27F2965E2A2CCAF5002470C5 /* SettingsView.swift in Sources */,
 				276413FF2B274B39006412D4 /* ImageModel.swift in Sources */,
@@ -1064,7 +1091,7 @@
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = project.livinglab.zypher.VirtuAI.AiWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = project.livinglab.zypher.AiWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1098,7 +1125,7 @@
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = project.livinglab.zypher.VirtuAI.AiWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = project.livinglab.zypher.AiWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -1227,7 +1254,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1277,7 +1304,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1459,7 +1486,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		54A43CB72CC668AD00A64B86 /* XCLocalSwiftPackageReference "../zypher/RSFUIPassportScanner-main" */ = {
+		541F49B92CD1EF87004D4D20 /* XCLocalSwiftPackageReference "../zypher/RSFUIPassportScanner-main" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../zypher/RSFUIPassportScanner-main";
 		};
@@ -1718,6 +1745,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 540B9AFC2CCB134A00760AC1 /* XCRemoteSwiftPackageReference "SwiftyChat" */;
 			productName = SwiftyChatMock;
+		};
+		541F49BA2CD1EF87004D4D20 /* RSFUIPassportScanner */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RSFUIPassportScanner;
 		};
 		542117272CC666A800D32E21 /* VComponents */ = {
 			isa = XCSwiftPackageProductDependency;

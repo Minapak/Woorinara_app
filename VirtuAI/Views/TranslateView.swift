@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TranslateView: View {
-    @State private var showTranslationView = false
+    @State private var showPDFOverlayView = false
     var languageOptions = ["English", "Vietnamese", "Chinese", "Japanese"]
     var imageOptions = ["af_e", "af_v", "af_c", "af_j"]
     @State private var selectedLanguage: String? = nil
@@ -22,7 +22,7 @@ struct TranslateView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
                             Button("Korean") {
-                                showTranslationView = true
+                                showPDFOverlayView = true
                             }
                             .frame(width: 150, height: 50)
                             .font(.system(size: 16, weight: .bold))
@@ -71,8 +71,8 @@ struct TranslateView: View {
                     
                     // Translation button remains fixed
                     HStack {
-                        Button("Translation") {
-                            showTranslationView = true
+                        Button("Auto-Fill") {
+                            showPDFOverlayView = true
                         }
                         .frame(width: 350, height: 50)
                         .font(.system(size: 16, weight: .bold))
@@ -119,7 +119,7 @@ struct TranslateView: View {
                 }
             }
             .background(
-                NavigationLink(destination: PDFClickViewer(), isActive: $showTranslationView) { EmptyView() }
+                NavigationLink(destination: PDFOverlayView(), isActive: $showPDFOverlayView) { EmptyView() }
             )
         }
     }

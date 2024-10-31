@@ -71,14 +71,15 @@ extension UserDefaults {
     
     static var isDarkTheme: Bool {
         get {
-            myUserDefaults.register(defaults: [Constants.Preferences.DARK_MODE : true])
+            myUserDefaults.register(defaults: [Constants.Preferences.DARK_MODE : false])
 
-            let savedCount = myUserDefaults.bool(forKey: Constants.Preferences.DARK_MODE)
-            return savedCount
+            // 무조건 라이트 모드를 반환하도록 변경
+                return false
             
         }
         set {
-            myUserDefaults.set(newValue, forKey: Constants.Preferences.DARK_MODE)
+            // newValue는 무시하고 항상 false를 저장하여 라이트 모드 강제 적용
+            myUserDefaults.set(false, forKey: Constants.Preferences.DARK_MODE)
 
         }
     }
