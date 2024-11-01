@@ -129,6 +129,7 @@
 		5426B3B62CD2FD5300BDD084 /* AFCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */; };
 		5429955B2CD4A5BA007E3748 /* FindPWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429955A2CD4A5BA007E3748 /* FindPWView.swift */; };
 		542995662CD4AD7E007E3748 /* AFDoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995652CD4AD7E007E3748 /* AFDoneView.swift */; };
+		542995682CD52573007E3748 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995672CD52572007E3748 /* LocationManager.swift */; };
 		546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DEAD82CCB893B00823A00 /* TranslateView.swift */; };
 		54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */; };
 		54A43CB42CC6686700A64B86 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB32CC6686700A64B86 /* Helper.swift */; };
@@ -323,6 +324,7 @@
 		5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFCenterView.swift; sourceTree = "<group>"; };
 		5429955A2CD4A5BA007E3748 /* FindPWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindPWView.swift; sourceTree = "<group>"; };
 		542995652CD4AD7E007E3748 /* AFDoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFDoneView.swift; sourceTree = "<group>"; };
+		542995672CD52572007E3748 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		546DEAD82CCB893B00823A00 /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
 		54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		54A43CB12CC6686700A64B86 /* UIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIHelper.swift; sourceTree = "<group>"; };
@@ -524,7 +526,6 @@
 				5429955F2CD4A6D4007E3748 /* Chat */,
 				5429955E2CD4A6AB007E3748 /* Passport_ARC */,
 				5429955C2CD4A640007E3748 /* SignupLogin */,
-				54A43CC82CC6695900A64B86 /* TemporaryLinkView.swift */,
 				27F295E62A2B9966002470C5 /* ContentView.swift */,
 			);
 			path = Views;
@@ -648,6 +649,7 @@
 				54A43CBD2CC668F600A64B86 /* Login2View.swift */,
 				276E06B42B174E8F00E75DF5 /* LoginView.swift */,
 				5429955A2CD4A5BA007E3748 /* FindPWView.swift */,
+				54A43CC82CC6695900A64B86 /* TemporaryLinkView.swift */,
 			);
 			path = SignupLogin;
 			sourceTree = "<group>";
@@ -674,6 +676,7 @@
 				27C423A22B21F07D0065C328 /* VoiceView.swift */,
 				27F2966D2A2D1E7B002470C5 /* ChatView.swift */,
 				27F296112A2B9C49002470C5 /* StartChatView.swift */,
+				542995672CD52572007E3748 /* LocationManager.swift */,
 				54A43CCA2CC6695900A64B86 /* ContentMapView.swift */,
 			);
 			path = Chat;
@@ -1054,6 +1057,7 @@
 				54A43CC02CC668F600A64B86 /* AppButton.swift in Sources */,
 				54A43CC12CC668F600A64B86 /* SignUpView.swift in Sources */,
 				54A43CC22CC668F600A64B86 /* Login2View.swift in Sources */,
+				542995682CD52573007E3748 /* LocationManager.swift in Sources */,
 				54A43CC32CC668F600A64B86 /* AppInputBox.swift in Sources */,
 				54A43CC52CC668F600A64B86 /* TranslationView.swift in Sources */,
 				27F296892A2F8B7C002470C5 /* AssistantCard.swift in Sources */,
@@ -1318,7 +1322,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1368,7 +1372,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

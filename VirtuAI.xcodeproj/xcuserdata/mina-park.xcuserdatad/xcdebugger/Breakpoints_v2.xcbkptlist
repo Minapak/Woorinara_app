@@ -78,8 +78,8 @@
             filePath = "VirtuAI/Views/Chat/StartChatView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
+            startingLineNumber = "390"
+            endingLineNumber = "390"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>

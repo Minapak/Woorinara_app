@@ -9,15 +9,28 @@ import SwiftUI
 import Foundation
 import SwiftKeychainWrapper
 import SafariServices
-
+import CoreLocation
 /*
-이 코드는 iOS 앱에서 채팅 기능을 제공하는 뷰를 구현합니다. 사용자가 메시지를 입력하고 전송하면 서버로부터의 응답을 가져와 화면에 표시하고, 사용자에게 여러 Quick Reply 버튼을 통해 추가 선택지를 제공합니다.
-특히, Quick Reply 버튼 중 일부는 네이버 지도 등 외부 링크를 열거나, 특정 위치를 네이버 지도에서 탐색하도록 URL을 설정합니다.
+이 코드는 iOS 앱에서 채팅 기능을 제공하는 뷰를 구현합니다.
+ 사용자가 메시지를 입력하고 전송하면 서버로부터의 응답을 가져와 화면에 표시하고,
+ 사용자에게 여러 Quick Reply 버튼을 통해 추가 선택지를 제공합니다.
+특히, Quick Reply 버튼 중 일부는 네이버 지도 등 외부 링크를 열거나,
+ 특정 위치를 네이버 지도에서 탐색하도록 URL을 설정합니다.
 
 주요 흐름:
-1. **메시지 전송 및 서버 응답 처리**: 사용자가 메시지를 입력하고 보내면 서버로 요청을 보내며, 서버로부터 메시지 데이터를 받아 화면에 표시합니다.
-2. **Quick Reply 버튼 사용**: 서버가 응답으로 제공하는 Quick Reply 버튼을 사용하여, 사용자가 다른 화면으로 이동하거나 외부 링크(네이버 지도 등)로 이동할 수 있습니다.
-3. **UI 요소 구성**: 메시지 입력 필드, 전송 버튼, Quick Reply 버튼을 포함한 메시지 UI를 구성하며, 메시지 전송 오류나 기타 알림을 위한 알림 창을 띄웁니다.
+1. **메시지 전송 및 서버 응답 처리**:
+ 사용자가 메시지를 입력하고 보내면 서버로 요청을 보내며,
+ 서버로부터 메시지 데이터를 받아 화면에 표시합니다.
+ 
+2. **Quick Reply 버튼 사용**:
+ 서버가 응답으로 제공하는 Quick Reply 버튼을 사용하여,
+ 사용자가 다른 화면으로 이동하거나 외부 링크(네이버 지도 등)로
+ 이동할 수 있습니다.
+ 
+3. **UI 요소 구성**:
+ 메시지 입력 필드, 전송 버튼,
+ Quick Reply 버튼을 포함한 메시지 UI를 구성하며,
+ 메시지 전송 오류나 기타 알림을 위한 알림 창을 띄웁니다.
 
 */
 
@@ -248,22 +261,27 @@ class WooriChatAPI: ObservableObject {
     }
 }
 
+
+
 // 사용자 인터페이스
 struct StartChatView: View {
+    @StateObject private var locationManager = LocationManager()
+    @State private var isFetchingLocation = false // 위치 정보 가져오는 중 여부
     @State private var navigateToTranslateView = false
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var appChatState: AppChatState
     @StateObject private var WviewModel = WooriChatAPI()
     @AppStorage("language") private var language = LanguageManager.shared.selectedLanguage
     @State private var typingMessageCurrent: String = ""
-    @State private var userLatitude: String = "37.5655981161314"
-    @State private var userLongitude: String = "126.9749287001093"
+    //요청값 위도/경도 고정값이 아니라
+    @State var userLatitude: String = "37.5655981161314"
+    @State var userLongitude: String = "126.9749287001093"
     @FocusState private var fieldIsFocused: Bool
     @Binding var typingMessage: String
     @State private var isShowingAlert = false
     @State private var alertMessage = ""
     @State private var safariViewURL: URL?
-
+    @State private var isMessagesFetched = false // 메시지 로드 여부 확인 변수
     var body: some View {
         ZStack {
             Color.background.edgesIgnoringSafeArea(.all)
@@ -290,6 +308,7 @@ struct StartChatView: View {
                         }
                     }
                     .onAppear {
+                        if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
                         WviewModel.fetchWMessages { result in
                             switch result {
                             case .success(let messages):
@@ -299,6 +318,8 @@ struct StartChatView: View {
                                 isShowingAlert = true
                             }
                         }
+                            isMessagesFetched = true // 한 번 호출 후에는 true로 설정하여 다시 호출되지 않게 함
+                                     }
                     }
                     .onChange(of: WviewModel.messages) { _ in
                         if let lastMessage = WviewModel.messages.last {
@@ -371,41 +392,64 @@ struct StartChatView: View {
     
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?) {
         switch buttonLabel {
-        case "Change Visa":
-            sendMessage("Change Visa")
-            
-        case "Extend Visa":
-            sendMessage("Extend Visa")
-            
-        case "Change of Residence":
-            sendMessage("Change of Residence")
-            
-        case "Application Form":
-            // Show alert before navigating
-            sendMessage("Application Form")
-//            alertMessage = "DO YOU WANT TO GO Application Form?"
-//            isShowingAlert = true
-//            currentAlertAction = {
-//                sendMessage("Application Form")
-//                navigateToTranslateView = true
-//            }
-
-        case "Office Location":
-            if let address = actionValue?.address, let office = actionValue?.office {
-                let encodedStart = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                let encodedEnd = office.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                let naverMapURL = URL(string: "nmap://route/public?slat=\(userLatitude)&slng=\(userLongitude)&sname=\(encodedStart)&dlat=\(userLatitude)&dlng=\(userLongitude)&dname=\(encodedEnd)&appname=com.example.app")!
-                
-                if UIApplication.shared.canOpenURL(naverMapURL) {
-                    safariViewURL = naverMapURL
-                } else {
-                    let appStoreURL = URL(string: "https://apps.apple.com/app/id311867728")!
-                    UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
+            case "Change Visa":
+                sendMessage("Change Visa")
+            case "Extend Visa":
+                sendMessage("Extend Visa")
+            case "Application Form":
+                navigateToTranslateView = true
+            case "Fill Application":
+                navigateToTranslateView = true
+            case "Hikorea Website":
+                if let urlString = actionValue?.url, let url = URL(string: urlString) {
+                    safariViewURL = url
                 }
-            } else {
-                alertMessage = "출발지와 도착지 정보가 없습니다."
-                isShowingAlert = true
+        case "Open Map":
+            isFetchingLocation = true
+            locationManager.startUpdatingLocation() // 실시간 위치 가져오기 시작
+            
+            // 1초 뒤에 위치 가져오기 완료 후 로그 출력 및 네이버 맵 열기 시도
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                locationManager.stopUpdatingLocation()
+                isFetchingLocation = false
+                
+                // 현재 위치 정보 로그로 출력
+                print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
+
+                if let address = actionValue?.address,
+                   let office = actionValue?.office,
+                   let destinationLatitude = actionValue?.latitude,
+                   let destinationLongitude = actionValue?.longitude {
+                    
+                    // 출발지와 도착지 이름 정보 인코딩
+                    let encodedStartName = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    let encodedEndName = office.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    
+                    // 네이버 지도 웹 URL 생성 (sname, dname에 한글 인코딩 적용)
+                    let webMapURL = URL(string: "https://map.naver.com/v5/directions/-/141.39/\(destinationLatitude),\(destinationLongitude)?c=\(locationManager.userLatitude),\(locationManager.userLongitude),15,0,0,0,dh&dname=\(encodedEndName)&sname=\(encodedStartName)")!
+
+                    // SafariView를 통해 네이버 지도 웹 페이지를 표시
+                    safariViewURL = webMapURL
+                } else {
+                    alertMessage = "출발지와 도착지 정보가 없습니다."
+                    isShowingAlert = true
+                }
             }
+
+
+            // 실시간 위치 업데이트 시작 (CoreLocation에서 위치 얻기 시작)
+                  case "Office Location":
+                      isFetchingLocation = true
+                      locationManager.startUpdatingLocation() // 실시간 위치 가져오기 시작
+                      sendMessage("Office Location", isButtonClicked: true)
+                      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
+                          locationManager.stopUpdatingLocation()
+                          isFetchingLocation = false
+                          print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
+                          let encodedStart = locationManager.userLatitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                          let encodedEnd = locationManager.userLongitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
+                      }
 
         default:
             break

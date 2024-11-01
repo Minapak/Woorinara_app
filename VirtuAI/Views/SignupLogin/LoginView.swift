@@ -205,7 +205,7 @@ struct LoginView: View {
 
 class TokenManager {
     private let urlSession = URLSession.shared
-    private let tokenRefreshURL = "http://43.203.237.202:18080/login/basic"
+    private let tokenRefreshURL = "http://43.203.237.202:18080/api/v1/token/issue"
     private let refreshThreshold: TimeInterval = 24 * 60 * 60 // 만료 24시간 전
     private var timer: Timer?
 
