@@ -19,11 +19,11 @@ struct ScanARCView: View {
     // Initializer with OCRResult data
     init(result: OCRResult) {
         // Initializing each field with data from OCRResult
-        self._foreignRegistrationNumber = State(initialValue: result.data.documentNumber ?? "")
-        self._dateOfBirth = State(initialValue: result.data.dateOfBirth ?? "")
-        self._gender = State(initialValue: result.data.gender)
-        self._name = State(initialValue: "\(result.data.givenName ?? "") \(result.data.surName ?? "")")
-        self._country = State(initialValue: result.data.nationality ?? "")
+        self._foreignRegistrationNumber = State(initialValue: result.data?.documentNumber ?? "")
+        self._dateOfBirth = State(initialValue: result.data?.dateOfBirth ?? "")
+        self._gender = State(initialValue: result.data?.gender)
+        self._name = State(initialValue: "\(result.data?.givenName ?? "") \(result.data?.surName ?? "")")
+        self._country = State(initialValue: result.data?.nationality ?? "")
     }
     
     var body: some View {

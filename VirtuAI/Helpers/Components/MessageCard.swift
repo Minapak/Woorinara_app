@@ -149,7 +149,7 @@ struct BotMessageCard : View
                                 }.buttonStyle(BounceButtonStyle())
                             // sheet를 사용하여 PDFViewer 화면을 띄움
                                       .sheet(isPresented: $isShowingPDFViewer) {
-                                          PDFViewer()
+                                          TranslateView()
                                       }
                             Button {
                                 if let url = URL(string: "https://www.hikorea.go.kr/Main.pt") {

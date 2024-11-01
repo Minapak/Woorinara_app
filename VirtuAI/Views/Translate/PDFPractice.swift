@@ -8,7 +8,7 @@
 import SwiftUI
 import PDFKit
 
-struct PDFClickViewer: View {
+struct PDFPractice: View {
     @State private var document: PDFDocument?
     @State private var showModal = false // State to control modal presentation
 
@@ -140,7 +140,7 @@ struct PDFModalViewRepresentable: UIViewRepresentable {
 
 struct PdfContentModalView: View {
     var body: some View {
-        PDFClickViewer()
+        PDFPractice()
     }
 }
 

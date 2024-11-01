@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ImageViewer: View {
+struct TranslationView: View {
     // 화면 이동을 위한 상태 변수
     @State private var showTranslationView = false
     @State private var showAutoFillView = false
@@ -65,32 +65,20 @@ struct ImageViewer: View {
             }
             // NavigationLink를 사용하여 뷰 전환
             .background(
-                NavigationLink(destination: TranslateView(), isActive: $showTranslationView) { EmptyView() }
+                NavigationLink(destination: PDFPractice(), isActive: $showTranslationView) { EmptyView() }
             )
             .background(
-                NavigationLink(destination: PDFClickViewer(), isActive: $showAutoFillView) { EmptyView() }
+                NavigationLink(destination: TranslateView(), isActive: $showAutoFillView) { EmptyView() }
             )
         }
     }
 }
 
-//// 예시 뷰 (Translation 기능을 위한 뷰)
-//struct TranslationView: View {
-//    var body: some View {
-//        Text("Translation View")
-//    }
-//}
-//
-//// 예시 뷰 (Auto-Fill 기능을 위한 뷰)
-//struct AutoFillView: View {
-//    var body: some View {
-//        Text("Auto-Fill View")
-//    }
-//}
+
 
 struct ContentImageView: View {
     var body: some View {
-        ImageViewer()
+        TranslationView()
     }
 }
 

@@ -33,8 +33,8 @@ struct AFCenterView: View {
                     ("남 M", 183, 153, 4, 4, passportData["gender"] == "M" ? "✓" : ""),
                     ("여 F", 183, 158, 4, 4, passportData["gender"] == "F" ? "✓" : ""),
                     ("국적 Nationality", 245, 153, 24, 21, passportData["nationality"] ?? ""),
-                    ("여권 번호 Passport No.", 78, 180, 55, 9, passportData["documentNumber"] ?? ""),
-                    ("여권 유효 기간 Passport Expiry Date", 248, 178, 55, 8, passportData["dateOfExpiry"] ?? "")
+                    ("여권 번호 Passport No.", 78, 180, 55, 9, passportData["passportNumber"] ?? ""),
+                    ("여권 유효 기간 Passport Expiry Date", 248, 178, 55, 8, passportData["passportExpirationDate"] ?? "")
                 ]
 
                 ForEach(boxes, id: \.title) { box in

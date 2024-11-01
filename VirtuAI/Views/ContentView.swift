@@ -24,9 +24,9 @@ struct ContentView: View {
                 TabView(selection: $selectedIndex)
                 {
                     StartChatView(typingMessage: ContentView.$typingMessageCurrent).tag(0)
-                    ImageViewer().tag(1)
+                    TranslationView().tag(1)
                     ContentWebView().tag(2)
-                    ContentVcomView().tag(3)
+                    TemporaryLinkView().tag(3)
                     SettingsView().tag(4)
                 }
                
@@ -34,18 +34,7 @@ struct ContentView: View {
                     CustomTabView(tabs: TabType.allCases.map({ $0.tabItem }), selectedIndex: $selectedIndex )
 
                 }
-//                ZStack
-//                {
-//                    Rectangle()
-//                        .foregroundColor(Color.black)
-//                        .opacity(upgradeViewModel.isLoading ? 0.5: 0.0)
-//                        .edgesIgnoringSafeArea(.all)
-//                    
-//                    ProgressView()
-//                        .scaleEffect(2, anchor: .center)
-//                        .progressViewStyle(CircularProgressViewStyle(tint: Color.blue))
-//                    
-//                }.opacity(upgradeViewModel.isLoading ? 1: 0.0).edgesIgnoringSafeArea(.all)
+
            
             }
         

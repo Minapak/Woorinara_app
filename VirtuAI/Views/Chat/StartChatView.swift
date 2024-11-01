@@ -369,15 +369,27 @@ struct StartChatView: View {
         }
     }
     
-    // QuickReply 버튼 선택 처리
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?) {
         switch buttonLabel {
-        case "Fill Application":
-            navigateToTranslateView = true
-        case "Hikorea Website":
-            if let urlString = actionValue?.url, let url = URL(string: urlString) {
-                safariViewURL = url
-            }
+        case "Change Visa":
+            sendMessage("Change Visa")
+            
+        case "Extend Visa":
+            sendMessage("Extend Visa")
+            
+        case "Change of Residence":
+            sendMessage("Change of Residence")
+            
+        case "Application Form":
+            // Show alert before navigating
+            sendMessage("Application Form")
+//            alertMessage = "DO YOU WANT TO GO Application Form?"
+//            isShowingAlert = true
+//            currentAlertAction = {
+//                sendMessage("Application Form")
+//                navigateToTranslateView = true
+//            }
+
         case "Office Location":
             if let address = actionValue?.address, let office = actionValue?.office {
                 let encodedStart = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
@@ -394,10 +406,12 @@ struct StartChatView: View {
                 alertMessage = "출발지와 도착지 정보가 없습니다."
                 isShowingAlert = true
             }
+
         default:
             break
         }
     }
+
     
     // 메시지 전송 함수
     private func sendMessage(_ message: String, isButtonClicked: Bool = false) {
@@ -420,6 +434,32 @@ struct StartChatView: View {
     }
 }
 
+// Extension to allow initialization of Color using hex values
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (r, g, b) = ((int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (r, g, b) = (int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (r, g, b) = (0, 0, 0)
+        }
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            opacity: 1
+        )
+    }
+}
+
+
 struct MessageStartView: View {
     var message: WooriMessageData
     @Binding var typingMessageCurrent: String
@@ -432,9 +472,9 @@ struct MessageStartView: View {
                 Spacer()
                 Text(message.content)
                     .padding()
+                    .background(message.sender == currentUser ? Color.gray : Color(red: 0.25, green: 0.29, blue: 0.34)) // #414A57
                     .foregroundColor(.white)
-                    .background(Color.gray)
-                    .cornerRadius(10)
+                    .cornerRadius(14)
             } else {
                 Image("chatLogo")
                     .resizable()
@@ -444,7 +484,7 @@ struct MessageStartView: View {
                     .padding()
                     .foregroundColor(.black)
                     .background(Color.blue.opacity(0.1))
-                    .cornerRadius(10)
+                    .cornerRadius(14)
                 Spacer()
             }
         }
@@ -467,6 +507,8 @@ struct MessageStartView: View {
                             Text(button.actionValue?.text ?? "")
                                 .font(.caption)
                                 .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(5) // Limit to 2 lines
                         }
                     }
                 }
@@ -474,6 +516,8 @@ struct MessageStartView: View {
         }
     }
 }
+
+
 
 // 외부 Safari 브라우저 뷰
 struct SafariView: UIViewControllerRepresentable {

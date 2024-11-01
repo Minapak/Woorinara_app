@@ -205,7 +205,7 @@ struct HistoryItem: View {
     private var language = LanguageManager.shared.selectedLanguage
 
     var body: some View {
-        NavigationLink(destination: ContentVcomView()
+        NavigationLink(destination: TemporaryLinkView()
 //                        LazyView(
 //                            ChatView(
 //                                role: Constants.DEFAULT_AI, conversationId: conversation.conversationId, historyGPTModel: conversation.gptModel)

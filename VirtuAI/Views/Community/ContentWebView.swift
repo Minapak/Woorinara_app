@@ -37,13 +37,7 @@ struct ContentWebView: View {
                 }.padding(.bottom, 5)
                 .padding(16)
             }
-            // NavigationLink를 사용하여 뷰 전환
-            .background(
-                NavigationLink(destination: PDFClickViewer(), isActive: $showTranslationView) { EmptyView() }
-            )
-            .background(
-                NavigationLink(destination: PDFViewer(), isActive: $showAutoFillView) { EmptyView() }
-            )
+        
         }
     }
 
