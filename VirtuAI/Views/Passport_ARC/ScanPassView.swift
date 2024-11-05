@@ -69,8 +69,8 @@ struct ScanPassView: View {
                             HStack(spacing: 3) {
                                 // 성, 이름, 중간 이름
                                 InputField(title: "Surname", text: $surname, isFocused: _isFocused)
-                                InputField(title: "Given name", text: $givenName, isFocused: _isFocused)
-                                InputField(title: "Middle name", text: $middleName, showError: showError && middleName.isEmpty, placeholder: "Required", isRequired: true, isFocused: _isFocused)
+                                InputField(title: "Given name", text: $givenName,showError: showError && givenName.isEmpty, placeholder: "Required", isRequired: true, isFocused: _isFocused)
+                                InputField(title: "Middle name", text: $middleName, isFocused: _isFocused)
                             }
                             Spacer()
                             // 생년월일

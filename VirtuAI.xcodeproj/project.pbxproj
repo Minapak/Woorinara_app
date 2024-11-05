@@ -112,6 +112,7 @@
 		27F311842A37410500BB399B /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 27F311832A37410500BB399B /* PopupView */; };
 		27F311872A375F7A00BB399B /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 27F311862A375F7A00BB399B /* AppsFlyerLib */; };
 		27F311892A37902900BB399B /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F311882A37902900BB399B /* SplashView.swift */; };
+		5408D52C2CD9E7FE002CF084 /* AFTransView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D52B2CD9E7FE002CF084 /* AFTransView.swift */; };
 		540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFD2CCB134A00760AC1 /* SwiftyChat */; };
 		540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */; };
 		541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */; };
@@ -130,6 +131,10 @@
 		5429955B2CD4A5BA007E3748 /* FindPWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429955A2CD4A5BA007E3748 /* FindPWView.swift */; };
 		542995662CD4AD7E007E3748 /* AFDoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995652CD4AD7E007E3748 /* AFDoneView.swift */; };
 		542995682CD52573007E3748 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995672CD52572007E3748 /* LocationManager.swift */; };
+		5429956A2CD88818007E3748 /* AFAutoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995692CD88818007E3748 /* AFAutoView.swift */; };
+		5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956B2CD892C7007E3748 /* MyInfoView.swift */; };
+		5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */; };
+		542995702CD8C681007E3748 /* MInfoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956E2CD8C681007E3748 /* MInfoDetailView.swift */; };
 		546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DEAD82CCB893B00823A00 /* TranslateView.swift */; };
 		54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */; };
 		54A43CB42CC6686700A64B86 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB32CC6686700A64B86 /* Helper.swift */; };
@@ -313,6 +318,7 @@
 		27F311802A37096600BB399B /* GenericDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDialogs.swift; sourceTree = "<group>"; };
 		27F311882A37902900BB399B /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		27F3118A2A37B23C00BB399B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		5408D52B2CD9E7FE002CF084 /* AFTransView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFTransView.swift; sourceTree = "<group>"; };
 		541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOverlayView.swift; sourceTree = "<group>"; };
 		541F49AF2CD1E632004D4D20 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		541F49B02CD1E632004D4D20 /* ScanPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPassView.swift; sourceTree = "<group>"; };
@@ -325,6 +331,10 @@
 		5429955A2CD4A5BA007E3748 /* FindPWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindPWView.swift; sourceTree = "<group>"; };
 		542995652CD4AD7E007E3748 /* AFDoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFDoneView.swift; sourceTree = "<group>"; };
 		542995672CD52572007E3748 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		542995692CD88818007E3748 /* AFAutoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFAutoView.swift; sourceTree = "<group>"; };
+		5429956B2CD892C7007E3748 /* MyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoView.swift; sourceTree = "<group>"; };
+		5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MInfoUpdateView.swift; sourceTree = "<group>"; };
+		5429956E2CD8C681007E3748 /* MInfoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MInfoDetailView.swift; sourceTree = "<group>"; };
 		546DEAD82CCB893B00823A00 /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
 		54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		54A43CB12CC6686700A64B86 /* UIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIHelper.swift; sourceTree = "<group>"; };
@@ -527,6 +537,7 @@
 				5429955E2CD4A6AB007E3748 /* Passport_ARC */,
 				5429955C2CD4A640007E3748 /* SignupLogin */,
 				27F295E62A2B9966002470C5 /* ContentView.swift */,
+				54A43CC82CC6695900A64B86 /* TemporaryLinkView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -649,7 +660,6 @@
 				54A43CBD2CC668F600A64B86 /* Login2View.swift */,
 				276E06B42B174E8F00E75DF5 /* LoginView.swift */,
 				5429955A2CD4A5BA007E3748 /* FindPWView.swift */,
-				54A43CC82CC6695900A64B86 /* TemporaryLinkView.swift */,
 			);
 			path = SignupLogin;
 			sourceTree = "<group>";
@@ -685,10 +695,13 @@
 		542995602CD4A742007E3748 /* MyPage */ = {
 			isa = PBXGroup;
 			children = (
+				5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */,
+				5429956E2CD8C681007E3748 /* MInfoDetailView.swift */,
 				54A43CBA2CC668F600A64B86 /* AppButton.swift */,
 				54A43CBB2CC668F600A64B86 /* AppInputBox.swift */,
 				27F2965D2A2CCAF5002470C5 /* SettingsView.swift */,
 				27F3116C2A3396D600BB399B /* LanguagesView.swift */,
+				5429956B2CD892C7007E3748 /* MyInfoView.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -726,6 +739,8 @@
 				5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */,
 				541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */,
 				542995652CD4AD7E007E3748 /* AFDoneView.swift */,
+				542995692CD88818007E3748 /* AFAutoView.swift */,
+				5408D52B2CD9E7FE002CF084 /* AFTransView.swift */,
 			);
 			path = Autofill;
 			sourceTree = "<group>";
@@ -988,6 +1003,8 @@
 			files = (
 				27F311892A37902900BB399B /* SplashView.swift in Sources */,
 				27F3116D2A3396D600BB399B /* LanguagesView.swift in Sources */,
+				5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */,
+				542995702CD8C681007E3748 /* MInfoDetailView.swift in Sources */,
 				27F3117F2A36438200BB399B /* UpgradeViewModel.swift in Sources */,
 				5426B3B22CD2AB2E00BDD084 /* AppChatState.swift in Sources */,
 				277A657E2B225C710057D146 /* ImagePicker.swift in Sources */,
@@ -1028,6 +1045,7 @@
 				27F295E52A2B9966002470C5 /* VirtuAIApp.swift in Sources */,
 				27544A012B24A19E00C6DF61 /* GPTModel.swift in Sources */,
 				276E06B82B175A4D00E75DF5 /* AuthenticationViewModel.swift in Sources */,
+				5429956A2CD88818007E3748 /* AFAutoView.swift in Sources */,
 				54E0BE372CC8CE9C00D41163 /* MembersViewModel.swift in Sources */,
 				542995662CD4AD7E007E3748 /* AFDoneView.swift in Sources */,
 				27F2966E2A2D1E7B002470C5 /* ChatView.swift in Sources */,
@@ -1063,12 +1081,14 @@
 				27F296892A2F8B7C002470C5 /* AssistantCard.swift in Sources */,
 				276E06A42B1672ED00E75DF5 /* String+Error.swift in Sources */,
 				27F311692A33857800BB399B /* Appearance.swift in Sources */,
+				5408D52C2CD9E7FE002CF084 /* AFTransView.swift in Sources */,
 				54E0BE332CC892FE00D41163 /* PDFPractice.swift in Sources */,
 				546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */,
 				27F311782A362B5200BB399B /* ViewExtensions.swift in Sources */,
 				27F296242A2BA23E002470C5 /* ColorExtension.swift in Sources */,
 				27367B5D2B1A0FE600E2AA14 /* AppState.swift in Sources */,
 				54E0BE2B2CC7ABE800D41163 /* WooriChatAPI.swift in Sources */,
+				5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */,
 				27F296802A2F3D41002470C5 /* MessageModel.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
 				541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */,

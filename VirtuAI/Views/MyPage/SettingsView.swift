@@ -18,7 +18,7 @@ struct SettingsView: View {
     @EnvironmentObject var upgradeViewModel: UpgradeViewModel
     @State var showSuccessToast = false
     @State var showErrorToast = false
-    @State private var navigateToLogin = false  // LoginView로 이동하는 상태 변수
+    @State private var navigateToLogin = false
     
     @StateObject var viewModelAuth = AuthenticationViewModel()
 
@@ -338,19 +338,11 @@ struct SettingsView: View {
                 }
                 .padding(15)
                 .presentationDetents([.height(280)])
-                .presentationBackground {
-                    VStack { Spacer() }
-                        .background(Color.light_gray)
-                        .cornerRadius(50)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 50)
-                                .stroke(Color.card_border, lineWidth: 2)
-                        )
-                        .padding(3)
-                }
+                .presentationBackground(Color.white)
+                .presentationCornerRadius(20)
             }
             .fullScreenCover(isPresented: $navigateToLogin) {
-                LoginView()  // 로그아웃 후 LoginView로 이동
+                LoginView()
             }
         }
     }
@@ -369,7 +361,6 @@ struct SettingsView: View {
         }
     }
     
-    // 로그아웃 처리
     func logOut() {
         do {
             try Auth.auth().signOut()
@@ -378,7 +369,7 @@ struct SettingsView: View {
             UserDefaults.standard.removeObject(forKey: "userStatus")
             UserDefaults.standard.removeObject(forKey: "userRole")
             print("Logged out successfully.")
-            navigateToLogin = true  // 상태 변경으로 LoginView로 이동
+            navigateToLogin = true
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
         }

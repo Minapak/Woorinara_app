@@ -76,7 +76,8 @@ struct ScanPreARCView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    
+    ?? "DefaultAccessToken"
+    @State private var isManualInput = false // New state
     var body: some View {
         NavigationStack {
             ZStack {
@@ -85,12 +86,13 @@ struct ScanPreARCView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
 
-                VStack(spacing: 15) {
-                    Spacer().frame(height: 50)
+                VStack(spacing: 30) {
+                    Spacer().frame(height: 0)
 
                     Text("Place your ARC within\nthe frame and tap the capture\nbutton to scan.")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 22, weight: .bold))
                         .multilineTextAlignment(.center)
+                        .foregroundColor(.white)
                         .padding(.horizontal, 16)
                     
                     ZStack {
@@ -122,9 +124,9 @@ struct ScanPreARCView: View {
                     }) {
                         Image(systemName: "camera.circle.fill")
                             .resizable()
-                            .frame(width: 70, height: 70)
+                            .frame(width: 50, height: 50)
                             .foregroundColor(.white)
-                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 90, height: 90))
+                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 70, height: 70))
                     }
                     
                     Button("Send Image for OCR") {
@@ -138,9 +140,24 @@ struct ScanPreARCView: View {
                         }
                     }
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.blue)
+                    .foregroundColor(.white)
                     .disabled(capturedImage == nil)
-                    .padding(.top, 20)
+                    .padding(.bottom, 30)
+                    
+                    
+                        Button("Manual input") {
+                            isManualInput = true // Trigger manual input navigation
+                        }
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundColor(.white)
+                        .padding(.top, 20)
+                        .overlay(
+                            Rectangle()
+                                .frame(height: 1) // 1px height
+                                .foregroundColor(.white), // White color for the stroke
+                            alignment: .bottom // Align it to the bottom of the button
+                        )
+                    
                 }
                 
                 if isLoading {
@@ -164,6 +181,21 @@ struct ScanPreARCView: View {
             .alert(isPresented: $showErrorAlert) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
+            
+            NavigationLink(
+                destination: ocrResult.map { ScanARCView(result: $0) },
+                isActive: $navigateToResultView
+            ) {
+                EmptyView() // NavigationLink를 위한 EmptyView
+            }
+            
+            // NavigationLink for manual input
+                        NavigationLink(
+                            destination: ScanARCView(result: OCRResult(status: 0, message: "", data: OCRData())),
+                            isActive: $isManualInput
+                        ) {
+                            EmptyView()
+                        }
         }
     }
 

@@ -1,36 +1,5 @@
 import SwiftUI
 
-//struct AppBar: View {
-//    var imageName: String = "arrow.left"  // Default back arrow
-//    var title: String = "app_name"
-//    var isMainPage: Bool = false
-//    var onBack: () -> Void = {}  // Default action
-//    
-//    var body: some View {
-//        ZStack {
-//            Text(title)
-//                .font(.system(size: 20, weight: .bold))
-//                .multilineTextAlignment(.center)
-//                .foregroundColor(.black)
-//                .frame(maxWidth: .infinity)
-//
-//            HStack {
-//                Button(action: onBack) {  // onBack action
-//                    Image(systemName: imageName)
-//                        .resizable()
-//                        .frame(width: 20, height: 20)
-//                        .foregroundColor(.gray)
-//                }
-//                Spacer()
-//            }
-//            .padding(.leading)
-//        }
-//        .frame(height: 55)
-//    }
-//}
-
-import SwiftUI
-
 struct ScanView: View {
     @State private var showScanPreARCView = false
     @State private var showScanPrePassView = false

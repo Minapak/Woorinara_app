@@ -11,7 +11,7 @@ struct VirtuAIApp: App {
     @StateObject var upgradeViewModel = UpgradeViewModel()
     @StateObject var appState = AppState()
     @StateObject private var appChatState = AppChatState() // Defined here to share across the app
-
+    @StateObject private var locationManager = LocationManager()
     @AppStorage(Constants.Preferences.DARK_MODE)
     private var isDarkTheme = UserDefaults.isDarkTheme
     
@@ -23,7 +23,10 @@ struct VirtuAIApp: App {
                 .preferredColorScheme(isDarkTheme ? .dark : .light)
                 .environmentObject(upgradeViewModel)
                 .environmentObject(appState)
+                .environmentObject(locationManager)  // 앱 전역에서 위치 정보를 사용할 수 있도록 설정
                 .environmentObject(appChatState) // Pass to SplashView as an EnvironmentObject
+//            StartChatView(typingMessage: ContentView.$typingMessageCurrent).tag(0)
+                          
         }
         .onChange(of: scenePhase) { newScenePhase in
             if case .active = newScenePhase {

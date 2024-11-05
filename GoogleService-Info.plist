@@ -27,6 +27,10 @@
 	<string>219197666995</string>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:219197666995:ios:69bb16502d6202c74622c6</string>
+	<key>INIntentsSupported</key>
+	<array>
+		<string>Intent</string>
+	</array>
 	<key>IS_ADS_ENABLED</key>
 	<true/>
 	<key>IS_ANALYTICS_ENABLED</key>

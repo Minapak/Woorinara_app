@@ -10,6 +10,11 @@ import Foundation
 import SwiftKeychainWrapper
 import SafariServices
 import CoreLocation
+import Combine
+import CoreLocationUI
+import MapKit
+import UIKit
+import WebKit
 /*
 이 코드는 iOS 앱에서 채팅 기능을 제공하는 뷰를 구현합니다.
  사용자가 메시지를 입력하고 전송하면 서버로부터의 응답을 가져와 화면에 표시하고,
@@ -57,14 +62,17 @@ struct ActionValue: Codable, Equatable {
     var text: String?
     var value: String?
     var id: Int?
-    var office: String?
     var address: String?
     var url: String? // 외부 URL로 연결할 경우 사용
     var latitude: Double?
     var longitude: Double?
-    var office_eng: String?
     var address_eng: String?
     var phone_number: String?
+    var name: String?
+    var name_eng: String?
+    var detailed_location: String?
+    var detailed_location_eng: String?
+    
 }
 
 // 서버 응답 데이터 모델
@@ -117,7 +125,29 @@ struct MemberInfo: Codable {
 extension URL: Identifiable {
     public var id: URL { self }
 }
+struct GifImage: UIViewRepresentable {
+    private let name: String
 
+    init(_ name: String) {
+        self.name = name
+    }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let webView = WKWebView()
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.isScrollEnabled = false
+
+        if let path = Bundle.main.path(forResource: name, ofType: "gif") {
+            let data = try? Data(contentsOf: URL(fileURLWithPath: path))
+            webView.load(data!, mimeType: "image/gif", characterEncodingName: "UTF-8", baseURL: URL(fileURLWithPath: path))
+        }
+        
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {}
+}
 // WooriChatAPI 클래스: 메시지 전송 및 서버 데이터 가져오기 기능을 제공
 class WooriChatAPI: ObservableObject {
     private let baseURL = "http://43.203.237.202:18080/api/v1/chatbot/messages" // API 엔드포인트
@@ -308,6 +338,11 @@ struct StartChatView: View {
                         }
                     }
                     .onAppear {
+                        // 앱이 시작되자마자 위치 요청
+                        locationManager.requestLocation()
+                        print("Requesting initial location...")
+
+                        
                         if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
                         WviewModel.fetchWMessages { result in
                             switch result {
@@ -321,6 +356,14 @@ struct StartChatView: View {
                             isMessagesFetched = true // 한 번 호출 후에는 true로 설정하여 다시 호출되지 않게 함
                                      }
                     }
+                    .onChange(of: locationManager.userLatitude) { newLatitude in
+                                         userLatitude = newLatitude
+                                         print("Latitude updated: \(newLatitude)")
+                                     }
+                                     .onChange(of: locationManager.userLongitude) { newLongitude in
+                                         userLongitude = newLongitude
+                                         print("Longitude updated: \(newLongitude)")
+                                     }
                     .onChange(of: WviewModel.messages) { _ in
                         if let lastMessage = WviewModel.messages.last {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -391,11 +434,45 @@ struct StartChatView: View {
     }
     
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?) {
+        VStack {
+            if let actionValueText = actionValue?.text {
+                VStack {
+                    Text(buttonLabel)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.blue)
+                    
+                    Text(actionValueText)
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                        .padding(.leading, 8)
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.blue, lineWidth: 2)
+                )
+                .padding(.horizontal, 16)
+            } else {
+                Text(buttonLabel)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.blue)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue, lineWidth: 2)
+                    )
+                    .padding(.horizontal, 16)
+            }
+        }
         switch buttonLabel {
             case "Change Visa":
-                sendMessage("Change Visa")
+                sendMessage("Change Visa", isButtonClicked: true)
             case "Extend Visa":
-                sendMessage("Extend Visa")
+                sendMessage("Extend Visa", isButtonClicked: true)
             case "Application Form":
                 navigateToTranslateView = true
             case "Fill Application":
@@ -405,31 +482,32 @@ struct StartChatView: View {
                     safariViewURL = url
                 }
         case "Open Map":
-            isFetchingLocation = true
-            locationManager.startUpdatingLocation() // 실시간 위치 가져오기 시작
-            
+            locationManager.requestLocation()
             // 1초 뒤에 위치 가져오기 완료 후 로그 출력 및 네이버 맵 열기 시도
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                locationManager.stopUpdatingLocation()
-                isFetchingLocation = false
+            
                 
                 // 현재 위치 정보 로그로 출력
                 print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
 
-                if let address = actionValue?.address,
-                   let office = actionValue?.office,
+                if let name = actionValue?.name,
+                   let name_eng = actionValue?.name_eng,
+                   let address = actionValue?.address,
+                   let address_eng = actionValue?.address_eng,
                    let destinationLatitude = actionValue?.latitude,
                    let destinationLongitude = actionValue?.longitude {
                     
                     // 출발지와 도착지 이름 정보 인코딩
-                    let encodedStartName = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                    let encodedEndName = office.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    let encodedStartName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    let encodedEndName = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                     
                     // 네이버 지도 웹 URL 생성 (sname, dname에 한글 인코딩 적용)
                     let webMapURL = URL(string: "https://map.naver.com/v5/directions/-/141.39/\(destinationLatitude),\(destinationLongitude)?c=\(locationManager.userLatitude),\(locationManager.userLongitude),15,0,0,0,dh&dname=\(encodedEndName)&sname=\(encodedStartName)")!
+                    let appMapURL = URL(string: "nmap://route/public?slat=\(locationManager.userLatitude)&slng=\(locationManager.userLongitude)&sname=\(encodedStartName)&dlat=\(destinationLatitude)&dlng=\(destinationLongitude)&dname=\(encodedEndName)&Woorinara=project.livinglab.zypher")!
 
                     // SafariView를 통해 네이버 지도 웹 페이지를 표시
-                    safariViewURL = webMapURL
+                  //  safariViewURL = webMapURL
+                    safariViewURL = appMapURL
                 } else {
                     alertMessage = "출발지와 도착지 정보가 없습니다."
                     isShowingAlert = true
@@ -439,12 +517,10 @@ struct StartChatView: View {
 
             // 실시간 위치 업데이트 시작 (CoreLocation에서 위치 얻기 시작)
                   case "Office Location":
-                      isFetchingLocation = true
-                      locationManager.startUpdatingLocation() // 실시간 위치 가져오기 시작
+                     locationManager.requestLocation()
                       sendMessage("Office Location", isButtonClicked: true)
                       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
-                          locationManager.stopUpdatingLocation()
-                          isFetchingLocation = false
+                        
                           print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
                           let encodedStart = locationManager.userLatitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                           let encodedEnd = locationManager.userLongitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
@@ -505,12 +581,20 @@ extension Color {
 
 
 struct MessageStartView: View {
+    @EnvironmentObject var locationManager: LocationManager
     var message: WooriMessageData
     @Binding var typingMessageCurrent: String
     var currentUser: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     var onQuickReplyTap: (String, ActionValue?) -> Void
+    @State private var alertMessage = ""
+    @State private var isLoading = true // Loading state
+    // 포커스 상태 관리
+     @FocusState private var isActionTextFocused: Bool
+     @FocusState private var isContentOrLabelFocused: Bool
+     @State private var shouldFocusOnActionText: Bool = false
     
     var body: some View {
+        
         HStack {
             if message.sender == currentUser {
                 Spacer()
@@ -533,33 +617,71 @@ struct MessageStartView: View {
             }
         }
         .padding(.horizontal)
-        
+        .onAppear {
+                    // actionValue?.text가 있으면 해당 부분에 포커스, 없으면 button.label 포커스
+                    shouldFocusOnActionText = message.quickReplyButtons?.contains(where: { $0.actionValue?.text != nil }) ?? false
+                }
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(message.quickReplyButtons ?? [], id: \.label) { button in
-                    Button(action: {
-                        onQuickReplyTap(button.label, button.actionValue)
-                    }) {
-                        VStack {
-                            Text(button.label)
-                                .font(.system(size: 18, weight: .bold))
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .foregroundColor(.blue)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                            Text(button.actionValue?.text ?? "")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(5) // Limit to 2 lines
+                if let quickReplyButtons = message.quickReplyButtons {
+                    ForEach(quickReplyButtons, id: \.label) { button in
+                        Button(action: {
+                            onQuickReplyTap(button.label, button.actionValue)
+                        }) {
+                            VStack {
+                                if let actionValueText = button.actionValue?.text {
+                                    VStack {
+                                        Text(button.label)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(.blue)
+                                            .focused($isActionTextFocused)
+                                        Text(actionValueText)
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.gray)
+                                            .padding(.leading, 2)
+                                            .focused($isActionTextFocused)
+                                    }
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(16)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.blue, lineWidth: 2)
+                                    )
+                                    .focused($isActionTextFocused)
+                                    .padding(.horizontal, 16)
+                                } else {
+                                    Text(button.label)
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundColor(.blue)
+                                        .padding()
+                                        .background(Color.white)
+                                        .cornerRadius(16)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .stroke(Color.blue, lineWidth: 2)
+                                        )
+                                        .padding(.horizontal, 16)
+                                        .focused($isActionTextFocused)
+                                }
+                            }
                         }
                     }
                 }
             }
+            .onAppear {
+                           // 조건에 맞는 포커스 설정
+                           if shouldFocusOnActionText {
+                               isActionTextFocused = true
+                           } else {
+                               isContentOrLabelFocused = true
+                           }
+                       }
         }
+
     }
 }
+
 
 
 

@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct AFDoneView: View {
+struct AFTransView: View {
     @State private var showAlertForRedText = false
     @State private var showAlertForFileName = false
     @State private var showFileTypeSelection = false
@@ -26,27 +26,27 @@ struct AFDoneView: View {
                     
                     VStack (alignment: .leading ,spacing: 0){
                         Spacer()
-                        Text("You should edit or delete the red texts \nbefore submitting")
+                        Text("The integrated application form will be automatically \nfilled out based on the registered user information")
                             .font(.system(size: 14))
                             .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
                             .frame(maxWidth: .infinity, alignment: .center)
                             .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
-                            .foregroundColor(.red)
+                            .foregroundColor(.gray)
                             .padding(12) // 프레임에 12씩 패딩 추가
-                            .background(Color.red.opacity(0.1))
+                            .background(Color.white.opacity(0.1))
                             .cornerRadius(8)
 
                         Spacer()
-                        Image("af_done")
+                        Image("af")
                             .resizable()
                             .frame(width: 298, height: 422)
                             .padding()
                         Spacer()
-                        HStack(spacing: 20) {
+                        HStack(spacing: 0) {
                             Button(action: {
                                 // Edit button action
                             }) {
-                                Text("Edit")
+                                Text("Select Application/Report")
                                     .font(.system(size: 18).bold())
                                     .frame(maxWidth: .infinity)
                                     .padding()
@@ -55,17 +55,7 @@ struct AFDoneView: View {
                                     .cornerRadius(16)
                             }
                             
-                            Button(action: {
-                                showAlertForRedText = true
-                            }) {
-                                Text("Save")
-                                    .font(.system(size: 18).bold())
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(16)
-                            }
+                        
                         }.padding(.bottom, 5)
                      
                     }.padding(.horizontal, 16)
@@ -133,8 +123,8 @@ struct AFDoneView: View {
     }
 }
 
-struct AFDoneView_Previews: PreviewProvider {
+struct AFTransView_Previews: PreviewProvider {
     static var previews: some View {
-        AFDoneView()
+        AFTransView()
     }
 }

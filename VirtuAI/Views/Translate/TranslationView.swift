@@ -65,10 +65,10 @@ struct TranslationView: View {
             }
             // NavigationLink를 사용하여 뷰 전환
             .background(
-                NavigationLink(destination: PDFPractice(), isActive: $showTranslationView) { EmptyView() }
+                NavigationLink(destination: TranslateView(), isActive: $showTranslationView) { EmptyView() }
             )
             .background(
-                NavigationLink(destination: TranslateView(), isActive: $showAutoFillView) { EmptyView() }
+                NavigationLink(destination: AFTransView(), isActive: $showAutoFillView) { EmptyView() }
             )
         }
     }

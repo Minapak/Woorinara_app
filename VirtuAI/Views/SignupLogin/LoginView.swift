@@ -217,11 +217,12 @@ class TokenManager {
 
     func checkAndRefreshToken() {
         guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
+              let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
               let expirationDate = decodeExpirationDate(from: accessToken),
-              expirationDate.timeIntervalSinceNow < refreshThreshold else {
+              expirationDate.timeIntervalSinceNow < 0 else {
             return
         }
-        refreshAccessToken()
+        refreshAccessToken(refreshToken: refreshToken)
     }
 
     private func decodeExpirationDate(from accessToken: String) -> Date? {
@@ -242,21 +243,19 @@ class TokenManager {
         return Date(timeIntervalSince1970: payload.exp)
     }
 
-    private func refreshAccessToken() {
-        guard let url = URL(string: tokenRefreshURL),
-              let username = KeychainWrapper.standard.string(forKey: "username"),
-              let password = KeychainWrapper.standard.string(forKey: "password") else { return }
+    private func refreshAccessToken(refreshToken: String) {
+        guard let url = URL(string: tokenRefreshURL) else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let json = ["username": username, "password": password]
+
+        let json = ["refreshToken": refreshToken]
         guard let jsonData = try? JSONSerialization.data(withJSONObject: json) else {
             print("Failed to encode JSON for token refresh.")
             return
         }
-        
+
         request.httpBody = jsonData
 
         urlSession.dataTask(with: request) { data, response, error in
@@ -271,6 +270,7 @@ class TokenManager {
         }.resume()
     }
 }
+
 
 struct LoginToken: Codable {
     var username: String

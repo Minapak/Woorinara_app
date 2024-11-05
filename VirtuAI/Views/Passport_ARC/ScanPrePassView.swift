@@ -75,7 +75,7 @@ struct ScanPrePassView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-
+    @State private var isManualInput = false // New state variable for manual input navigation
     var body: some View {
         NavigationStack {
             ZStack {
@@ -85,10 +85,11 @@ struct ScanPrePassView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 30) {
-                    Spacer().frame(height: 50)
+                    Spacer().frame(height: 0)
 
                     Text("Place your Passport within the frame and tap the capture button to scan.")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
                     
@@ -113,15 +114,14 @@ struct ScanPrePassView: View {
                                 )
                         }
                     }
-                    
                     Button(action: {
                         isCameraPresented = true
                     }) {
                         Image(systemName: "camera.circle.fill")
                             .resizable()
-                            .frame(width: 70, height: 70)
+                            .frame(width: 50, height: 50)
                             .foregroundColor(.white)
-                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 90, height: 90))
+                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 70, height: 70))
                     }
                     
                     Button("Send Image for OCR") {
@@ -130,12 +130,28 @@ struct ScanPrePassView: View {
                         } else {
                             errorMessage = "No image captured."
                             showErrorAlert = true
+                            print("Error: No image captured")
                         }
                     }
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.blue)
+                    .foregroundColor(.white)
                     .disabled(capturedImage == nil)
+                    .padding(.bottom, 30)
+                    
+                
+                
+                    Button("Manual input") {
+                        isManualInput = true // Trigger manual input navigation
+                    }
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(.white)
                     .padding(.top, 20)
+                    .overlay(
+                        Rectangle()
+                            .frame(height: 1) // 1px height
+                            .foregroundColor(.white), // White color for the stroke
+                        alignment: .bottom // Align it to the bottom of the button
+                    )
                 }
                 
                 if isLoading {
@@ -166,6 +182,15 @@ struct ScanPrePassView: View {
             ) {
                 EmptyView() // NavigationLink를 위한 EmptyView
             }
+            
+            // NavigationLink for manual input
+                        NavigationLink(
+                            destination: ScanPassView(result: OCRPassResult(status: 0, message: "", data: OCRPassData())),
+                            isActive: $isManualInput
+                        ) {
+                            EmptyView()
+                        }
+            
         }
     }
 

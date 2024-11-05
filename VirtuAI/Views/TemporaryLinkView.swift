@@ -14,9 +14,9 @@ struct TemporaryLinkView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         List {
                             NavigationLink("여권 / 외국인 등록증 프로세스", destination: ScanView())
-                            NavigationLink("통합 신청서 좌표 뷰", destination: PDFOverlayView())
-                            NavigationLink("사인 이미지 저장 및 업로드", destination: ContentSignView())
-                            NavigationLink("AF done", destination: AFDoneView())
+                            NavigationLink("통합 신청서 뷰", destination: AFAutoView())
+                            NavigationLink("My Infomation", destination: MyInfoView())
+                            NavigationLink("core Location", destination: ContentMapView())
 //                            passportInfoLink()
 //                            afCenterViewLink()
                             
