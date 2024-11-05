@@ -165,6 +165,10 @@ struct ScanPreARCView: View {
                     ProgressView().scaleEffect(2)
                 }
             }
+            .onAppear {
+                // Automatically present the camera when view appears
+                isCameraPresented = true
+            }
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
                 presentationMode.wrappedValue.dismiss()

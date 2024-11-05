@@ -9,44 +9,40 @@ import CoreLocation
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var userLatitude: String = ""
     @Published var userLongitude: String = ""
-    private var manager = CLLocationManager()
+    public var manager = CLLocationManager()
+    @Published var currentLocation: CLLocationCoordinate2D?
     
     override init() {
         super.init()
         manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        
-        // 권한이 결정되지 않은 경우 권한 요청
-             if manager.authorizationStatus == .notDetermined {
-                 manager.requestWhenInUseAuthorization()
-             } else if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
-                 manager.requestLocation()
-             }
-         }
-         
-    func requestLocation() {
-        if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
-            manager.requestLocation()
-        } else {
-            // 필요할 때 다시 권한 요청
+        requestLocationPermission()
+    }
+    
+    func requestLocationPermission() {
+        if manager.authorizationStatus == .notDetermined {
             manager.requestWhenInUseAuthorization()
         }
     }
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == .authorizedWhenInUse || status == .authorizedAlways {
+    
+    func requestLocation() {
+        if CLLocationManager.locationServicesEnabled() {
             manager.requestLocation()
-        } else if status == .denied {
-            print("위치 권한이 거부되었습니다.")
+        } else {
+            print("Location services are not enabled")
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        userLatitude = "\(location.coordinate.latitude)"
-        userLongitude = "\(location.coordinate.longitude)"
+        if let location = locations.first {
+            currentLocation = location.coordinate
+            userLatitude = "\(location.coordinate.latitude)"
+            userLongitude = "\(location.coordinate.longitude)"
+            print("현재 위치 업데이트 - 위도: \(userLatitude), 경도: \(userLongitude)")
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("위치 업데이트 실패: \(error.localizedDescription)")
     }
-}
+    }
+

@@ -14,7 +14,7 @@ struct AFTransView: View {
     @State private var selectedFileTypes: [String] = ["pdf"]
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
-
+    @State private var showARView = false
     var body: some View {
         NavigationStack {
             ZStack {
@@ -26,11 +26,11 @@ struct AFTransView: View {
                     
                     VStack (alignment: .leading ,spacing: 0){
                         Spacer()
-                        Text("The integrated application form will be automatically \nfilled out based on the registered user information")
-                            .font(.system(size: 14))
+                        Text("The integrated application form will be automatically filled out based on the registered user information")
+                            .font(.system(size: 12))
                             .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
+                            .multilineTextAlignment(.leading) // 여러 줄을 가운데 정렬
                             .foregroundColor(.gray)
                             .padding(12) // 프레임에 12씩 패딩 추가
                             .background(Color.white.opacity(0.1))
@@ -43,8 +43,9 @@ struct AFTransView: View {
                             .padding()
                         Spacer()
                         HStack(spacing: 0) {
-                            Button(action: {
-                                // Edit button action
+                            
+                            NavigationLink(destination: PDFClickViewer(), isActive: $showARView){Button(action: {
+                                showARView = true
                             }) {
                                 Text("Select Application/Report")
                                     .font(.system(size: 18).bold())
@@ -54,10 +55,10 @@ struct AFTransView: View {
                                     .foregroundColor(.white)
                                     .cornerRadius(16)
                             }
-                            
-                        
-                        }.padding(.bottom, 5)
-                     
+                                
+                                
+                            }.padding(.bottom, 5)
+                        }
                     }.padding(.horizontal, 16)
                 }
             }
@@ -100,6 +101,7 @@ struct AFTransView: View {
                 }
                 .padding()
             }
+            
             .actionSheet(isPresented: $showFileTypeSelection) {
                 ActionSheet(
                     title: Text("Save file"),

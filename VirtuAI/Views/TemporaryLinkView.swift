@@ -16,11 +16,12 @@ struct TemporaryLinkView: View {
                             NavigationLink("여권 / 외국인 등록증 프로세스", destination: ScanView())
                             NavigationLink("통합 신청서 뷰", destination: AFAutoView())
                             NavigationLink("My Infomation", destination: MyInfoView())
+                            NavigationLink("로그아웃", destination: LogOutView())
                             NavigationLink("core Location", destination: ContentMapView())
 //                            passportInfoLink()
 //                            afCenterViewLink()
                             
-                            NavigationLink("셋팅", destination: SettingsView())
+//                            NavigationLink("셋팅", destination: SettingsView())
                         }
                         .navigationTitle("My Page")
                     }

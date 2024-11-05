@@ -10,11 +10,12 @@ import SwiftUI
 struct ContentView: View {
     
     @State var selectedIndex = 0
-
-    @ObservedObject var viewModel  = ContentViewModel()
+    @ObservedObject var viewModel = ContentViewModel()
     @EnvironmentObject var upgradeViewModel: UpgradeViewModel
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var appChatState: AppChatState
     @State static var typingMessageCurrent: String = "" // Create a mutable state for preview
+
 
     var body: some View {
         NavigationStack {
@@ -23,7 +24,14 @@ struct ContentView: View {
             {
                 TabView(selection: $selectedIndex)
                 {
-                    StartChatView(typingMessage: ContentView.$typingMessageCurrent).tag(0)
+                    StartChatView(
+                        appState: _appState,
+                        appChatState: _appChatState,
+                                           userLatitude: 37.7749,
+                                           userLongitude: -122.4194,
+                                           typingMessage: ContentView.$typingMessageCurrent
+                                       )
+                                       .tag(0)
                     TranslationView().tag(1)
                     ContentWebView().tag(2)
                     TemporaryLinkView().tag(3)

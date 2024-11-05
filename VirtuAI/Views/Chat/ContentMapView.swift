@@ -52,7 +52,7 @@ class LocationMapManager: NSObject, ObservableObject, CLLocationManagerDelegate 
     }
  
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("위치 업데이트 실패: \(error.localizedDescription)")
+        print("위치 업데이트 실패MAP: \(error.localizedDescription)")
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -69,3 +69,4 @@ class LocationMapManager: NSObject, ObservableObject, CLLocationManagerDelegate 
         region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
     }
 }
+

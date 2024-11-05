@@ -89,6 +89,8 @@ struct AFAutoView: View {
                     ("email", 209, 265, 88, 5, "zypher.kr@gmail.com"),
                     ("반환용계좌번호", 221, 274, 91, 9, "KOOKMIN, 123456-12-234456"),
                     ("신청일", 130, 283, 42, 6, "20301212"),
+                    ("Signature Box1", 234, 284, 36, 18, ""),
+                                       ("Signature Box2", 64, 343, 36, 18, "")
                 ]
 
                 ForEach(boxes, id: \.title) { box in
@@ -135,10 +137,15 @@ struct BoxAutoView: View {
             // 이미지가 들어갈 특정 좌표에 대해 조건 확인
                     if (xPosition == 234 && yPosition == 284 && width == 36 && height == 18) ||
                        (xPosition == 64 && yPosition == 343 && width == 36 && height == 18) {
-                        Image("sign") // 이미지 파일 이름
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: width, height: height)
+                        // 이미지가 제대로 로드되는지 확인하기 위해 배경 색상 추가
+                                      Rectangle()
+                                          .fill(Color.yellow.opacity(0.3))
+                                          .frame(width: width, height: height)
+                                          .overlay(
+                                              Image("sign") // 여기에 실제 이미지 이름
+                                                  .resizable()
+                                                  .scaledToFit()
+                                          )
             } else {
                 Text(text)
                     .font(.system(size: 5, weight: .bold))

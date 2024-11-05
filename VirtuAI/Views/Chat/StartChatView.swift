@@ -117,8 +117,8 @@ struct RequestBody: Codable {
 
 // 사용자 위치 정보
 struct MemberInfo: Codable {
-    var latitude: String
-    var longitude: String
+    var latitude: Double
+    var longitude: Double
 }
 
 // URL 확장: Identifiable 프로토콜 적용
@@ -149,11 +149,12 @@ struct GifImage: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 }
 // WooriChatAPI 클래스: 메시지 전송 및 서버 데이터 가져오기 기능을 제공
-class WooriChatAPI: ObservableObject {
+class WooriChatAPI: NSObject, ObservableObject, CLLocationManagerDelegate{
     private let baseURL = "http://43.203.237.202:18080/api/v1/chatbot/messages" // API 엔드포인트
     private let urlSession = URLSession.shared
     lazy var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    
+    private var locationManager = CLLocationManager()
+    private var currentLocation: CLLocation?
     @AppStorage("username") public var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     @Published public var messages: [WooriMessageData] = []
 
@@ -163,7 +164,28 @@ class WooriChatAPI: ObservableObject {
             "Authorization": "Bearer \(self.authToken)"
         ]
     }
-
+    override init() {
+           super.init()
+           locationManager.delegate = self
+           locationManager.desiredAccuracy = kCLLocationAccuracyBest
+           locationManager.requestWhenInUseAuthorization()
+           locationManager.startUpdatingLocation()
+       }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("위치 업데이트 실패: \(error.localizedDescription)")
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        
+        // 현재 위치의 위도와 경도를 저장하고 로그에 출력
+        currentLocation = location
+        let latitude = location.coordinate.latitude
+        let longitude = location.coordinate.longitude
+        print("현재 위치 - 위도: \(latitude), 경도: \(longitude)")
+    
+    }
     // 서버로부터 메시지를 가져오는 함수 (GET 요청)
     public func fetchWMessages(completion: @escaping (Result<[WooriMessageData], Error>) -> Void) {
         guard let url = URL(string: baseURL) else {
@@ -215,114 +237,124 @@ class WooriChatAPI: ObservableObject {
     }
     
     // 서버로 메시지를 전송하는 함수 (POST 요청)
-    public func sendUserMessage(message: String, typingMessage: String? = nil, isButtonClicked: Bool = false, latitude: String, longitude: String, completion: @escaping (Result<WooriMessageDetail, Error>) -> Void) {
-        guard let url = URL(string: baseURL) else {
-            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
-            return
-        }
-        
-        let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedTypingMessage = typingMessage?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let finalMessage = trimmedMessage + (trimmedTypingMessage.map { " \($0)" } ?? "")
-        let previousMessage = messages.last?.content ?? "No previous message"
-        
-        let requestBody = RequestBody(
-            preMessage: previousMessage,
-            message: finalMessage,
-            isButtonClicked: isButtonClicked,
-            memberInfo: MemberInfo(latitude: latitude, longitude: longitude)
-        )
+    public func sendUserMessage(message: String,typingMessage: String? = nil, isButtonClicked: Bool = false,latitude: Double, longitude: Double, completion: @escaping (Result<WooriMessageDetail, Error>) -> Void) {
+          guard let url = URL(string: baseURL) else {
+              completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+              return
+          }
+          
+          guard let currentLocation = currentLocation else {
+              print("현재 위치를 사용할 수 없습니다.")
+              completion(.failure(NSError(domain: "Location unavailable", code: -1, userInfo: nil)))
+              return
+          }
 
-        guard let jsonData = try? JSONEncoder().encode(requestBody) else {
-            print("POST: Failed to encode JSON")
-            completion(.failure(NSError(domain: "Failed to encode JSON", code: -1, userInfo: nil)))
-            return
-        }
+          // 현재 위치의 위도와 경도를 가져옴
+          let latitude = currentLocation.coordinate.latitude
+          let longitude = currentLocation.coordinate.longitude
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.allHTTPHeaderFields = headers
-        request.httpBody = jsonData
+          let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
+          let trimmedTypingMessage = typingMessage?.trimmingCharacters(in: .whitespacesAndNewlines)
+          let finalMessage = trimmedMessage + (trimmedTypingMessage.map { " \($0)" } ?? "")
+          let previousMessage = messages.last?.content ?? "No previous message"
 
-        let task = urlSession.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("POST Error: \(error.localizedDescription)")
-                completion(.failure(error))
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                print("Invalid POST response")
-                completion(.failure(NSError(domain: "Invalid response", code: -1, userInfo: nil)))
-                return
-            }
-            
-            guard let data = data else {
-                print("POST: No data received")
-                completion(.failure(NSError(domain: "No data", code: -1, userInfo: nil)))
-                return
-            }
-            
-            do {
-                let apiResponse = try JSONDecoder().decode(ChatAPIPostResponse.self, from: data)
-                if apiResponse.status == 200 {
-                    DispatchQueue.main.async {
-                        let botMessageContent = apiResponse.data.botMessage.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let botMessage = WooriMessageData(
-                            content: botMessageContent,
-                            sender: "BOT",
-                            createdAt: Date().description,
-                            quickReplyButtons: apiResponse.data.quickReplyButton
-                        )
-                        self.messages.append(botMessage)
-                    }
-                    completion(.success(apiResponse.data))
-                } else {
-                    print("POST API Error: \(apiResponse.message)")
-                    completion(.failure(NSError(domain: apiResponse.message, code: apiResponse.status, userInfo: nil)))
-                }
-            } catch {
-                print("POST Decoding Error: \(error)")
-                print("POST Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
-                completion(.failure(error))
-            }
-        }
-        
-        task.resume()
-    }
-}
+          // RequestBody에 현재 위치 정보를 포함
+          let requestBody = RequestBody(
+              preMessage: previousMessage,
+              message: finalMessage,
+              isButtonClicked: isButtonClicked,
+              memberInfo: MemberInfo(latitude: latitude, longitude: longitude)
+          )
+
+          guard let jsonData = try? JSONEncoder().encode(requestBody) else {
+              print("POST: Failed to encode JSON")
+              completion(.failure(NSError(domain: "Failed to encode JSON", code: -1, userInfo: nil)))
+              return
+          }
+
+          var request = URLRequest(url: url)
+          request.httpMethod = "POST"
+          request.allHTTPHeaderFields = headers
+          request.httpBody = jsonData
+
+          let task = urlSession.dataTask(with: request) { data, response, error in
+              if let error = error {
+                  print("POST Error: \(error.localizedDescription)")
+                  completion(.failure(error))
+                  return
+              }
+              guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                  print("Invalid POST response")
+                  completion(.failure(NSError(domain: "Invalid response", code: -1, userInfo: nil)))
+                  return
+              }
+              
+              guard let data = data else {
+                  print("POST: No data received")
+                  completion(.failure(NSError(domain: "No data", code: -1, userInfo: nil)))
+                  return
+              }
+              
+              do {
+                  let apiResponse = try JSONDecoder().decode(ChatAPIPostResponse.self, from: data)
+                  if apiResponse.status == 200 {
+                      DispatchQueue.main.async {
+                          let botMessageContent = apiResponse.data.botMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+                          let botMessage = WooriMessageData(
+                              content: botMessageContent,
+                              sender: "BOT",
+                              createdAt: Date().description,
+                              quickReplyButtons: apiResponse.data.quickReplyButton
+                          )
+                          self.messages.append(botMessage)
+                      }
+                      completion(.success(apiResponse.data))
+                  } else {
+                      print("POST API Error: \(apiResponse.message)")
+                      completion(.failure(NSError(domain: apiResponse.message, code: apiResponse.status, userInfo: nil)))
+                  }
+              } catch {
+                  print("POST Decoding Error: \(error)")
+                  print("POST Data: \(String(data: data, encoding: .utf8) ?? "No Data")")
+                  completion(.failure(error))
+              }
+          }
+          
+          task.resume()
+      }
+  }
 
 
 
-// 사용자 인터페이스
 struct StartChatView: View {
-    @StateObject private var locationManager = LocationManager()
-    @State private var isFetchingLocation = false // 위치 정보 가져오는 중 여부
+    @StateObject private var locationMapManager = LocationMapManager()
+    @State private var isFetchingLocation = false
     @State private var navigateToTranslateView = false
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var appChatState: AppChatState
     @StateObject private var WviewModel = WooriChatAPI()
     @AppStorage("language") private var language = LanguageManager.shared.selectedLanguage
     @State private var typingMessageCurrent: String = ""
-    //요청값 위도/경도 고정값이 아니라
-    @State var userLatitude: String = "37.5655981161314"
-    @State var userLongitude: String = "126.9749287001093"
+    @State var userLatitude: Double
+    @State var userLongitude: Double
     @FocusState private var fieldIsFocused: Bool
     @Binding var typingMessage: String
     @State private var isShowingAlert = false
     @State private var alertMessage = ""
     @State private var safariViewURL: URL?
-    @State private var isMessagesFetched = false // 메시지 로드 여부 확인 변수
+    @State private var isMessagesFetched = false
+    @State private var isLoading = false // 로딩 상태 추가
     var body: some View {
         ZStack {
             Color.background.edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading) {
                 AppBar(title: "", isMainPage: true)
                     .padding(.horizontal, 20)
-                // TranslateView로의 NavigationLink
+                
                 NavigationLink(destination: TranslateView(), isActive: $navigateToTranslateView) {
                     EmptyView()
                 }
-                               
+                
                 ScrollViewReader { proxy in
                     ScrollView(.vertical, showsIndicators: false) {
                         VStack(spacing: 10) {
@@ -337,33 +369,23 @@ struct StartChatView: View {
                             }
                         }
                     }
-                    .onAppear {
-                        // 앱이 시작되자마자 위치 요청
-                        locationManager.requestLocation()
-                        print("Requesting initial location...")
-
+                    .onAppear { 
+                        locationMapManager.manager.requestLocation() // 앱 실행 시 위치 요청
+                                              
                         
-                        if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
-                        WviewModel.fetchWMessages { result in
-                            switch result {
-                            case .success(let messages):
-                                print("Messages loaded successfully: \(messages.count) messages.")
-                            case .failure(let error):
-                                alertMessage = "Error loading messages: \(error.localizedDescription)"
-                                isShowingAlert = true
+                        if !isMessagesFetched {
+                            WviewModel.fetchWMessages { result in
+                                switch result {
+                                case .success(let messages):
+                                    print("Messages loaded successfully: \(messages.count) messages.")
+                                case .failure(let error):
+                                    alertMessage = "Error loading messages: \(error.localizedDescription)"
+                                    isShowingAlert = true
+                                }
                             }
+                            isMessagesFetched = true
                         }
-                            isMessagesFetched = true // 한 번 호출 후에는 true로 설정하여 다시 호출되지 않게 함
-                                     }
                     }
-                    .onChange(of: locationManager.userLatitude) { newLatitude in
-                                         userLatitude = newLatitude
-                                         print("Latitude updated: \(newLatitude)")
-                                     }
-                                     .onChange(of: locationManager.userLongitude) { newLongitude in
-                                         userLongitude = newLongitude
-                                         print("Longitude updated: \(newLongitude)")
-                                     }
                     .onChange(of: WviewModel.messages) { _ in
                         if let lastMessage = WviewModel.messages.last {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -414,127 +436,98 @@ struct StartChatView: View {
                         appState.hideBottomNav = isFocused
                     }
                     .onDisappear {
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity)
-            .padding(.bottom, 5)
+                                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                             }
+                         }
+                     }
+                     .frame(maxHeight: .infinity)
+                     .padding(.bottom, 5)
+                     
+                     // 로딩 상태가 true일 때 로딩 인디케이터 표시
+                     if isLoading {
+                         VStack {
+                             ProgressView("Loading...")
+                                 .progressViewStyle(CircularProgressViewStyle())
+                                 .padding()
+                                 .background(Color.white)
+                                 .cornerRadius(10)
+                                 .shadow(radius: 5)
+                         }
+                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                         .background(Color.black.opacity(0.3))
+                     }
+                 }
+                 .alert(isPresented: $isShowingAlert) {
+                     Alert(
+                         title: Text("Error"),
+                         message: Text(alertMessage),
+                         dismissButton: .default(Text("OK"))
+                     )
+                 }
+                 .fullScreenCover(item: $safariViewURL) { url in
+                     SafariView(url: url)
+                 }
+        
+        // 현재 위치 버튼
+        LocationButton(.currentLocation) {
+            locationMapManager.manager.requestLocation()
         }
-        .alert(isPresented: $isShowingAlert) {
-            Alert(
-                title: Text("Error"),
-                message: Text(alertMessage),
-                dismissButton: .default(Text("OK"))
-            )
-        }
-        .fullScreenCover(item: $safariViewURL) { url in
-            SafariView(url: url)
-        }
-    }
-    
+        .frame(width: 250, height: 50)
+        .symbolVariant(.fill)
+        .foregroundColor(.white)
+        .tint(.purple)
+        .clipShape(Capsule())
+        .padding()
+             }
+             
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?) {
-        VStack {
-            if let actionValueText = actionValue?.text {
-                VStack {
-                    Text(buttonLabel)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.blue)
-                    
-                    Text(actionValueText)
-                        .font(.system(size: 14))
-                        .foregroundColor(.gray)
-                        .padding(.leading, 8)
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.blue, lineWidth: 2)
-                )
-                .padding(.horizontal, 16)
-            } else {
-                Text(buttonLabel)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.blue)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.blue, lineWidth: 2)
-                    )
-                    .padding(.horizontal, 16)
-            }
-        }
         switch buttonLabel {
-            case "Change Visa":
-                sendMessage("Change Visa", isButtonClicked: true)
-            case "Extend Visa":
-                sendMessage("Extend Visa", isButtonClicked: true)
-            case "Application Form":
-                navigateToTranslateView = true
-            case "Fill Application":
-                navigateToTranslateView = true
-            case "Hikorea Website":
-                if let urlString = actionValue?.url, let url = URL(string: urlString) {
-                    safariViewURL = url
-                }
         case "Open Map":
-            locationManager.requestLocation()
-            // 1초 뒤에 위치 가져오기 완료 후 로그 출력 및 네이버 맵 열기 시도
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            
-                
-                // 현재 위치 정보 로그로 출력
-                print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
-
-                if let name = actionValue?.name,
-                   let name_eng = actionValue?.name_eng,
-                   let address = actionValue?.address,
-                   let address_eng = actionValue?.address_eng,
-                   let destinationLatitude = actionValue?.latitude,
-                   let destinationLongitude = actionValue?.longitude {
-                    
-                    // 출발지와 도착지 이름 정보 인코딩
-                    let encodedStartName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                    let encodedEndName = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                    
-                    // 네이버 지도 웹 URL 생성 (sname, dname에 한글 인코딩 적용)
-                    let webMapURL = URL(string: "https://map.naver.com/v5/directions/-/141.39/\(destinationLatitude),\(destinationLongitude)?c=\(locationManager.userLatitude),\(locationManager.userLongitude),15,0,0,0,dh&dname=\(encodedEndName)&sname=\(encodedStartName)")!
-                    let appMapURL = URL(string: "nmap://route/public?slat=\(locationManager.userLatitude)&slng=\(locationManager.userLongitude)&sname=\(encodedStartName)&dlat=\(destinationLatitude)&dlng=\(destinationLongitude)&dname=\(encodedEndName)&Woorinara=project.livinglab.zypher")!
-
-                    // SafariView를 통해 네이버 지도 웹 페이지를 표시
-                  //  safariViewURL = webMapURL
-                    safariViewURL = appMapURL
-                } else {
-                    alertMessage = "출발지와 도착지 정보가 없습니다."
-                    isShowingAlert = true
-                }
-            }
-
-
-            // 실시간 위치 업데이트 시작 (CoreLocation에서 위치 얻기 시작)
-                  case "Office Location":
-                     locationManager.requestLocation()
-                      sendMessage("Office Location", isButtonClicked: true)
-                      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
-                        
-                          print("Latitude: \(locationManager.userLatitude), Longitude: \(locationManager.userLongitude)")
-                          let encodedStart = locationManager.userLatitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                          let encodedEnd = locationManager.userLongitude.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-
-                      }
-
+            requestLocationAndOpenMap(actionValue: actionValue)
+        case "Office Location":
+            requestLocationAndOpenMap(actionValue: actionValue)
         default:
             break
         }
     }
 
+    private func requestLocationAndOpenMap(actionValue: ActionValue?) {
+        isLoading = true // 로딩 시작
+        locationMapManager.manager.requestLocation()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            guard let currentLocation = locationMapManager.manager.location else {
+                isLoading = false // 로딩 종료
+                alertMessage = "현재 위치 정보를 가져올 수 없습니다."
+                isShowingAlert = true
+                return
+            }
+
+            let latitude = currentLocation.coordinate.latitude
+            let longitude = currentLocation.coordinate.longitude
+            print("현재 위치 - 위도: \(latitude), 경도: \(longitude)")
+
+            if let name = actionValue?.name,
+               let address = actionValue?.address,
+               let destinationLatitude = actionValue?.latitude,
+               let destinationLongitude = actionValue?.longitude {
+                
+                let encodedStartName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                let encodedEndName = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                
+                let webMapURL = URL(string: "https://map.naver.com/v5/directions/-/141.39/\(destinationLatitude),\(destinationLongitude)?c=\(latitude),\(longitude),15,0,0,0,dh&dname=\(encodedEndName)&sname=\(encodedStartName)")!
+                let appMapURL = URL(string: "nmap://route/public?slat=\(latitude)&slng=\(longitude)&sname=\(encodedStartName)&dlat=\(destinationLatitude)&dlng=\(destinationLongitude)&dname=\(encodedEndName)&Woorinara=project.livinglab.zypher")!
+
+                safariViewURL = appMapURL
+            } else {
+                alertMessage = "출발지와 도착지 정보가 없습니다."
+                isShowingAlert = true
+            }
+        }
+    }
     
-    // 메시지 전송 함수
     private func sendMessage(_ message: String, isButtonClicked: Bool = false) {
+        isLoading = true // 로딩 시작
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedMessage.isEmpty else { return }
         
@@ -542,7 +535,9 @@ struct StartChatView: View {
         WviewModel.messages.append(messageRecord)
         
         WviewModel.sendUserMessage(message: trimmedMessage, typingMessage: typingMessage, isButtonClicked: isButtonClicked, latitude: userLatitude, longitude: userLongitude) { result in
+            isLoading = false // 로딩 종료
             switch result {
+               
             case .success:
                 print("Message sent and response received.")
             case .failure(let error):
@@ -554,6 +549,12 @@ struct StartChatView: View {
     }
 }
 
+
+extension CLLocationCoordinate2D: Equatable {
+    public static func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+    }
+}
 // Extension to allow initialization of Color using hex values
 extension Color {
     init(hex: String) {
@@ -696,12 +697,13 @@ struct SafariView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
 
-// Preview 설정
-struct StartChatView_Previews: PreviewProvider {
-    @State static var typingMessage: String = ""
-        
-    static var previews: some View {
-        StartChatView(typingMessage: $typingMessage)
-            .environmentObject(AppChatState())
-    }
-}
+//// Preview 설정
+//struct StartChatView_Previews: PreviewProvider {
+//    @State static var typingMessage: String = ""
+//        
+//    static var previews: some View {
+//        StartChatView(typingMessage: $typingMessage, userLatitude: 37.7749, userLongitude: -122.4194) // Example coordinates
+//                 .environmentObject(AppChatState())
+//          
+//    }
+//}

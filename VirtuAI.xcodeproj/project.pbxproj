@@ -113,6 +113,8 @@
 		27F311872A375F7A00BB399B /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 27F311862A375F7A00BB399B /* AppsFlyerLib */; };
 		27F311892A37902900BB399B /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F311882A37902900BB399B /* SplashView.swift */; };
 		5408D52C2CD9E7FE002CF084 /* AFTransView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D52B2CD9E7FE002CF084 /* AFTransView.swift */; };
+		5408D5322CDA1831002CF084 /* PDFClickViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D5312CDA1830002CF084 /* PDFClickViewer.swift */; };
+		5408D5342CDA1A32002CF084 /* LogOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D5332CDA1A32002CF084 /* LogOutView.swift */; };
 		540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFD2CCB134A00760AC1 /* SwiftyChat */; };
 		540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */; };
 		541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */; };
@@ -319,6 +321,8 @@
 		27F311882A37902900BB399B /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		27F3118A2A37B23C00BB399B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5408D52B2CD9E7FE002CF084 /* AFTransView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFTransView.swift; sourceTree = "<group>"; };
+		5408D5312CDA1830002CF084 /* PDFClickViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFClickViewer.swift; sourceTree = "<group>"; };
+		5408D5332CDA1A32002CF084 /* LogOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogOutView.swift; sourceTree = "<group>"; };
 		541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOverlayView.swift; sourceTree = "<group>"; };
 		541F49AF2CD1E632004D4D20 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		541F49B02CD1E632004D4D20 /* ScanPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPassView.swift; sourceTree = "<group>"; };
@@ -660,6 +664,7 @@
 				54A43CBD2CC668F600A64B86 /* Login2View.swift */,
 				276E06B42B174E8F00E75DF5 /* LoginView.swift */,
 				5429955A2CD4A5BA007E3748 /* FindPWView.swift */,
+				5408D5332CDA1A32002CF084 /* LogOutView.swift */,
 			);
 			path = SignupLogin;
 			sourceTree = "<group>";
@@ -736,6 +741,7 @@
 		542995642CD4A955007E3748 /* Autofill */ = {
 			isa = PBXGroup;
 			children = (
+				5408D5312CDA1830002CF084 /* PDFClickViewer.swift */,
 				5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */,
 				541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */,
 				542995652CD4AD7E007E3748 /* AFDoneView.swift */,
@@ -1030,8 +1036,10 @@
 				27BC92C72A3130430031070B /* ConverstionsModel.swift in Sources */,
 				27C423A32B21F07D0065C328 /* VoiceView.swift in Sources */,
 				27F3116B2A338EF100BB399B /* SettingsViewModel.swift in Sources */,
+				5408D5322CDA1831002CF084 /* PDFClickViewer.swift in Sources */,
 				27F311812A37096600BB399B /* GenericDialogs.swift in Sources */,
 				27B0E0242A312724002CDA33 /* LazyView.swift in Sources */,
+				5408D5342CDA1A32002CF084 /* LogOutView.swift in Sources */,
 				27B0E01D2A30F5E9002CDA33 /* UserDefaults.swift in Sources */,
 				27C423A52B21F12E0065C328 /* VoiceViewModel.swift in Sources */,
 				54A43CCB2CC6695900A64B86 /* ContentSignView.swift in Sources */,

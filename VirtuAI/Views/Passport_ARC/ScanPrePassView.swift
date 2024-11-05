@@ -69,17 +69,18 @@ struct ScanPrePassView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToResultPassView = false
     @State private var capturedImage: UIImage?
-    @State private var isCameraPresented = false
+    @State private var isCameraPresented = true // Set to true to auto-present camera
     @State private var ocrPassResult: OCRPassResult?
     @State private var isLoading = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
     @State private var isManualInput = false // New state variable for manual input navigation
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Image("background") // Assets에 있는 "background" 이미지로 배경 설정
+                Image("background")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -130,27 +131,24 @@ struct ScanPrePassView: View {
                         } else {
                             errorMessage = "No image captured."
                             showErrorAlert = true
-                            print("Error: No image captured")
                         }
                     }
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(.white)
                     .disabled(capturedImage == nil)
                     .padding(.bottom, 30)
-                    
-                
-                
+
                     Button("Manual input") {
-                        isManualInput = true // Trigger manual input navigation
+                        isManualInput = true
                     }
                     .font(.system(size: 18, weight: .regular))
                     .foregroundColor(.white)
                     .padding(.top, 20)
                     .overlay(
                         Rectangle()
-                            .frame(height: 1) // 1px height
-                            .foregroundColor(.white), // White color for the stroke
-                        alignment: .bottom // Align it to the bottom of the button
+                            .frame(height: 1)
+                            .foregroundColor(.white),
+                        alignment: .bottom
                     )
                 }
                 
@@ -159,6 +157,10 @@ struct ScanPrePassView: View {
                     ProgressView().scaleEffect(2)
                 }
             }
+            .onAppear {
+                // Automatically present the camera when view appears
+                isCameraPresented = true
+            }
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
                 presentationMode.wrappedValue.dismiss()
@@ -166,8 +168,6 @@ struct ScanPrePassView: View {
                 Image(systemName: "chevron.left")
                     .foregroundColor(.blue)
                     .imageScale(.large)
-                Text("")
-                    .foregroundColor(.blue)
             })
             .sheet(isPresented: $isCameraPresented) {
                 CameraCaptureView(capturedImage: $capturedImage, isPresented: $isCameraPresented)
@@ -180,17 +180,15 @@ struct ScanPrePassView: View {
                 destination: ocrPassResult.map { ScanPassView(result: $0) },
                 isActive: $navigateToResultPassView
             ) {
-                EmptyView() // NavigationLink를 위한 EmptyView
+                EmptyView()
             }
             
-            // NavigationLink for manual input
-                        NavigationLink(
-                            destination: ScanPassView(result: OCRPassResult(status: 0, message: "", data: OCRPassData())),
-                            isActive: $isManualInput
-                        ) {
-                            EmptyView()
-                        }
-            
+            NavigationLink(
+                destination: ScanPassView(result: OCRPassResult(status: 0, message: "", data: OCRPassData())),
+                isActive: $isManualInput
+            ) {
+                EmptyView()
+            }
         }
     }
 
@@ -246,13 +244,9 @@ struct ScanPrePassView: View {
                 let result = try JSONDecoder().decode(OCRPassResult.self, from: data)
                 DispatchQueue.main.async {
                     if result.status == 200, let data = result.data, data.surName != nil || data.givenName != nil || data.documentNumber != nil {
-                        // OCRPassResult 값 출력
-                        print("OCRPassResult 값들 :", result)
-                                               
                         self.ocrPassResult = self.convertNilValues(result)
                         self.navigateToResultPassView = true
                     } else {
-                        // 필수 데이터 누락 시 알림 및 재시도 메시지
                         self.errorMessage = "\(result.data?.userId ?? "User")님, OCR 결과를 추출하지 못했습니다. 다시 시도하십시오."
                         self.showErrorAlert = true
                         self.resetScanPrePassView()
@@ -268,40 +262,24 @@ struct ScanPrePassView: View {
     }
 
     private func convertNilValues(_ result: OCRPassResult) -> OCRPassResult {
-        // 각 속성을 개별 상수로 복사한 후, 변경된 값으로 새로운 OCRPassData 객체 생성
-        let dateOfExpiry = result.data?.dateOfExpiry ?? ""
-        let inferResult = result.data?.inferResult ?? ""
-        let surName = result.data?.surName ?? ""
-        let nationality = result.data?.nationality ?? ""
-        let gender = result.data?.gender == "M" ? "M" : (result.data?.gender == "F" ? "F" : "")
-        let documentNumber = result.data?.documentNumber ?? ""
-        let givenName = result.data?.givenName ?? ""
-        let issueCountry = result.data?.issueCountry ?? ""
-        let middleName = result.data?.middleName ?? ""
-        let dateOfBirth = result.data?.dateOfBirth ?? ""
-        let message = result.data?.message ?? ""
-        let userId = result.data?.userId ?? ""
-
-        // 수정된 값들로 새로운 OCRPassData 객체를 생성하여 반환
         let modifiedData = OCRPassData(
-            dateOfExpiry: dateOfExpiry,
-            inferResult: inferResult,
-            surName: surName,
-            nationality: nationality,
-            gender: gender,
-            documentNumber: documentNumber,
-            givenName: givenName,
-            issueCountry: issueCountry,
-            middleName: middleName,
-            dateOfBirth: dateOfBirth,
-            message: message,
-            userId: userId
+            dateOfExpiry: result.data?.dateOfExpiry ?? "",
+            inferResult: result.data?.inferResult ?? "",
+            surName: result.data?.surName ?? "",
+            nationality: result.data?.nationality ?? "",
+            gender: result.data?.gender == "M" ? "M" : (result.data?.gender == "F" ? "F" : ""),
+            documentNumber: result.data?.documentNumber ?? "",
+            givenName: result.data?.givenName ?? "",
+            issueCountry: result.data?.issueCountry ?? "",
+            middleName: result.data?.middleName ?? "",
+            dateOfBirth: result.data?.dateOfBirth ?? "",
+            message: result.data?.message ?? "",
+            userId: result.data?.userId ?? ""
         )
         
         return OCRPassResult(status: result.status, message: result.message, data: modifiedData)
     }
 
-    // ScanPrePassView 초기화
     private func resetScanPrePassView() {
         self.capturedImage = nil
         self.ocrPassResult = nil
@@ -316,3 +294,4 @@ struct ScanPrePassView_Previews: PreviewProvider {
         }
     }
 }
+ 
