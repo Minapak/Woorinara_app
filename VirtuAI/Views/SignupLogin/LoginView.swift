@@ -20,7 +20,7 @@ struct LoginView: View {
     @StateObject var AuthviewModel = AuthenticationViewModel()
     @State private var isLoginSuccessful: Bool = false
     
-    private let tokenManager = TokenManager()
+    private let tokenManager = TokenManager.shared // 싱글톤 인스턴스를 사용
 
     var body: some View {
         NavigationView {
@@ -204,26 +204,45 @@ struct LoginView: View {
 }
 
 class TokenManager {
+    static let shared = TokenManager() // 싱글톤 인스턴스
+
     private let urlSession = URLSession.shared
     private let tokenRefreshURL = "http://43.203.237.202:18080/api/v1/token/issue"
     private let refreshThreshold: TimeInterval = 24 * 60 * 60 // 만료 24시간 전
     private var timer: Timer?
+    private var lastTokenRefreshDate: Date? // 마지막 토큰 갱신 시간
+    
+    private init() {}
 
-    func startTokenRefreshTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: refreshThreshold, repeats: true) { _ in
-            self.checkAndRefreshToken()
-        }
-    }
+      func startTokenRefreshTimer() {
+          // 타이머가 이미 설정된 경우 먼저 무효화
+          timer?.invalidate()
+          
+          // 24시간 간격으로 타이머 설정하여 토큰 자동 갱신
+          timer = Timer.scheduledTimer(withTimeInterval: refreshThreshold, repeats: true) { [weak self] _ in
+              self?.checkAndRefreshToken()
+          }
+      }
 
     func checkAndRefreshToken() {
-        guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
-              let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
-              let expirationDate = decodeExpirationDate(from: accessToken),
-              expirationDate.timeIntervalSinceNow < 0 else {
-            return
-        }
-        refreshAccessToken(refreshToken: refreshToken)
-    }
+          // 24시간 이내로 갱신이 수행된 경우, 갱신하지 않음
+          if let lastRefreshDate = lastTokenRefreshDate, Date().timeIntervalSince(lastRefreshDate) < refreshThreshold {
+              print("24시간 이내로 이미 토큰이 갱신되었습니다.")
+              return
+          }
+          
+          // 현재 토큰과 만료 시점을 확인하여 갱신 여부 결정
+          guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
+                let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
+                let expirationDate = decodeExpirationDate(from: accessToken),
+                expirationDate.timeIntervalSinceNow < 0 else {
+              return
+          }
+          
+          // 토큰 갱신 수행
+          refreshAccessToken(refreshToken: refreshToken)
+          lastTokenRefreshDate = Date() // 갱신 시간 업데이트
+      }
 
     private func decodeExpirationDate(from accessToken: String) -> Date? {
         let tokenParts = accessToken.split(separator: ".")

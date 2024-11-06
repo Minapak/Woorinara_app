@@ -115,6 +115,7 @@
 		5408D52C2CD9E7FE002CF084 /* AFTransView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D52B2CD9E7FE002CF084 /* AFTransView.swift */; };
 		5408D5322CDA1831002CF084 /* PDFClickViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D5312CDA1830002CF084 /* PDFClickViewer.swift */; };
 		5408D5342CDA1A32002CF084 /* LogOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D5332CDA1A32002CF084 /* LogOutView.swift */; };
+		5408D5362CDAD373002CF084 /* AFSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5408D5352CDAD373002CF084 /* AFSelectView.swift */; };
 		540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFD2CCB134A00760AC1 /* SwiftyChat */; };
 		540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */; };
 		541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */; };
@@ -323,6 +324,7 @@
 		5408D52B2CD9E7FE002CF084 /* AFTransView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFTransView.swift; sourceTree = "<group>"; };
 		5408D5312CDA1830002CF084 /* PDFClickViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFClickViewer.swift; sourceTree = "<group>"; };
 		5408D5332CDA1A32002CF084 /* LogOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogOutView.swift; sourceTree = "<group>"; };
+		5408D5352CDAD373002CF084 /* AFSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFSelectView.swift; sourceTree = "<group>"; };
 		541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOverlayView.swift; sourceTree = "<group>"; };
 		541F49AF2CD1E632004D4D20 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		541F49B02CD1E632004D4D20 /* ScanPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPassView.swift; sourceTree = "<group>"; };
@@ -747,6 +749,7 @@
 				542995652CD4AD7E007E3748 /* AFDoneView.swift */,
 				542995692CD88818007E3748 /* AFAutoView.swift */,
 				5408D52B2CD9E7FE002CF084 /* AFTransView.swift */,
+				5408D5352CDAD373002CF084 /* AFSelectView.swift */,
 			);
 			path = Autofill;
 			sourceTree = "<group>";
@@ -1096,6 +1099,7 @@
 				27F296242A2BA23E002470C5 /* ColorExtension.swift in Sources */,
 				27367B5D2B1A0FE600E2AA14 /* AppState.swift in Sources */,
 				54E0BE2B2CC7ABE800D41163 /* WooriChatAPI.swift in Sources */,
+				5408D5362CDAD373002CF084 /* AFSelectView.swift in Sources */,
 				5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */,
 				27F296802A2F3D41002470C5 /* MessageModel.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
@@ -1350,7 +1354,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1400,7 +1404,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

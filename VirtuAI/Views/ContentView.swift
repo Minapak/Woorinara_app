@@ -27,8 +27,8 @@ struct ContentView: View {
                     StartChatView(
                         appState: _appState,
                         appChatState: _appChatState,
-                                           userLatitude: 37.7749,
-                                           userLongitude: -122.4194,
+//                                           userLatitude: 37.7749,
+//                                           userLongitude: -122.4194,
                                            typingMessage: ContentView.$typingMessageCurrent
                                        )
                                        .tag(0)

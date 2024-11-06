@@ -10,11 +10,13 @@ struct AFTransView: View {
     @State private var showAlertForRedText = false
     @State private var showAlertForFileName = false
     @State private var showFileTypeSelection = false
+    @State private var showAutoFillView = false
     @State private var fileName: String = "Alteration of Residence"
     @State private var selectedFileTypes: [String] = ["pdf"]
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
-    @State private var showARView = false
+    @State private var showAFSelectView = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -26,11 +28,11 @@ struct AFTransView: View {
                     
                     VStack (alignment: .leading ,spacing: 0){
                         Spacer()
-                        Text("The integrated application form will be automatically filled out based on the registered user information")
+                        Text("The integrated application form will be automatically \nfilled out based on the registered user information")
                             .font(.system(size: 12))
                             .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.leading) // 여러 줄을 가운데 정렬
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
                             .foregroundColor(.gray)
                             .padding(12) // 프레임에 12씩 패딩 추가
                             .background(Color.white.opacity(0.1))
@@ -43,9 +45,8 @@ struct AFTransView: View {
                             .padding()
                         Spacer()
                         HStack(spacing: 0) {
-                            
-                            NavigationLink(destination: PDFClickViewer(), isActive: $showARView){Button(action: {
-                                showARView = true
+                            Button(action: {
+                                showAFSelectView = true
                             }) {
                                 Text("Select Application/Report")
                                     .font(.system(size: 18).bold())
@@ -55,10 +56,10 @@ struct AFTransView: View {
                                     .foregroundColor(.white)
                                     .cornerRadius(16)
                             }
-                                
-                                
-                            }.padding(.bottom, 5)
-                        }
+                            
+                        
+                        }.padding(.bottom, 5)
+                     
                     }.padding(.horizontal, 16)
                 }
             }
@@ -73,46 +74,49 @@ struct AFTransView: View {
                             Text("")
                                 .foregroundColor(.black)
                         })
-            .alert(isPresented: $showAlertForRedText) {
-                Alert(
-                    title: Text("Red text is a sample value, so it will be deleted if not edited"),
-                    message: Text("Everything else will be saved"),
-                    primaryButton: .default(Text("Edit")),
-                    secondaryButton: .default(Text("OK"), action: {
-                        showAlertForFileName = true
-                    })
-                )
-            }
-            .alert("Save as...", isPresented: $showAlertForFileName) {
-                VStack {
-                    TextField("Enter file name", text: $fileName)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-
-                    Button("Save") {
-                        showFileTypeSelection = true
-                    }
-                    .padding(.top, 10)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                }
-                .padding()
-            }
-            
-            .actionSheet(isPresented: $showFileTypeSelection) {
-                ActionSheet(
-                    title: Text("Save file"),
-                    message: Text("Choose file format"),
-                    buttons: [
-                        .default(Text("PDF"), action: { toggleFileType("pdf") }),
-                        .default(Text("PNG"), action: { toggleFileType("png") }),
-                        .default(Text("Done"))
-                    ]
-                )
-            }
+            // NavigationLink를 사용하여 뷰 전환
+            .background(
+                NavigationLink(destination: AFSelectView(), isActive: $showAFSelectView) { EmptyView() }
+            )
+//            .alert(isPresented: $showAlertForRedText) {
+//                Alert(
+//                    title: Text("Red text is a sample value, so it will be deleted if not edited"),
+//                    message: Text("Everything else will be saved"),
+//                    primaryButton: .default(Text("Edit")),
+//                    secondaryButton: .default(Text("OK"), action: {
+//                        showAlertForFileName = true
+//                    })
+//                )
+//            }
+//            .alert("Save as...", isPresented: $showAlertForFileName) {
+//                VStack {
+//                    TextField("Enter file name", text: $fileName)
+//                        .padding()
+//                        .background(Color.gray.opacity(0.2))
+//                        .cornerRadius(8)
+//
+//                    Button("Save") {
+//                        showFileTypeSelection = true
+//                    }
+//                    .padding(.top, 10)
+//                    .frame(maxWidth: .infinity)
+//                    .background(Color.blue)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(8)
+//                }
+//                .padding()
+//            }
+//            .actionSheet(isPresented: $showFileTypeSelection) {
+//                ActionSheet(
+//                    title: Text("Save file"),
+//                    message: Text("Choose file format"),
+//                    buttons: [
+//                        .default(Text("PDF"), action: { toggleFileType("pdf") }),
+//                        .default(Text("PNG"), action: { toggleFileType("png") }),
+//                        .default(Text("Done"))
+//                    ]
+//                )
+//            }
         }
     }
 
