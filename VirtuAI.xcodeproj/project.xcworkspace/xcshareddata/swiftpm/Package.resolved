@@ -1,5 +1,5 @@
 {
-  "originHash" : "76759c6756327f15234143dde8a1b00835b54f591debe3f0b6db54ece381c3af",
+  "originHash" : "712f5ea61c17fc457f3a6ae74293061e85e2ce760c2858e2a72baeb90f65ece6",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "b39252eacd159904afd7d718bba0afabb87f2f2f",
         "version" : "1.3.9"
+      }
+    },
+    {
+      "identity" : "animatedimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/noppefoxwolf/AnimatedImage",
+      "state" : {
+        "revision" : "de4c3e3585557c0a5787958b59defe83e279220f",
+        "version" : "0.0.8"
       }
     },
     {
@@ -173,12 +182,12 @@
       }
     },
     {
-      "identity" : "lottie-ios",
+      "identity" : "mixpanel-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios.git",
+      "location" : "https://github.com/mixpanel/mixpanel-swift",
       "state" : {
-        "revision" : "d6feea26a370019b4d3a85f5984cb95a2734776f",
-        "version" : "4.2.0"
+        "branch" : "master",
+        "revision" : "61ce9b40817466fb1334db1d7a582fbaf616ab4c"
       }
     },
     {

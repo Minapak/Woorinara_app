@@ -68,8 +68,9 @@ struct TranslationView: View {
                 NavigationLink(destination: TranslateView(), isActive: $showTranslationView) { EmptyView() }
             )
             .background(
-                NavigationLink(destination: AFTransView(), isActive: $showAutoFillView) { EmptyView() }
+                NavigationLink(destination: ScanView(), isActive: $showAutoFillView) { EmptyView() }
             )
+            
         }
     }
 }

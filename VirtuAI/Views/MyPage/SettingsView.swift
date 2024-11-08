@@ -35,10 +35,10 @@ struct SettingsView: View {
                                 isPresented.toggle()
                             } label: {
                                 HStack {
-                                    LottieView(animationName: "starLottie")
-                                        .frame(width: 55, height: 55)
-                                        .background(.white)
-                                        .cornerRadius(99)
+//                                    LottieView(animationName: "starLottie")
+//                                        .frame(width: 55, height: 55)
+//                                        .background(.white)
+//                                        .cornerRadius(99)
                                     
                                     VStack(alignment: .leading, spacing: 10) {
                                         Text("upgrade_to_pro".localize(language))

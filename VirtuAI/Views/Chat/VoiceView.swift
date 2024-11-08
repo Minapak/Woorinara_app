@@ -200,9 +200,9 @@ struct VoiceView: View {
                             Image(viewModel.selectedImage).centerCropped().frame( height: 350)
 
 
-                            if viewModel.isPlayingFromURL {
-                                LottieView(animationName: "speechWave").frame(height: 60).padding(.horizontal, 5)
-                            }
+//                            if viewModel.isPlayingFromURL {
+//                                LottieView(animationName: "speechWave").frame(height: 60).padding(.horizontal, 5)
+//                            }
                             
                         }
                         
@@ -410,9 +410,9 @@ struct VoiceStyleItem: View {
                         .background(Color.light_gray)
                         .frame(width: 120, height: 200)
                     
-                    if isPlaying {
-                        LottieView(animationName: "speechWave").frame(height: 40).padding(.horizontal, 5)
-                    }
+//                    if isPlaying {
+//                        LottieView(animationName: "speechWave").frame(height: 40).padding(.horizontal, 5)
+//                    }
                     
                 }
                 

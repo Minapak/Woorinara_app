@@ -180,17 +180,20 @@ struct LoginView: View {
             showAlert = true
             return
         }
-        KeychainWrapper.standard.set(username, forKey: "username") // username 저장
-        KeychainWrapper.standard.set(password, forKey: "password") // password 저장
+        
+        KeychainWrapper.standard.set(username, forKey: "username")
+        KeychainWrapper.standard.set(password, forKey: "password")
         KeychainWrapper.standard.set(token.accessToken, forKey: "accessToken")
         KeychainWrapper.standard.set(token.refreshToken, forKey: "refreshToken")
         UserDefaults.standard.set(token.status, forKey: "userStatus")
         UserDefaults.standard.set(token.role, forKey: "userRole")
         
+        // 현재 날짜 저장
+        UserDefaults.standard.set(Date(), forKey: "tokenDate")
+        
         print("Access token and username saved.")
         isLoginSuccessful = true
     }
-
     private func processErrorResponse(data: Data?) {
         guard let data = data,
               let errorDetails = try? JSONDecoder().decode(ServerErrorDetails.self, from: data) else {
@@ -203,6 +206,8 @@ struct LoginView: View {
     }
 }
 
+
+
 class TokenManager {
     static let shared = TokenManager() // 싱글톤 인스턴스
 
@@ -214,39 +219,60 @@ class TokenManager {
     
     private init() {}
 
-      func startTokenRefreshTimer() {
-          // 타이머가 이미 설정된 경우 먼저 무효화
-          timer?.invalidate()
-          
-          // 24시간 간격으로 타이머 설정하여 토큰 자동 갱신
-          timer = Timer.scheduledTimer(withTimeInterval: refreshThreshold, repeats: true) { [weak self] _ in
-              self?.checkAndRefreshToken()
-          }
-      }
+    func startTokenRefreshTimer() {
+        print("🔄 Starting token refresh timer every midnight.")
+             
+             // 매일 자정에 토큰을 확인하고 필요한 경우 갱신하도록 설정
+             timer = Timer.scheduledTimer(withTimeInterval: 24 * 60 * 60, repeats: true) { [weak self] _ in
+                 self?.checkAndRefreshToken()
+             }
+    }
 
     func checkAndRefreshToken() {
-          // 24시간 이내로 갱신이 수행된 경우, 갱신하지 않음
-          if let lastRefreshDate = lastTokenRefreshDate, Date().timeIntervalSince(lastRefreshDate) < refreshThreshold {
-              print("24시간 이내로 이미 토큰이 갱신되었습니다.")
-              return
-          }
-          
-          // 현재 토큰과 만료 시점을 확인하여 갱신 여부 결정
-          guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
-                let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
-                let expirationDate = decodeExpirationDate(from: accessToken),
-                expirationDate.timeIntervalSinceNow < 0 else {
-              return
-          }
-          
-          // 토큰 갱신 수행
-          refreshAccessToken(refreshToken: refreshToken)
-          lastTokenRefreshDate = Date() // 갱신 시간 업데이트
-      }
+        print("🔍 Checking if token needs refresh based on date...")
+             
+             // 이전 갱신 날짜가 있는지 확인하고, 하루가 지나지 않았다면 갱신하지 않음
+             if let lastRefreshDate = lastTokenRefreshDate,
+                Calendar.current.isDateInToday(lastRefreshDate) {
+                 print("✅ Token already refreshed today.")
+                 return
+             }
+
+             // 토큰의 만료 날짜 확인
+             guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
+                   let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
+                   let expirationDate = decodeExpirationDate(from: accessToken),
+                   expirationDate < Date() else {
+                 print("❌ No need to refresh token or token is still valid.")
+                 return
+             }
+             
+             print("🔄 Token needs refresh. Proceeding with refresh request.")
+             
+             // 토큰 갱신 수행
+             refreshAccessToken(refreshToken: refreshToken)
+             lastTokenRefreshDate = Date() // 갱신 날짜 업데이트
+    }
 
     private func decodeExpirationDate(from accessToken: String) -> Date? {
+        guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❗ Failed to retrieve access token from Keychain.")
+            return nil
+        }
+        
         let tokenParts = accessToken.split(separator: ".")
-        guard tokenParts.count > 1, let payloadData = Data(base64Encoded: String(tokenParts[1])) else {
+        guard tokenParts.count > 1 else {
+            print("❗ Access token is not in the correct format.")
+            return nil
+        }
+        
+        var payloadString = String(tokenParts[1])
+        while payloadString.count % 4 != 0 { // Base64 패딩 추가
+            payloadString += "="
+        }
+        
+        guard let payloadData = Data(base64Encoded: payloadString) else {
+            print("❗ Failed to decode payload part of the token as Base64.")
             return nil
         }
 
@@ -256,39 +282,60 @@ class TokenManager {
 
         let decoder = JSONDecoder()
         guard let payload = try? decoder.decode(TokenPayload.self, from: payloadData) else {
+            print("❗ Failed to decode JSON payload for expiration date.")
             return nil
         }
 
-        return Date(timeIntervalSince1970: payload.exp)
+        let expirationDate = Date(timeIntervalSince1970: payload.exp)
+        print("🕑 Token expiration date decoded: \(expirationDate)")
+        return expirationDate
     }
 
+
+
     private func refreshAccessToken(refreshToken: String) {
-        guard let url = URL(string: tokenRefreshURL) else { return }
+        guard let url = URL(string: tokenRefreshURL) else {
+            print("❗ Invalid token refresh URL.")
+            return
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken")
+        
         let json = ["refreshToken": refreshToken]
         guard let jsonData = try? JSONSerialization.data(withJSONObject: json) else {
-            print("Failed to encode JSON for token refresh.")
+            print("❗ Failed to encode JSON for token refresh request.")
             return
         }
 
         request.httpBody = jsonData
 
+        print("🔄 Sending token refresh request to \(url.absoluteString)")
+
         urlSession.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil,
-                  let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200,
-                  let newToken = try? JSONDecoder().decode(LoginToken.self, from: data) else {
-                print("Token refresh failed.")
+            if let error = error {
+                print("❗ Token refresh request failed with error: \(error.localizedDescription)")
                 return
             }
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                print("❌ Invalid response for token refresh request.")
+                return
+            }
+            
+            guard let data = data,
+                  let newToken = try? JSONDecoder().decode(LoginToken.self, from: data) else {
+                print("❗ Token refresh response data decoding failed.")
+                return
+            }
+            
             KeychainWrapper.standard.set(newToken.accessToken, forKey: "accessToken")
-            print("Token refreshed successfully.")
+            print("✅ Token refreshed successfully and saved to Keychain.")
         }.resume()
     }
 }
+
 
 
 struct LoginToken: Codable {

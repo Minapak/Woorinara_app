@@ -97,7 +97,6 @@
 		27F296872A2F6D2F002470C5 /* AIAssistantsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F296862A2F6D2F002470C5 /* AIAssistantsModel.swift */; };
 		27F296892A2F8B7C002470C5 /* AssistantCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F296882A2F8B7C002470C5 /* AssistantCard.swift */; };
 		27F3115A2A334D7400BB399B /* LottieView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F311592A334D7400BB399B /* LottieView.swift */; };
-		27F3115D2A33510A00BB399B /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 27F3115C2A33510A00BB399B /* Lottie */; };
 		27F311652A335EF500BB399B /* starLottie.json in Resources */ = {isa = PBXBuildFile; fileRef = 27F311642A335EF500BB399B /* starLottie.json */; };
 		27F311692A33857800BB399B /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F311682A33857800BB399B /* Appearance.swift */; };
 		27F3116B2A338EF100BB399B /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F3116A2A338EF100BB399B /* SettingsViewModel.swift */; };
@@ -133,7 +132,6 @@
 		5426B3B62CD2FD5300BDD084 /* AFCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */; };
 		5429955B2CD4A5BA007E3748 /* FindPWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429955A2CD4A5BA007E3748 /* FindPWView.swift */; };
 		542995662CD4AD7E007E3748 /* AFDoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995652CD4AD7E007E3748 /* AFDoneView.swift */; };
-		542995682CD52573007E3748 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995672CD52572007E3748 /* LocationManager.swift */; };
 		5429956A2CD88818007E3748 /* AFAutoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 542995692CD88818007E3748 /* AFAutoView.swift */; };
 		5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956B2CD892C7007E3748 /* MyInfoView.swift */; };
 		5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */; };
@@ -155,6 +153,7 @@
 		54A43CD42CC677AF00A64B86 /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD32CC677AF00A64B86 /* AlertToast */; };
 		54A43CD72CC6787700A64B86 /* SwiftUIDigitalSignature in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD62CC6787700A64B86 /* SwiftUIDigitalSignature */; };
 		54A43CDA2CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD92CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI */; };
+		54DCC6962CDCAF7E002AA420 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 54DCC6952CDCAF7E002AA420 /* Mixpanel */; };
 		54E0BE2B2CC7ABE800D41163 /* WooriChatAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE2A2CC7ABE800D41163 /* WooriChatAPI.swift */; };
 		54E0BE2F2CC8789900D41163 /* ContentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE2E2CC8789900D41163 /* ContentResultView.swift */; };
 		54E0BE332CC892FE00D41163 /* PDFPractice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE322CC892FE00D41163 /* PDFPractice.swift */; };
@@ -164,6 +163,9 @@
 		54E7FCB12CC69CD600D1D098 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 54E7FCB02CC69CD600D1D098 /* Alamofire */; };
 		54F1CD392CCB513B0018B30E /* WebView in Frameworks */ = {isa = PBXBuildFile; productRef = 54F1CD382CCB513B0018B30E /* WebView */; };
 		54F1CD3B2CCB57F00018B30E /* ContentWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */; };
+		54F7C3BE2CDB23FB00FF3F15 /* AnimatedImage in Frameworks */ = {isa = PBXBuildFile; productRef = 54F7C3BD2CDB23FB00FF3F15 /* AnimatedImage */; };
+		54F7C3C02CDB23FB00FF3F15 /* AnimatedImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 54F7C3BF2CDB23FB00FF3F15 /* AnimatedImageSwiftUI */; };
+		54F7C3C22CDB244E00FF3F15 /* GifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F7C3C12CDB244E00FF3F15 /* GifView.swift */; };
 		54FC8CF02CC758ED004A23C2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54A43CC62CC6691500A64B86 /* GoogleService-Info.plist */; };
 		54FC8CF62CC76774004A23C2 /* GoogleServiceEx-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54FC8CF52CC76774004A23C2 /* GoogleServiceEx-Info.plist */; };
 /* End PBXBuildFile section */
@@ -336,7 +338,6 @@
 		5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFCenterView.swift; sourceTree = "<group>"; };
 		5429955A2CD4A5BA007E3748 /* FindPWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindPWView.swift; sourceTree = "<group>"; };
 		542995652CD4AD7E007E3748 /* AFDoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFDoneView.swift; sourceTree = "<group>"; };
-		542995672CD52572007E3748 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		542995692CD88818007E3748 /* AFAutoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFAutoView.swift; sourceTree = "<group>"; };
 		5429956B2CD892C7007E3748 /* MyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyInfoView.swift; sourceTree = "<group>"; };
 		5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MInfoUpdateView.swift; sourceTree = "<group>"; };
@@ -362,6 +363,7 @@
 		54E0BE362CC8CE9C00D41163 /* MembersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersViewModel.swift; sourceTree = "<group>"; };
 		54E0BE382CC8D25F00D41163 /* UserViewModel.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = UserViewModel.txt; sourceTree = "<group>"; };
 		54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentWebView.swift; sourceTree = "<group>"; };
+		54F7C3C12CDB244E00FF3F15 /* GifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifView.swift; sourceTree = "<group>"; };
 		54FC8CF52CC76774004A23C2 /* GoogleServiceEx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleServiceEx-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -384,8 +386,8 @@
 				5426B3A62CD1FFE300BDD084 /* RSFUIPassportScanner in Frameworks */,
 				276E06BC2B175AD900E75DF5 /* GoogleSignInSwift in Frameworks */,
 				27F311842A37410500BB399B /* PopupView in Frameworks */,
-				27F3115D2A33510A00BB399B /* Lottie in Frameworks */,
 				27B0E02F2A312F15002CDA33 /* SQLite in Frameworks */,
+				54DCC6962CDCAF7E002AA420 /* Mixpanel in Frameworks */,
 				277A65812B227FAE0057D146 /* CropViewController in Frameworks */,
 				27F311762A362AB200BB399B /* RevenueCat in Frameworks */,
 				276E06AF2B16836C00E75DF5 /* FirebaseFirestore in Frameworks */,
@@ -399,12 +401,14 @@
 				540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */,
 				276E06AB2B16836C00E75DF5 /* FirebaseAnalytics in Frameworks */,
 				54A43CD72CC6787700A64B86 /* SwiftUIDigitalSignature in Frameworks */,
+				54F7C3BE2CDB23FB00FF3F15 /* AnimatedImage in Frameworks */,
 				27F311872A375F7A00BB399B /* AppsFlyerLib in Frameworks */,
 				276E06BA2B175AD900E75DF5 /* GoogleSignIn in Frameworks */,
 				54F1CD392CCB513B0018B30E /* WebView in Frameworks */,
 				54A43CD12CC6768B00A64B86 /* SwiftKeychainWrapper in Frameworks */,
 				277A65862B2289170057D146 /* SwiftSoup in Frameworks */,
 				54A43CD42CC677AF00A64B86 /* AlertToast in Frameworks */,
+				54F7C3C02CDB23FB00FF3F15 /* AnimatedImageSwiftUI in Frameworks */,
 				540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */,
 				54E7FCB12CC69CD600D1D098 /* Alamofire in Frameworks */,
 			);
@@ -693,8 +697,8 @@
 				27C423A22B21F07D0065C328 /* VoiceView.swift */,
 				27F2966D2A2D1E7B002470C5 /* ChatView.swift */,
 				27F296112A2B9C49002470C5 /* StartChatView.swift */,
-				542995672CD52572007E3748 /* LocationManager.swift */,
 				54A43CCA2CC6695900A64B86 /* ContentMapView.swift */,
+				54F7C3C12CDB244E00FF3F15 /* GifView.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -794,7 +798,6 @@
 				27F296822A2F429F002470C5 /* MarkdownUI */,
 				27B0E01F2A30FF6C002CDA33 /* GoogleMobileAds */,
 				27B0E02E2A312F15002CDA33 /* SQLite */,
-				27F3115C2A33510A00BB399B /* Lottie */,
 				27F311752A362AB200BB399B /* RevenueCat */,
 				27F311832A37410500BB399B /* PopupView */,
 				27F311862A375F7A00BB399B /* AppsFlyerLib */,
@@ -819,6 +822,9 @@
 				540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */,
 				54F1CD382CCB513B0018B30E /* WebView */,
 				541F49BA2CD1EF87004D4D20 /* RSFUIPassportScanner */,
+				54F7C3BD2CDB23FB00FF3F15 /* AnimatedImage */,
+				54F7C3BF2CDB23FB00FF3F15 /* AnimatedImageSwiftUI */,
+				54DCC6952CDCAF7E002AA420 /* Mixpanel */,
 			);
 			productName = ConversAI;
 			productReference = 27F295E12A2B9966002470C5 /* VirtuAI.app */;
@@ -908,7 +914,6 @@
 				27F296812A2F429F002470C5 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				27B0E01E2A30FF6C002CDA33 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 				27B0E02D2A312F15002CDA33 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
-				27F3115B2A33510A00BB399B /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				27F311742A362AB200BB399B /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				27F311822A37410500BB399B /* XCRemoteSwiftPackageReference "PopupView" */,
 				27F311852A375F7A00BB399B /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
@@ -926,6 +931,8 @@
 				540B9AFC2CCB134A00760AC1 /* XCRemoteSwiftPackageReference "SwiftyChat" */,
 				54F1CD372CCB513B0018B30E /* XCRemoteSwiftPackageReference "WebView" */,
 				541F49B92CD1EF87004D4D20 /* XCLocalSwiftPackageReference "../zypher/RSFUIPassportScanner-main" */,
+				54F7C3BC2CDB23FB00FF3F15 /* XCRemoteSwiftPackageReference "AnimatedImage" */,
+				54DCC6942CDCAF7E002AA420 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 			);
 			productRefGroup = 27F295E22A2B9966002470C5 /* Products */;
 			projectDirPath = "";
@@ -1086,7 +1093,6 @@
 				54A43CC02CC668F600A64B86 /* AppButton.swift in Sources */,
 				54A43CC12CC668F600A64B86 /* SignUpView.swift in Sources */,
 				54A43CC22CC668F600A64B86 /* Login2View.swift in Sources */,
-				542995682CD52573007E3748 /* LocationManager.swift in Sources */,
 				54A43CC32CC668F600A64B86 /* AppInputBox.swift in Sources */,
 				54A43CC52CC668F600A64B86 /* TranslationView.swift in Sources */,
 				27F296892A2F8B7C002470C5 /* AssistantCard.swift in Sources */,
@@ -1103,6 +1109,7 @@
 				5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */,
 				27F296802A2F3D41002470C5 /* MessageModel.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
+				54F7C3C22CDB244E00FF3F15 /* GifView.swift in Sources */,
 				541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */,
 				27F2965A2A2CCA16002470C5 /* GenerateImageView.swift in Sources */,
 				27F2965E2A2CCAF5002470C5 /* SettingsView.swift in Sources */,
@@ -1354,7 +1361,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1404,7 +1411,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1657,14 +1664,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		27F3115B2A33510A00BB399B /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
 		27F311742A362AB200BB399B /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
@@ -1737,6 +1736,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		54DCC6942CDCAF7E002AA420 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		54E7FCAF2CC69CD600D1D098 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire";
@@ -1751,6 +1758,14 @@
 			requirement = {
 				kind = upToNextMinorVersion;
 				minimumVersion = 0.1.1;
+			};
+		};
+		54F7C3BC2CDB23FB00FF3F15 /* XCRemoteSwiftPackageReference "AnimatedImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/noppefoxwolf/AnimatedImage";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.0.8;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1816,11 +1831,6 @@
 			package = 27F296812A2F429F002470C5 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		27F3115C2A33510A00BB399B /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 27F3115B2A33510A00BB399B /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
-		};
 		27F311752A362AB200BB399B /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 27F311742A362AB200BB399B /* XCRemoteSwiftPackageReference "purchases-ios" */;
@@ -1883,6 +1893,11 @@
 			package = 54A43CD82CC679C700A64B86 /* XCRemoteSwiftPackageReference "FloatingLabelTextFieldSwiftUI" */;
 			productName = FloatingLabelTextFieldSwiftUI;
 		};
+		54DCC6952CDCAF7E002AA420 /* Mixpanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 54DCC6942CDCAF7E002AA420 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
+			productName = Mixpanel;
+		};
 		54E7FCB02CC69CD600D1D098 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 54E7FCAF2CC69CD600D1D098 /* XCRemoteSwiftPackageReference "Alamofire" */;
@@ -1892,6 +1907,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 54F1CD372CCB513B0018B30E /* XCRemoteSwiftPackageReference "WebView" */;
 			productName = WebView;
+		};
+		54F7C3BD2CDB23FB00FF3F15 /* AnimatedImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 54F7C3BC2CDB23FB00FF3F15 /* XCRemoteSwiftPackageReference "AnimatedImage" */;
+			productName = AnimatedImage;
+		};
+		54F7C3BF2CDB23FB00FF3F15 /* AnimatedImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 54F7C3BC2CDB23FB00FF3F15 /* XCRemoteSwiftPackageReference "AnimatedImage" */;
+			productName = AnimatedImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

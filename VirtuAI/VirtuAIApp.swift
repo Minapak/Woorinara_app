@@ -4,7 +4,7 @@ import RevenueCat
 import UIKit
 import FirebaseCore
 import GoogleSignIn
-
+import Mixpanel
 @main
 struct VirtuAIApp: App {
     @Environment(\.scenePhase) private var scenePhase
@@ -51,6 +51,7 @@ struct VirtuAIApp: App {
 
         func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
             FirebaseApp.configure()
+            Mixpanel.initialize(token: "c44056e5db4e574a5dc70f815486b4d8", trackAutomaticEvents: false)
             return true
         }
 

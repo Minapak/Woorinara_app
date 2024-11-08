@@ -30,7 +30,7 @@ struct ContentWebView: View {
                            
 
                     }.onAppear {
-                        self.webViewStore.webView.load(URLRequest(url: URL(string: "https://m.cafe.naver.com")!))
+                        self.webViewStore.webView.load(URLRequest(url: URL(string: "https://m.cafe.naver.com/woorinarakr?iframe_url=/MyCafeIntro.nhn%3Fclubid=31322615")!))
                     }
                    // Spacer()
 

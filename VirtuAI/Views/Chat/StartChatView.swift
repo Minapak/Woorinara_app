@@ -127,29 +127,7 @@ struct MemberInfo: Codable {
 extension URL: Identifiable {
     public var id: URL { self }
 }
-struct GifImage: UIViewRepresentable {
-    private let name: String
 
-    init(_ name: String) {
-        self.name = name
-    }
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
-
-        if let path = Bundle.main.path(forResource: name, ofType: "gif") {
-            let data = try? Data(contentsOf: URL(fileURLWithPath: path))
-            webView.load(data!, mimeType: "image/gif", characterEncodingName: "UTF-8", baseURL: URL(fileURLWithPath: path))
-        }
-        
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
-}
 // WooriChatAPI 클래스: 메시지 전송 및 서버 데이터 가져오기 기능을 제공
 class WooriChatAPI: ObservableObject {
     private let baseURL = "http://43.203.237.202:18080/api/v1/chatbot/messages" // API 엔드포인트
@@ -307,9 +285,9 @@ struct StartChatView: View {
     @StateObject private var WviewModel = WooriChatAPI()
     @AppStorage("language") private var language = LanguageManager.shared.selectedLanguage
     @State private var typingMessageCurrent: String = ""
-    //요청값 위도/경도 고정값이 아니라
-    @State var userLatitude: Double = 37.5655981161314
-    @State var userLongitude: Double = 126.9749287001093
+
+    @State private var userLatitude: Double = 0.0
+    @State private var userLongitude: Double = 0.0
     @FocusState private var fieldIsFocused: Bool
     @Binding var typingMessage: String
     @State private var isShowingAlert = false
@@ -354,13 +332,15 @@ struct StartChatView: View {
                     }
                     .onAppear {
                         // 앱이 시작되자마자 위치 요청
+                        // StartChatView가 나타날 때 LocationManager의 모든 함수 호출
+                        locationManager.requestLocationPermission()
                         locationManager.requestLocation()
                         print("Requesting initial location...")
                         // 첫 번째 갱신을 즉시 수행
-                                  tokenManager.checkAndRefreshToken()
+                        tokenManager.checkAndRefreshToken()
                         print("토큰 갱신")
-                                  // 이후 24시간 간격으로 자동 갱신 타이머 시작
-                                  tokenManager.startTokenRefreshTimer()
+                        // 이후 24시간 간격으로 자동 갱신 타이머 시작
+                        tokenManager.startTokenRefreshTimer()
                         
                         if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
                         WviewModel.fetchWMessages { result in
@@ -376,13 +356,13 @@ struct StartChatView: View {
                                      }
                     }
                     .onChange(of: locationManager.userLatitude) { newLatitude in
-                                         userLatitude = newLatitude
-                                         print("Latitude updated: \(newLatitude)")
-                                     }
-                                     .onChange(of: locationManager.userLongitude) { newLongitude in
-                                         userLongitude = newLongitude
-                                         print("Longitude updated: \(newLongitude)")
-                                     }
+                         userLatitude = newLatitude
+                         print("Latitude updated in StartChatView: \(newLatitude)")
+                     }
+                     .onChange(of: locationManager.userLongitude) { newLongitude in
+                         userLongitude = newLongitude
+                         print("Longitude updated in StartChatView: \(newLongitude)")
+                     }
                     .onChange(of: WviewModel.messages) { _ in
                         if let lastMessage = WviewModel.messages.last {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -502,6 +482,8 @@ struct StartChatView: View {
                 }
        
         case "Office Location":
+            locationManager.requestLocationPermission()
+            locationManager.requestLocation()
             // 사용자가 위치 정보를 요청하는 경우 메시지를 전송하고 위치 정보를 업데이트
             sendMessage("Office Location", isButtonClicked: true)
             
@@ -514,12 +496,9 @@ struct StartChatView: View {
                 let encodedStartName = actionValue?.address?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                 let encodedEndName = actionValue?.office?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
 
-                print("Latitude: \(userLatitude), Longitude: \(userLongitude)")
+                print("Office Location Latitude: \(userLatitude), Office Location Longitude: \(userLongitude)")
 
-                let webMapURL = URL(string: "https://map.naver.com/v5/directions/-/141.39/\(destinationLatitude),\(destinationLongitude)?c=\(userLatitude),\(userLongitude),15,0,0,0,dh&dname=\(encodedEndName)&sname=\(encodedStartName)")!
-                let appMapURL = URL(string: "nmap://route/public?slat=\(userLatitude)&slng=\(userLongitude)&sname=\(encodedStartName)&dlat=\(destinationLatitude)&dlng=\(destinationLongitude)&dname=\(encodedEndName)&Woorinara=project.livinglab.zypher")!
-
-                safariViewURL = appMapURL
+              
             }
 
         case "Open Map":
@@ -608,11 +587,14 @@ extension Color {
 
 struct MessageStartView: View {
     @EnvironmentObject var locationManager: LocationManager
+    @State private var userLatitude: Double = 0.0
+    @State private var userLongitude: Double = 0.0
     var message: WooriMessageData
     @State private var safariViewURL: URL? // Safari URL을 열기 위한 상태 변수
     @Binding var typingMessageCurrent: String
     var currentUser: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     var onQuickReplyTap: (String, ActionValue?) -> Void
+  
     @State private var alertMessage = ""
     @State private var isLoading = true // Loading state
     // 포커스 상태 관리
@@ -646,11 +628,8 @@ struct MessageStartView: View {
         }
         .padding(.horizontal)
         .onAppear {
-                    // actionValue?.text가 있거나 "Open Map" 버튼이 있는 경우 포커스 설정
-                    shouldFocusOnActionText = message.quickReplyButtons?.contains(where: {
-                        $0.label == "Open Map" || $0.actionValue?.text != nil
-                    }) ?? false
-                    openMapFocused = message.content == "Office Location" && (message.quickReplyButtons?.contains { $0.label == "Open Map" } ?? false)
+                   
+                    openMapFocused = message.content == "Office Location" && (message.quickReplyButtons?.contains { $0.label == "Open Map" } ?? true)
                 }
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -658,21 +637,22 @@ struct MessageStartView: View {
                     ForEach(quickReplyButtons, id: \.label) { button in
                         Button(action: {
                             onQuickReplyTap(button.label, button.actionValue)
-                            focusedButtonLabel = button.label
+                            if button.actionType == "map" {
+                                    openMapFocused = true
+                                }
                         }) {
                             VStack {
                                 if
-                                    (button.actionValue?.text) != nil || button.label == "Open Map"{
+                                    (button.actionValue?.text) != nil {
                                     VStack {
                                         Text(button.label)
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundColor(.blue)
-                                            .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
                                         Text(button.actionValue?.text ?? "")
                                             .font(.system(size: 14))
                                             .foregroundColor(.gray)
                                             .padding(.leading, 2)
-                                            .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
+                                          
                                     }
                                     .padding(.vertical, 1)
                                    .padding(.horizontal, 12)
@@ -697,7 +677,7 @@ struct MessageStartView: View {
                                                 .stroke(Color.blue, lineWidth: 2)
                                         )
                                         .padding(.horizontal, 8)
-                                        .focused($isContentOrLabelFocused)
+                                        .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
                                 }
                             }
                         }
@@ -705,15 +685,16 @@ struct MessageStartView: View {
                 }
             }
             .onAppear {
-                           // "Open Map" 버튼에 포커스가 필요한 경우 설정
-                           if openMapFocused {
-                               isActionTextFocused = true
-                           } else if shouldFocusOnActionText {
-                               isActionTextFocused = true
-                           } else {
-                               isContentOrLabelFocused = true
-                           }
+                // "Open Map" 버튼에 포커스를 설정
+                             if openMapFocused {
+                                 isActionTextFocused = true
+                             } else {
+                                 isContentOrLabelFocused = true
+                             }
+              
+                
                        }
+             
         }
 
     }
@@ -728,13 +709,21 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         manager.delegate = self
-        requestLocationPermission()
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        requestLocationPermission() // 위치 권한 요청
     }
     
     func requestLocationPermission() {
-        if manager.authorizationStatus == .notDetermined {
-            manager.requestWhenInUseAuthorization()
-        }
+        // 위치 서비스 사용 여부 확인
+             if !CLLocationManager.locationServicesEnabled() {
+                 print("위치 서비스가 꺼져 있습니다. 설정에서 위치 서비스를 켜주세요.")
+                 return
+             }
+             
+             // 권한 요청
+             if manager.authorizationStatus == .notDetermined {
+                 manager.requestWhenInUseAuthorization()
+             }
     }
     
     func requestLocation() {
@@ -754,7 +743,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("위치 업데이트 실패: \(error.localizedDescription)")
+        print("위치 업데이트 실패???????????: \(error.localizedDescription)")
     }
 }
 
