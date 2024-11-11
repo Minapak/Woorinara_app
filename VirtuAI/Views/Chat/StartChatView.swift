@@ -15,6 +15,7 @@ import CoreLocationUI
 import MapKit
 import UIKit
 import WebKit
+import iActivityIndicator
 /*
 이 코드는 iOS 앱에서 채팅 기능을 제공하는 뷰를 구현합니다.
  사용자가 메시지를 입력하고 전송하면 서버로부터의 응답을 가져와 화면에 표시하고,
@@ -71,6 +72,7 @@ struct ActionValue: Codable, Equatable {
     var office_eng: String?
     var phone_number: String?
     var name: String?
+    var type: String?
     var name_eng: String?
     var detailed_location: String?
     var detailed_location_eng: String?
@@ -132,11 +134,13 @@ extension URL: Identifiable {
 class WooriChatAPI: ObservableObject {
     private let baseURL = "http://43.203.237.202:18080/api/v1/chatbot/messages" // API 엔드포인트
     private let urlSession = URLSession.shared
-    lazy var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    
+    // 항상 최신의 accessToken을 가져오도록 computed property로 변경
+      private var authToken: String {
+          KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
+      }
     @AppStorage("username") public var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     @Published public var messages: [WooriMessageData] = []
-
+    @State var isLoading = false
     private var headers: [String: String] {
         [
             "Content-Type": "application/json",
@@ -154,8 +158,11 @@ class WooriChatAPI: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.allHTTPHeaderFields = headers
-
+        isLoading = true // Start loading
         let task = urlSession.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                           self.isLoading = false // Stop loading
+                       }
             if let error = error {
                 print("GET Error: \(error.localizedDescription)")
                 completion(.failure(error))
@@ -204,7 +211,7 @@ class WooriChatAPI: ObservableObject {
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedTypingMessage = typingMessage?.trimmingCharacters(in: .whitespacesAndNewlines)
         let finalMessage = trimmedMessage + (trimmedTypingMessage.map { " \($0)" } ?? "")
-        let previousMessage = messages.last?.content ?? "No previous message"
+        let previousMessage = messages.count >= 3 ? messages[messages.count - 3].content : "No previous message"
         
         let requestBody = RequestBody(
             preMessage: previousMessage,
@@ -293,8 +300,8 @@ struct StartChatView: View {
     @State private var isShowingAlert = false
     @State private var alertMessage = ""
     @State private var isMessagesFetched = false // 메시지 로드 여부 확인 변수
-    
-    
+    @State var isLoading: Bool
+    var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     // 네이버 지도 URL 열기 함수를 수정
     private func openMapURL(_ url: URL) {
         if url.scheme == "nmap" {
@@ -323,25 +330,25 @@ struct StartChatView: View {
                                 MessageStartView(
                                     message: message,
                                     typingMessageCurrent: $typingMessageCurrent,
-                                    currentUser: WviewModel.username,
-                                    onQuickReplyTap: handleQuickReplyTap
+                                    onQuickReplyTap: handleQuickReplyTap, currentUser: WviewModel.username
+                               
                                 )
                                 .id(message.id)
                             }
                         }
                     }
                     .onAppear {
-                        // 앱이 시작되자마자 위치 요청
-                        // StartChatView가 나타날 때 LocationManager의 모든 함수 호출
-                        locationManager.requestLocationPermission()
-                        locationManager.requestLocation()
-                        print("Requesting initial location...")
+                 
                         // 첫 번째 갱신을 즉시 수행
-                        tokenManager.checkAndRefreshToken()
-                        print("토큰 갱신")
-                        // 이후 24시간 간격으로 자동 갱신 타이머 시작
-                        tokenManager.startTokenRefreshTimer()
-                        
+                        tokenManager.checkAndRefreshTokenIfNeeded { isSuccess in
+                            if isSuccess {
+                                print("✅ Token refresh succeeded.")
+                                // 필요한 추가 작업이 있으면 여기서 수행하세요
+                            } else {
+                                print("❌ Token refresh failed.")
+                                // 실패 시 처리할 작업을 여기에 추가할 수 있습니다.
+                            }
+                        }
                         if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
                         WviewModel.fetchWMessages { result in
                             switch result {
@@ -432,7 +439,7 @@ struct StartChatView: View {
         }
     }
     
-    private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?) {
+    private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?, memberInfo: MemberInfo?) {
         VStack {
             if let actionValueText = actionValue?.text {
                 VStack {
@@ -482,29 +489,29 @@ struct StartChatView: View {
                 }
        
         case "Office Location":
-            locationManager.requestLocationPermission()
-            locationManager.requestLocation()
-            // 사용자가 위치 정보를 요청하는 경우 메시지를 전송하고 위치 정보를 업데이트
-            sendMessage("Office Location", isButtonClicked: true)
-            
-            // 응답이 돌아온 후 위치 정보와 지도 URL을 설정
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
-                let userLatitude = 37.5655981161314
-                let userLongitude = 126.9749287001093
-                let destinationLatitude = actionValue?.latitude ?? 37.5698552
-                let destinationLongitude = actionValue?.longitude ?? 126.9814644
-                let encodedStartName = actionValue?.address?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                let encodedEndName = actionValue?.office?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                locationManager.requestLocation()
+                // 사용자가 위치 정보를 요청하는 경우 메시지를 전송하고 위치 정보를 업데이트
+                sendMessage("Office Location", isButtonClicked: true)
+                
+                // 응답이 돌아온 후 위치 정보와 지도 URL을 설정
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
+                    let userLatitude = memberInfo?.latitude ?? 0.0
+                    let userLongitude = memberInfo?.longitude ?? 0.0
+                    let destinationLatitude = actionValue?.latitude ?? 37.5698552
+                    let destinationLongitude = actionValue?.longitude ?? 126.9814644
+                    let encodedStartName = actionValue?.address?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                    let encodedEndName = actionValue?.office?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
 
-                print("Office Location Latitude: \(userLatitude), Office Location Longitude: \(userLongitude)")
+                    print("Office Location Latitude: \(userLatitude), Office Location Longitude: \(userLongitude)")
 
-              
-            }
+                  
+                }
 
         case "Open Map":
             // `Office Location` 응답에서 "Open Map"을 선택한 경우
             locationManager.requestLocation()
             
+            print("Open Map Latitude: \(userLatitude), Open Map Longitude: \(userLongitude)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 let userLatitude = locationManager.userLatitude
                 let userLongitude = locationManager.userLongitude
@@ -586,168 +593,162 @@ extension Color {
 
 
 struct MessageStartView: View {
-    @EnvironmentObject var locationManager: LocationManager
+    @StateObject var locationManager: LocationManager = .init()
+    
     @State private var userLatitude: Double = 0.0
     @State private var userLongitude: Double = 0.0
     var message: WooriMessageData
     @State private var safariViewURL: URL? // Safari URL을 열기 위한 상태 변수
     @Binding var typingMessageCurrent: String
-    var currentUser: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
-    var onQuickReplyTap: (String, ActionValue?) -> Void
+    var currentUser: String 
+    var onQuickReplyTap: (String, ActionValue?, MemberInfo?) -> Void
   
     @State private var alertMessage = ""
-    @State private var isLoading = true // Loading state
-    // 포커스 상태 관리
-     @FocusState private var isActionTextFocused: Bool
-     @FocusState private var isContentOrLabelFocused: Bool
-     @State private var shouldFocusOnActionText: Bool = false
+    @State var isLoading: Bool
+    @FocusState private var isActionTextFocused: Bool
+    @FocusState private var isContentOrLabelFocused: Bool
+    @State private var isMessageLoading: Bool
+    @State private var shouldFocusOnActionText: Bool = false
     @State private var openMapFocused: Bool = false // "Open Map" 버튼 포커스 상태
     @State private var focusedButtonLabel: String? // 현재 포커스된 버튼의 레이블
-    var body: some View {
-        
-        HStack {
-            if message.sender == currentUser {
-                Spacer()
-                Text(message.content)
-                    .padding()
-                    .background(message.sender == currentUser ? Color.gray : Color(red: 0.25, green: 0.29, blue: 0.34)) // #414A57
-                    .foregroundColor(.white)
-                    .cornerRadius(14)
-            } else {
-                Image("chatLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 25, height: 25)
-                Text(message.content)
-                    .padding()
-                    .foregroundColor(.black)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(14)
-                Spacer()
-            }
-        }
-        .padding(.horizontal)
-        .onAppear {
-                   
-                    openMapFocused = message.content == "Office Location" && (message.quickReplyButtons?.contains { $0.label == "Open Map" } ?? true)
-                }
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                if let quickReplyButtons = message.quickReplyButtons {
-                    ForEach(quickReplyButtons, id: \.label) { button in
-                        Button(action: {
-                            onQuickReplyTap(button.label, button.actionValue)
-                            if button.actionType == "map" {
-                                    openMapFocused = true
-                                }
-                        }) {
-                            VStack {
-                                if
-                                    (button.actionValue?.text) != nil {
-                                    VStack {
-                                        Text(button.label)
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundColor(.blue)
-                                        Text(button.actionValue?.text ?? "")
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.gray)
-                                            .padding(.leading, 2)
-                                          
+    @State private var lastMessageId: UUID? // Track the latest message ID
+
+  
+
+      var body: some View {
+          ScrollViewReader { proxy in
+              VStack {
+                  HStack {
+                      if message.sender == currentUser {
+                          Spacer()
+                          Text(message.content)
+                              .padding()
+                              .background(Color.gray)
+                              .foregroundColor(.white)
+                              .cornerRadius(14)
+                      } else {
+                          // Display logo and message for bot's response
+                          Image("chatLogo")
+                              .resizable()
+                              .scaledToFit()
+                              .frame(width: 34, height: 34)
+                          Text(message.content)
+                              .padding()
+                              .foregroundColor(.black)
+                              .background(Color.blue.opacity(0.1))
+                              .cornerRadius(14)
+                          // Show message content or loading indicator
+                          if message.sender == "BOT" && message.content.isEmpty {
+                              // Show loading indicator if message is still being received
+                              HStack(alignment: .center, spacing: 1) {
+                                  Image("chatLoading")
+                                      .resizable()
+                                      .scaledToFit()
+                                      .frame(width: 100, height: 34)
+                              }
+                          } else {
+                           
+                          }
+                          Spacer()
+                      }
+                  }
+                  .padding(.horizontal)
+                  .id(message.id) // Assign a unique ID to each message
+
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        if let quickReplyButtons = message.quickReplyButtons {
+                            ForEach(quickReplyButtons, id: \.label) { button in
+                                Button(action: {
+                                    onQuickReplyTap(button.label, button.actionValue, MemberInfo.init(latitude: 0.0, longitude: 0.0))
+                                    lastMessageId = message.id // Update lastMessageId to focus on the latest message
+                                    if button.actionType == "map" {
+                                        openMapFocused = true
                                     }
-                                    .padding(.vertical, 1)
-                                   .padding(.horizontal, 12)
-                                    .background(Color.white)
-                                    .cornerRadius(16)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(Color.blue, lineWidth: 2)
-                                    )
-                                    .padding(.horizontal, 8)
-                                } else {
-                                    Text(button.label)
-                                        .font(.system(size: 16, weight: .bold))
-                                        .foregroundColor(.blue)
-                                        .padding(.vertical, 1)
-                                        .padding(.top, 3)
-                                         .padding(.horizontal, 12)
-                                        .background(Color.white)
-                                        .cornerRadius(16)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 16)
-                                                .stroke(Color.blue, lineWidth: 2)
-                                        )
-                                        .padding(.horizontal, 8)
-                                        .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
+                                }) {
+                                    VStack {
+                                        if let actionText = button.actionValue?.text {
+                                            VStack {
+                                                Text(button.label)
+                                                    .font(.system(size: 16, weight: .bold))
+                                                    .foregroundColor(.blue)
+                                                Text(actionText)
+                                                    .font(.system(size: 14))
+                                                    .foregroundColor(.gray)
+                                                    .padding(.leading, 2)
+                                            }
+                                            .padding(.vertical, 1)
+                                            .padding(.horizontal, 12)
+                                            .background(Color.white)
+                                            .cornerRadius(16)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .stroke(Color.blue, lineWidth: 2)
+                                            )
+                                            .padding(.horizontal, 8)
+                                        } else {
+                                            Text(button.label)
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundColor(.blue)
+                                                .padding(.vertical, 1)
+                                                .padding(.top, 3)
+                                                .padding(.horizontal, 12)
+                                                .background(Color.white)
+                                                .cornerRadius(16)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 16)
+                                                        .stroke(Color.blue, lineWidth: 2)
+                                                )
+                                                .padding(.horizontal, 8)
+                                                .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                    .onAppear {
+                        if openMapFocused {
+                            isActionTextFocused = true
+                        } else {
+                            isContentOrLabelFocused = true
+                        }
+                    }
                 }
+       
+            
             }
-            .onAppear {
-                // "Open Map" 버튼에 포커스를 설정
-                             if openMapFocused {
-                                 isActionTextFocused = true
-                             } else {
-                                 isContentOrLabelFocused = true
-                             }
-              
-                
-                       }
-             
         }
-
     }
 }
 
-// LocationManager 클래스
-class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var userLatitude: Double = 0.0
-    @Published var userLongitude: Double = 0.0
-    public var manager = CLLocationManager()
-    
-    override init() {
-        super.init()
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        requestLocationPermission() // 위치 권한 요청
-    }
-    
-    func requestLocationPermission() {
-        // 위치 서비스 사용 여부 확인
-             if !CLLocationManager.locationServicesEnabled() {
-                 print("위치 서비스가 꺼져 있습니다. 설정에서 위치 서비스를 켜주세요.")
-                 return
-             }
-             
-             // 권한 요청
-             if manager.authorizationStatus == .notDetermined {
-                 manager.requestWhenInUseAuthorization()
-             }
-    }
-    
-    func requestLocation() {
-        if CLLocationManager.locationServicesEnabled() {
-            manager.requestLocation()
-        } else {
-            print("Location services are not enabled")
+// Example of a custom activity indicator view
+struct iActivityIndicator: View {
+    var style: Style
+
+    var body: some View {
+        HStack {
+            ForEach(0..<style.count, id: \.self) { index in
+                Circle()
+                    .scaleEffect(style.scaleRange.contains(CGFloat(index) / CGFloat(style.count - 1)) ? style.scaleRange.upperBound : style.scaleRange.lowerBound)
+                    .animation(
+                        Animation.easeInOut(duration: 0.5)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(index) * 0.1)
+                    )
+                    .frame(width: 10, height: 10)
+            }
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            userLatitude = location.coordinate.latitude
-            userLongitude = location.coordinate.longitude
-            print("현재 위치 업데이트 - 위도: \(userLatitude), 경도: \(userLongitude)")
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("위치 업데이트 실패???????????: \(error.localizedDescription)")
+    struct Style {
+        var count: Int
+        var scaleRange: ClosedRange<CGFloat>
+        
+        static let rowOfShapes = Style(count: 3, scaleRange: 0.1...1)
     }
 }
-
-
 
 // 외부 Safari 브라우저 뷰를 지원하는 구조체는 http 및 https URLs만 열도록 제한됩니다.
 // nmap:// 같은 앱 URL은 직접 열도록 처리합니다.
@@ -768,7 +769,7 @@ struct StartChatView_Previews: PreviewProvider {
     @State static var typingMessage: String = ""
         
     static var previews: some View {
-        StartChatView(typingMessage: $typingMessage)
+        StartChatView(typingMessage: $typingMessage, isLoading: false)
             .environmentObject(AppChatState())
     }
 }

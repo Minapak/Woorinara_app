@@ -1,5 +1,5 @@
 {
-  "originHash" : "712f5ea61c17fc457f3a6ae74293061e85e2ce760c2858e2a72baeb90f65ece6",
+  "originHash" : "64015650652f72045ae62ab81fa25ca66e45fb46c0477e62ab7687eaa985dbbc",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -8,6 +8,24 @@
       "state" : {
         "revision" : "194a6706acbd25e4ef639bcaddea16e8758a3e27",
         "version" : "1.2024011602.0"
+      }
+    },
+    {
+      "identity" : "activityindicator-swiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MojtabaHs/ActivityIndicator-SwiftUI.git",
+      "state" : {
+        "revision" : "051ba2db67f019af4b0600c01ba2ca991092daae",
+        "version" : "0.4.1"
+      }
+    },
+    {
+      "identity" : "activityindicatorview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/ActivityIndicatorView.git",
+      "state" : {
+        "revision" : "9970fd0bb7a05dad0b6566ae1f56937716686b24",
+        "version" : "1.1.1"
       }
     },
     {
@@ -42,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/app-check.git",
       "state" : {
-        "revision" : "87dd288fc792bf9751e522e171a47df5b783b0b8",
-        "version" : "11.1.0"
+        "revision" : "61b85103a1aeed8218f17c794687781505fbbef5",
+        "version" : "11.2.0"
       }
     },
     {
@@ -51,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/openid/AppAuth-iOS.git",
       "state" : {
-        "revision" : "71cde449f13d453227e687458144bde372d30fc7",
-        "version" : "1.6.2"
+        "revision" : "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
+        "version" : "1.7.5"
       }
     },
     {
@@ -60,8 +78,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/AppsFlyerSDK/AppsFlyerFramework",
       "state" : {
-        "revision" : "7cf56a908fb602ffaab7a85e6697c6f383fdcf96",
-        "version" : "6.11.1"
+        "revision" : "048633aeec183ddd41b5342c5e0ff57f102dd509",
+        "version" : "6.15.3"
       }
     },
     {
@@ -69,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "f909f901bfba9e27e4e9da83242a4915d6dd64bb",
-        "version" : "11.3.0"
+        "revision" : "8328630971a8fdd8072b36bb22bef732eb15e1f0",
+        "version" : "11.4.0"
       }
     },
     {
@@ -87,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "93406fd21b85e66e2d6dbf50b472161fd75c3f1f",
-        "version" : "11.3.0"
+        "revision" : "4f234bcbdae841d7015258fbbf8e7743a39b8200",
+        "version" : "11.4.0"
       }
     },
     {
@@ -105,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleSignIn-iOS",
       "state" : {
-        "revision" : "7932d33686c1dc4d7df7a919aae47361d1cdfda4",
-        "version" : "7.0.0"
+        "revision" : "a7965d134c5d3567026c523e0a8a583f73b62b0d",
+        "version" : "7.1.0"
       }
     },
     {
@@ -121,7 +139,7 @@
     {
       "identity" : "gptencoder",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/alfianlosari/GPTEncoder.git",
+      "location" : "https://github.com/alfianlosari/GPTEncoder",
       "state" : {
         "revision" : "a86968867ab4380e36b904a14c42215f71efe8b4",
         "version" : "1.0.4"
@@ -150,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GTMAppAuth.git",
       "state" : {
-        "revision" : "cee3c709307912d040bd1e06ca919875a92339c6",
-        "version" : "2.0.0"
+        "revision" : "5d7d66f647400952b1758b230e019b07c0b4b22a",
+        "version" : "4.1.1"
       }
     },
     {
@@ -177,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/leveldb.git",
       "state" : {
-        "revision" : "9d108e9112aa1d65ce508facf804674546116d9c",
-        "version" : "1.22.3"
+        "revision" : "a0bc79961d7be727d258d33d5a6b2f1023270ba1",
+        "version" : "1.22.5"
       }
     },
     {
@@ -222,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/PopupView.git",
       "state" : {
-        "revision" : "c382cb80e2148daf1da2d7077a6b0e11faae8269",
-        "version" : "2.5.0"
+        "revision" : "038f37d281a61842f96fffeb8903fa5c5e35ecf9",
+        "version" : "2.10.6"
       }
     },
     {
@@ -240,8 +258,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-ios.git",
       "state" : {
-        "revision" : "6dd0cf0cc8ef81848849c5224f4039f0a0d3136f",
-        "version" : "4.21.1"
+        "revision" : "1357d57a38d09e60f967d0e78a912254fe46137c",
+        "version" : "4.43.3"
       }
     },
     {
@@ -249,8 +267,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stephencelis/SQLite.swift.git",
       "state" : {
-        "revision" : "7a2e3cd27de56f6d396e84f63beefd0267b55ccb",
-        "version" : "0.14.1"
+        "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
+        "version" : "0.15.3"
       }
     },
     {
@@ -267,8 +285,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/googleads/swift-package-manager-google-mobile-ads.git",
       "state" : {
-        "revision" : "1e60477cbc4c4868ec8414524f8cd163132753ff",
-        "version" : "11.10.0"
+        "revision" : "82c49f703da08f6c20715fd8bb8dfe5d94a2f187",
+        "version" : "11.12.0"
       }
     },
     {
@@ -276,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git",
       "state" : {
-        "revision" : "74f2ec169551c3b924947b473716142a0b983e10",
-        "version" : "2.6.0"
+        "revision" : "708a282840c2171ee63bd93b87afa49fe507d70e",
+        "version" : "2.7.0"
       }
     },
     {
@@ -285,8 +303,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-protobuf.git",
       "state" : {
-        "revision" : "07f7f26ded8df9645c072f220378879c4642e063",
-        "version" : "1.25.1"
+        "revision" : "ebc7251dd5b37f627c93698e4374084d98409633",
+        "version" : "1.28.2"
       }
     },
     {
@@ -312,8 +330,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup",
       "state" : {
-        "revision" : "8b6cf29eead8841a1fa7822481cb3af4ddaadba6",
-        "version" : "2.6.1"
+        "revision" : "0837db354faf9c9deb710dc597046edaadf5360f",
+        "version" : "2.7.6"
       }
     },
     {
@@ -323,6 +341,15 @@
       "state" : {
         "revision" : "e4cc06d0f6c785dcb69ffc60cc1ffbd40eb02e18",
         "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/swiftui-introspect",
+      "state" : {
+        "revision" : "807f73ce09a9b9723f12385e592b4e0aaebd3336",
+        "version" : "1.3.0"
       }
     },
     {
@@ -344,12 +371,21 @@
       }
     },
     {
+      "identity" : "systemnotification",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/danielsaidi/SystemNotification.git",
+      "state" : {
+        "revision" : "be3aeda807ee3194ecf6dd4846700e9236c4f2ed",
+        "version" : "1.2.0"
+      }
+    },
+    {
       "identity" : "tocropviewcontroller",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/TimOliver/TOCropViewController",
       "state" : {
-        "revision" : "d0470491f56e734731bbf77991944c0dfdee3e0e",
-        "version" : "2.6.1"
+        "revision" : "a634cb7cdfd580006e79a6e74e64417fe9e9783b",
+        "version" : "2.7.4"
       }
     },
     {
@@ -357,8 +393,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/VakhoKontridze/VComponents.git",
       "state" : {
-        "revision" : "57577c51d99419c3afe1c36ffa94ab6260057406",
-        "version" : "7.0.0"
+        "revision" : "f66e71c5c5dde9c4041e4937c8bf8a91240e319b",
+        "version" : "7.1.0"
       }
     },
     {
@@ -366,8 +402,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/VakhoKontridze/VCore",
       "state" : {
-        "revision" : "07f0cf6dc82320ca3457991d99a68b7f4dd8ac27",
-        "version" : "7.0.1"
+        "revision" : "f49601e1b843d7170bbd0498281750bd35919af9",
+        "version" : "7.1.1"
       }
     },
     {

@@ -17,8 +17,8 @@ struct TemporaryLinkView: View {
                             NavigationLink("통합 신청서 뷰", destination: AFAutoView())
                             NavigationLink("My Infomation", destination: MyInfoView())
                             NavigationLink("로그아웃", destination: LogOutView())
-//                            NavigationLink("core Location", destination: ContentMapView())
- //                           NavigationLink("gif", destination: GifView(animationName: "loading"))
+                            NavigationLink("core Location", destination: ContentMapView())
+                           NavigationLink("gif", destination: GifView())
 
 //                            passportInfoLink()
 //                            afCenterViewLink()

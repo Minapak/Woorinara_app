@@ -11,7 +11,7 @@ struct VirtuAIApp: App {
     @StateObject var upgradeViewModel = UpgradeViewModel()
     @StateObject var appState = AppState()
     @StateObject private var appChatState = AppChatState() // Defined here to share across the app
-    @StateObject private var locationManager = LocationManager()
+    @StateObject var locationManager = LocationManager()
     @AppStorage(Constants.Preferences.DARK_MODE)
     private var isDarkTheme = UserDefaults.isDarkTheme
     
@@ -48,7 +48,7 @@ struct VirtuAIApp: App {
         var ConversionData: [AnyHashable: Any]? = nil
         var window: UIWindow?
         var deferred_deep_link_processed_flag: Bool = false
-
+        let locationManager = LocationManager()
         func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
             FirebaseApp.configure()
             Mixpanel.initialize(token: "c44056e5db4e574a5dc70f815486b4d8", trackAutomaticEvents: false)

@@ -176,8 +176,7 @@ struct ScanPreARCView: View {
                 Image(systemName: "chevron.left")
                     .foregroundColor(.blue)
                     .imageScale(.large)
-                Text("")
-                    .foregroundColor(.blue)
+            
             })
             .sheet(isPresented: $isCameraPresented) {
                 CameraCaptureARCView(capturedImage: $capturedImage, isPresented: $isCameraPresented)

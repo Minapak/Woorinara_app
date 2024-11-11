@@ -11,6 +11,9 @@ struct ScanARCView: View {
     @State private var residenceCategory2 = "1"
     
     @State private var showError = false
+    @State private var errorMessage = ""  // 에러 메시지를 저장하는 변수
+    @FocusState private var isFocused: Bool
+    @State private var navigateToAFCenterView = false
     
     let countries = ["South Korea", "Japan", "China", "India", "Thailand", "United States", "Canada", "Germany", "France", "United Kingdom"]
     let residenceCategories1 = (65...90).map { String(UnicodeScalar($0)!) }
@@ -24,6 +27,13 @@ struct ScanARCView: View {
         self._gender = State(initialValue: result.data?.gender)
         self._name = State(initialValue: "\(result.data?.givenName ?? "") \(result.data?.surName ?? "")")
         self._country = State(initialValue: result.data?.nationality ?? "")
+        
+        // Initial log for fields
+        print("Initialized foreignRegistrationNumber: \(result.data?.documentNumber ?? "")")
+        print("Initialized dateOfBirth: \(result.data?.dateOfBirth ?? "")")
+        print("Initialized gender: \(result.data?.gender ?? "nil")")
+        print("Initialized name: \(result.data?.givenName ?? "") \(result.data?.surName ?? "")")
+        print("Initialized country: \(result.data?.nationality ?? "")")
     }
     
     var body: some View {
@@ -115,8 +125,10 @@ struct ScanARCView: View {
                         Button("Done") {
                             if validateFields() {
                                 // 성공 처리
+                                print("✅ All fields validated successfully.")
                             } else {
                                 showError = true
+                                print("❗ Validation failed.")
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -129,11 +141,23 @@ struct ScanARCView: View {
                 .padding()
             }
             .navigationTitle("")
-            .navigationBarBackButtonHidden(true)
+            .navigationBarBackButtonHidden(false)
+            .alert(isPresented: $showError) {
+                Alert(title: Text("Incomplete Form"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            }
         }
     }
     
     private func validateFields() -> Bool {
+        print("Validating fields...")
+        print("Foreign Registration Number: \(foreignRegistrationNumber)")
+        print("Date of Birth: \(dateOfBirth)")
+        print("Gender: \(gender ?? "nil")")
+        print("Name: \(name)")
+        print("Country: \(country)")
+        print("Residence Category 1: \(residenceCategory1)")
+        print("Residence Category 2: \(residenceCategory2)")
+        
         return !foreignRegistrationNumber.isEmpty && !dateOfBirth.isEmpty && gender != nil && !name.isEmpty && !country.isEmpty
     }
     
@@ -146,5 +170,6 @@ struct ScanARCView: View {
         residenceCategory1 = "A"
         residenceCategory2 = "1"
         showError = false
+        print("Fields reset.")
     }
 }
