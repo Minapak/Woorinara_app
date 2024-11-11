@@ -300,7 +300,8 @@ struct StartChatView: View {
     @State private var isShowingAlert = false
     @State private var alertMessage = ""
     @State private var isMessagesFetched = false // 메시지 로드 여부 확인 변수
-    @State var isLoading: Bool
+    @State private var isLoading = false // 로딩 상태 추가
+
     var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     // 네이버 지도 URL 열기 함수를 수정
     private func openMapURL(_ url: URL) {
@@ -328,17 +329,19 @@ struct StartChatView: View {
                         VStack(spacing: 10) {
                             ForEach(WviewModel.messages) { message in
                                 MessageStartView(
-                                    message: message,
-                                    typingMessageCurrent: $typingMessageCurrent,
-                                    onQuickReplyTap: handleQuickReplyTap, currentUser: WviewModel.username
-                               
-                                )
+                                                               message: message,
+                                                               typingMessageCurrent: $typingMessageCurrent,
+                                                               currentUser: WviewModel.username,
+                                                               onQuickReplyTap: handleQuickReplyTap,
+                                                               isLoading: $isLoading
+                                                           
+                                                           )
                                 .id(message.id)
                             }
                         }
                     }
                     .onAppear {
-                 
+                        isLoading = true // 로딩 시작
                         // 첫 번째 갱신을 즉시 수행
                         tokenManager.checkAndRefreshTokenIfNeeded { isSuccess in
                             if isSuccess {
@@ -349,8 +352,12 @@ struct StartChatView: View {
                                 // 실패 시 처리할 작업을 여기에 추가할 수 있습니다.
                             }
                         }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                   isLoading = false
+                               }
                         if !isMessagesFetched { // 메시지가 로드되지 않았다면 fetchWMessages 호출
                         WviewModel.fetchWMessages { result in
+                            isLoading = false // 로딩 완료
                             switch result {
                             case .success(let messages):
                                 print("Messages loaded successfully: \(messages.count) messages.")
@@ -400,6 +407,7 @@ struct StartChatView: View {
                             
                             Button {
                                 sendMessage(typingMessageCurrent)
+                                isLoading = true // 로딩 시작
                                 fieldIsFocused = false
                             } label: {
                                 Image("Send")
@@ -440,6 +448,9 @@ struct StartChatView: View {
     }
     
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?, memberInfo: MemberInfo?) {
+        // 로딩 상태 시작
+                isLoading = true
+
         VStack {
             if let actionValueText = actionValue?.text {
                 VStack {
@@ -495,6 +506,7 @@ struct StartChatView: View {
                 
                 // 응답이 돌아온 후 위치 정보와 지도 URL을 설정
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
+                    isLoading = false // 로딩 상태 종료
                     let userLatitude = memberInfo?.latitude ?? 0.0
                     let userLongitude = memberInfo?.longitude ?? 0.0
                     let destinationLatitude = actionValue?.latitude ?? 37.5698552
@@ -513,6 +525,7 @@ struct StartChatView: View {
             
             print("Open Map Latitude: \(userLatitude), Open Map Longitude: \(userLongitude)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                isLoading = false // 로딩 상태 종료
                 let userLatitude = locationManager.userLatitude
                 let userLongitude = locationManager.userLongitude
 
@@ -550,10 +563,14 @@ struct StartChatView: View {
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedMessage.isEmpty else { return }
         
+        isLoading = true // 로딩 상태 시작
+        
         let messageRecord = WooriMessageData(content: trimmedMessage, sender: WviewModel.username, createdAt: DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .short), quickReplyButtons: nil)
         WviewModel.messages.append(messageRecord)
         
         WviewModel.sendUserMessage(message: trimmedMessage, typingMessage: typingMessage, isButtonClicked: isButtonClicked, latitude: userLatitude, longitude: userLongitude) { result in
+            DispatchQueue.main.async {
+                           isLoading = false //
             switch result {
             case .success:
                 print("Message sent and response received.")
@@ -562,6 +579,7 @@ struct StartChatView: View {
                 isShowingAlert = true
             }
         }
+    }
         typingMessageCurrent = ""
     }
 }
@@ -602,17 +620,15 @@ struct MessageStartView: View {
     @Binding var typingMessageCurrent: String
     var currentUser: String 
     var onQuickReplyTap: (String, ActionValue?, MemberInfo?) -> Void
-  
+    @Binding var isLoading: Bool // 상위 뷰에서 전달받은 로딩 상태
+
     @State private var alertMessage = ""
-    @State var isLoading: Bool
     @FocusState private var isActionTextFocused: Bool
     @FocusState private var isContentOrLabelFocused: Bool
-    @State private var isMessageLoading: Bool
     @State private var shouldFocusOnActionText: Bool = false
     @State private var openMapFocused: Bool = false // "Open Map" 버튼 포커스 상태
     @State private var focusedButtonLabel: String? // 현재 포커스된 버튼의 레이블
     @State private var lastMessageId: UUID? // Track the latest message ID
-
   
 
       var body: some View {
@@ -627,6 +643,7 @@ struct MessageStartView: View {
                               .foregroundColor(.white)
                               .cornerRadius(14)
                       } else {
+                       
                           // Display logo and message for bot's response
                           Image("chatLogo")
                               .resizable()
@@ -638,16 +655,26 @@ struct MessageStartView: View {
                               .background(Color.blue.opacity(0.1))
                               .cornerRadius(14)
                           // Show message content or loading indicator
-                          if message.sender == "BOT" && message.content.isEmpty {
-                              // Show loading indicator if message is still being received
-                              HStack(alignment: .center, spacing: 1) {
-                                  Image("chatLoading")
-                                      .resizable()
-                                      .scaledToFit()
-                                      .frame(width: 100, height: 34)
-                              }
-                          } else {
-                           
+                          if isLoading == true && message.content.isEmpty{ // isLoading이 true일 때만 로딩 인디케이터 표시
+                                                     HStack(alignment: .center, spacing: 1) {
+                                                         Image("chatLoading")
+                                                             .resizable()
+                                                             .scaledToFit()
+                                                             .frame(width: 100, height: 34)
+                                                     }
+                          } else if isLoading == false
+                          {
+                              
+                                 // Display logo and message for bot's response
+                                 Image("chatLogo")
+                                     .resizable()
+                                     .scaledToFit()
+                                     .frame(width: 34, height: 34)
+                                 Text(message.content)
+                                     .padding()
+                                     .foregroundColor(.black)
+                                     .background(Color.blue.opacity(0.1))
+                                     .cornerRadius(14)
                           }
                           Spacer()
                       }
@@ -656,7 +683,7 @@ struct MessageStartView: View {
                   .id(message.id) // Assign a unique ID to each message
 
 
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.horizontal, showsIndicators: true) {
                     HStack(spacing: 10) {
                         if let quickReplyButtons = message.quickReplyButtons {
                             ForEach(quickReplyButtons, id: \.label) { button in
@@ -769,7 +796,7 @@ struct StartChatView_Previews: PreviewProvider {
     @State static var typingMessage: String = ""
         
     static var previews: some View {
-        StartChatView(typingMessage: $typingMessage, isLoading: false)
+        StartChatView(typingMessage: $typingMessage)
             .environmentObject(AppChatState())
     }
 }

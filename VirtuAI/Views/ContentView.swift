@@ -21,7 +21,7 @@ struct ContentView: View {
                         StartChatView(
                             appState: _appState,
                             appChatState: _appChatState,
-                            typingMessage: ContentView.$typingMessageCurrent, isLoading: true
+                            typingMessage: ContentView.$typingMessageCurrent
                         ).tag(0)
                         TranslationView().tag(1)
                         ContentWebView().tag(2)
