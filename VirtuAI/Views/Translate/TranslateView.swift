@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-// 확대, 축소 및 이동이 가능한 커스텀 ScrollView
+// Custom ScrollView with zooming functionality
 struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     private let content: Content
 
@@ -11,18 +11,14 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
-
-        // 확대/축소 설정
         scrollView.minimumZoomScale = 1.0
-        scrollView.maximumZoomScale = 5.0 // 필요에 따라 조정 가능
+        scrollView.maximumZoomScale = 5.0
         scrollView.delegate = context.coordinator
 
-        // SwiftUI 뷰를 UIHostingController에 래핑하여 추가
         let hostedView = context.coordinator.hostingController.view!
         hostedView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(hostedView)
 
-        // Auto Layout을 사용하여 hostedView가 scrollView 크기에 맞게 설정
         NSLayoutConstraint.activate([
             hostedView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             hostedView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
@@ -36,7 +32,6 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIScrollView, context: Context) {
-        // SwiftUI 뷰가 업데이트될 때마다 hostingController의 rootView도 업데이트
         context.coordinator.hostingController.rootView = content
     }
 
@@ -44,7 +39,6 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
         Coordinator(hostingController: UIHostingController(rootView: content))
     }
 
-    // 확대/축소를 위한 Coordinator
     class Coordinator: NSObject, UIScrollViewDelegate {
         let hostingController: UIHostingController<Content>
 
@@ -58,27 +52,28 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
     }
 }
 
-// 메인 TranslateView
+// Main TranslateView
 struct TranslateView: View {
-    @State private var showPDFOverlayView = false
+    var showPDFOverlayView = false
     var languageOptions = ["Korean", "English", "Vietnamese", "Chinese", "Japanese"]
     var imageOptions = ["af", "af_e", "af_v", "af_c", "af_j"]
+    
     @State private var selectedLanguage: String? = nil
     @State private var isLanguageDropdownOpen = false
-    @State private var selectedImage = "af"  // 기본 이미지를 선택된 옵션으로 설정
+    @State private var selectedImage = "af"
+    @State private var navigateToScanView = false // New state variable for navigation
+    
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.background.ignoresSafeArea()
-
+                
                 VStack(alignment: .center, spacing: 10) {
                     VStack(alignment: .leading, spacing: 0) {
                         HStack {
-                            Button("Korean") {
-                                showPDFOverlayView = true
-                            }
+                            Button("Korean") { }
                             .frame(width: 150, height: 50)
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.gray)
@@ -103,7 +98,6 @@ struct TranslateView: View {
 
                     Spacer()
 
-                    // ZoomableScrollView로 이미지 표시
                     ZoomableScrollView {
                         Image(selectedImage)
                             .resizable()
@@ -116,10 +110,10 @@ struct TranslateView: View {
 
                     Spacer()
 
-                    // 번역 버튼
+                    // "Auto-Fill" Button with NavigationLink
                     HStack {
                         Button("Auto-Fill") {
-                            showPDFOverlayView = true
+                            navigateToScanView = true // Trigger navigation
                         }
                         .frame(width: 350, height: 50)
                         .font(.system(size: 16, weight: .bold))
@@ -131,7 +125,6 @@ struct TranslateView: View {
                 .padding(.bottom, 5)
                 .padding(16)
 
-                // 드롭다운 메뉴
                 if isLanguageDropdownOpen {
                     VStack {
                         Spacer().frame(height: 60)
@@ -176,9 +169,11 @@ struct TranslateView: View {
                 Text("")
                     .foregroundColor(.black)
             })
-            .background(
-                NavigationLink(destination: AFTransView(), isActive: $showPDFOverlayView) { EmptyView() }
-            )
+            
+            // NavigationLink triggered by `navigateToScanView`
+            NavigationLink(destination: ScanView(), isActive: $navigateToScanView) {
+                EmptyView()
+            }
         }
     }
 }

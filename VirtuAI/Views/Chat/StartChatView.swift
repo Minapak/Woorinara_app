@@ -79,6 +79,7 @@ struct ActionValue: Codable, Equatable {
     
 }
 
+
 // 서버 응답 데이터 모델
 struct WooriMessageData: Codable, Equatable, Identifiable {
     let id = UUID()
@@ -141,6 +142,7 @@ class WooriChatAPI: ObservableObject {
     @AppStorage("username") public var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     @Published public var messages: [WooriMessageData] = []
     @State var isLoading = false
+
     private var headers: [String: String] {
         [
             "Content-Type": "application/json",
@@ -301,6 +303,7 @@ struct StartChatView: View {
     @State private var alertMessage = ""
     @State private var isMessagesFetched = false // 메시지 로드 여부 확인 변수
     @State private var isLoading = false // 로딩 상태 추가
+    @State private var isShowingPermissionView = false // 위치 권한 요청을 위한 상태 변수
 
     var username: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
     // 네이버 지도 URL 열기 함수를 수정
@@ -334,14 +337,14 @@ struct StartChatView: View {
                                                                currentUser: WviewModel.username,
                                                                onQuickReplyTap: handleQuickReplyTap,
                                                                isLoading: $isLoading
-                                                           
+                                                               
                                                            )
                                 .id(message.id)
                             }
                         }
                     }
                     .onAppear {
-                        isLoading = true // 로딩 시작
+                                                isLoading = true // 로딩 시작
                         // 첫 번째 갱신을 즉시 수행
                         tokenManager.checkAndRefreshTokenIfNeeded { isSuccess in
                             if isSuccess {
@@ -446,11 +449,58 @@ struct StartChatView: View {
             SafariView(url: url)
         }
     }
-    
+    struct PermissionView: View {
+        @Binding var isShowingPermissionView: Bool
+        var onPermissionGranted: () -> Void // 권한 승인 시 실행할 동작
+
+        var body: some View {
+            ZStack {
+                Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+
+                VStack(spacing: 20) {
+                    Text("Your location is used while the app is in use. Would you like to allow this permission?")
+                        .font(.system(size: 18))
+                        .multilineTextAlignment(.center)
+                        .padding()
+
+                    HStack(spacing: 20) {
+                        Button("Yes") {
+                            isShowingPermissionView = false // 안내 뷰 닫기
+                            onPermissionGranted() // 권한 승인 시 동작 호출
+                        }
+                        .frame(width: 100, height: 44)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+
+                        Button("No") {
+                            isShowingPermissionView = false // 안내 뷰 닫기
+                        }
+                        .frame(width: 100, height: 44)
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(.primary)
+                        .cornerRadius(8)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(16)
+                .padding(.horizontal, 16)
+            }
+        }
+    }
+
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?, memberInfo: MemberInfo?) {
         // 로딩 상태 시작
                 isLoading = true
-
+      
+//        // 허가 요청을 위한 로딩 상태 설정 및 권한 확인
+//        if isShowingPermissionView {
+//            PermissionView(isShowingPermissionView: $isShowingPermissionView) {
+//                proceedWithLocationRequestAndMessage(buttonLabel: "Office Location", actionValue: actionValue, memberInfo: memberInfo)
+//            }
+//            return
+//        }
         VStack {
             if let actionValueText = actionValue?.text {
                 VStack {
@@ -500,29 +550,15 @@ struct StartChatView: View {
                 }
        
         case "Office Location":
-                locationManager.requestLocation()
-                // 사용자가 위치 정보를 요청하는 경우 메시지를 전송하고 위치 정보를 업데이트
-                sendMessage("Office Location", isButtonClicked: true)
-                
-                // 응답이 돌아온 후 위치 정보와 지도 URL을 설정
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // 1초 후 위치 정보 사용
-                    isLoading = false // 로딩 상태 종료
-                    let userLatitude = memberInfo?.latitude ?? 0.0
-                    let userLongitude = memberInfo?.longitude ?? 0.0
-                    let destinationLatitude = actionValue?.latitude ?? 37.5698552
-                    let destinationLongitude = actionValue?.longitude ?? 126.9814644
-                    let encodedStartName = actionValue?.address?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-                    let encodedEndName = actionValue?.office?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-
-                    print("Office Location Latitude: \(userLatitude), Office Location Longitude: \(userLongitude)")
-
-                  
-                }
+            isShowingPermissionView = true
+            proceedWithLocationRequestAndMessage(buttonLabel: "Office Location", actionValue: actionValue, memberInfo: memberInfo)
+          
+              
 
         case "Open Map":
             // `Office Location` 응답에서 "Open Map"을 선택한 경우
+            isShowingPermissionView = true
             locationManager.requestLocation()
-            
             print("Open Map Latitude: \(userLatitude), Open Map Longitude: \(userLongitude)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 isLoading = false // 로딩 상태 종료
@@ -557,7 +593,23 @@ struct StartChatView: View {
         }
     }
 
-    
+    // 권한이 허가된 후 위치 요청 및 메시지 전송
+    private func proceedWithLocationRequestAndMessage(buttonLabel: String, actionValue: ActionValue?, memberInfo: MemberInfo?) {
+        locationManager.requestLocation()
+        sendMessage(buttonLabel, isButtonClicked: true)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            isLoading = false
+            let userLatitude = memberInfo?.latitude ?? 0.0
+            let userLongitude = memberInfo?.longitude ?? 0.0
+            let destinationLatitude = actionValue?.latitude ?? 37.5698552
+            let destinationLongitude = actionValue?.longitude ?? 126.9814644
+            let encodedStartName = actionValue?.address?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let encodedEndName = actionValue?.office?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
+            print("Office Location Latitude: \(userLatitude), Office Location Longitude: \(userLongitude)")
+        }
+    }
     // 메시지 전송 함수
     private func sendMessage(_ message: String, isButtonClicked: Bool = false) {
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -566,11 +618,26 @@ struct StartChatView: View {
         isLoading = true // 로딩 상태 시작
         
         let messageRecord = WooriMessageData(content: trimmedMessage, sender: WviewModel.username, createdAt: DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .short), quickReplyButtons: nil)
+
         WviewModel.messages.append(messageRecord)
+        
+        // 로딩 메시지 추가
+            let loadingMessage = WooriMessageData(
+                content: "Loading...",
+                sender: "BOT",
+                createdAt: Date().description,
+                quickReplyButtons: nil
+            )
+            WviewModel.messages.append(loadingMessage)
         
         WviewModel.sendUserMessage(message: trimmedMessage, typingMessage: typingMessage, isButtonClicked: isButtonClicked, latitude: userLatitude, longitude: userLongitude) { result in
             DispatchQueue.main.async {
-                           isLoading = false //
+                           isLoading = false
+                // 로딩 메시지 삭제
+                          if let loadingIndex = WviewModel.messages.firstIndex(of: loadingMessage) {
+                              WviewModel.messages.remove(at: loadingIndex)
+                          }
+                          
             switch result {
             case .success:
                 print("Message sent and response received.")
@@ -583,7 +650,46 @@ struct StartChatView: View {
         typingMessageCurrent = ""
     }
 }
+struct permissionView: View {
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var appChatState: AppChatState
+    @Environment(\.dismiss) private var dismiss
 
+    var body: some View {
+        ZStack {
+            Color.background.ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                Text("Your location is used while the app is in use. Would you like to allow this permission?")
+                    .font(.system(size: 18))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                
+                HStack(spacing: 20) {
+                    LocationButton(.currentLocation) {
+                        dismiss() // 위치 권한 요청 후 permissionView 닫기
+                    }
+                    .frame(width: 200, height: 44)
+                    .cornerRadius(8)
+                    .foregroundColor(.white)
+                    .cornerRadius(16)
+                    
+                    Button(action: {
+                        dismiss() // permissionView 닫기
+                    }) {
+                        Text("No")
+                            .foregroundColor(.primary)
+                            .frame(width: 100, height: 44)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(16)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
 // Extension to allow initialization of Color using hex values
 extension Color {
     init(hex: String) {
@@ -621,7 +727,7 @@ struct MessageStartView: View {
     var currentUser: String 
     var onQuickReplyTap: (String, ActionValue?, MemberInfo?) -> Void
     @Binding var isLoading: Bool // 상위 뷰에서 전달받은 로딩 상태
-
+  
     @State private var alertMessage = ""
     @FocusState private var isActionTextFocused: Bool
     @FocusState private var isContentOrLabelFocused: Bool
@@ -636,49 +742,41 @@ struct MessageStartView: View {
               VStack {
                   HStack {
                       if message.sender == currentUser {
-                          Spacer()
-                          Text(message.content)
-                              .padding()
-                              .background(Color.gray)
-                              .foregroundColor(.white)
-                              .cornerRadius(14)
-                      } else {
-                       
-                          // Display logo and message for bot's response
-                          Image("chatLogo")
-                              .resizable()
-                              .scaledToFit()
-                              .frame(width: 34, height: 34)
-                          Text(message.content)
-                              .padding()
-                              .foregroundColor(.black)
-                              .background(Color.blue.opacity(0.1))
-                              .cornerRadius(14)
-                          // Show message content or loading indicator
-                          if isLoading == true && message.content.isEmpty{ // isLoading이 true일 때만 로딩 인디케이터 표시
-                                                     HStack(alignment: .center, spacing: 1) {
-                                                         Image("chatLoading")
-                                                             .resizable()
-                                                             .scaledToFit()
-                                                             .frame(width: 100, height: 34)
-                                                     }
-                          } else if isLoading == false
-                          {
-                              
-                                 // Display logo and message for bot's response
-                                 Image("chatLogo")
-                                     .resizable()
-                                     .scaledToFit()
-                                     .frame(width: 34, height: 34)
-                                 Text(message.content)
-                                     .padding()
-                                     .foregroundColor(.black)
-                                     .background(Color.blue.opacity(0.1))
-                                     .cornerRadius(14)
-                          }
-                          Spacer()
-                      }
-                  }
+                                       Spacer()
+                                       Text(message.content)
+                                           .padding()
+                                           .background(Color.gray)
+                                           .foregroundColor(.white)
+                                           .cornerRadius(14)
+                                   } else {
+                                       // 봇 응답 시 로고와 메시지 표시
+                                       Image("chatLogo")
+                                           .resizable()
+                                           .scaledToFit()
+                                           .frame(width: 34, height: 34)
+
+                                       VStack(alignment: .leading) {
+                                           // 봇의 응답 메시지 표시
+                                           Text(message.content)
+                                               .padding()
+                                               .foregroundColor(.black)
+                                               .background(Color.blue.opacity(0.1))
+                                               .cornerRadius(14)
+                                           // 사용자가 메시지를 보낸 후, 봇 응답이 오기 전 로딩 인디케이터 표시
+//                                           if isLoading && message.sender == "BOT" && message.id == lastMessageId {
+//                                               // 로딩 인디케이터 표시
+//                                               HStack(alignment: .center, spacing: 24) {
+//                                                   Image("chatLoading")
+//                                                       .resizable()
+//                                                       .scaledToFit()
+//                                                       .frame(width: 100, height: 34)
+//                                               }
+//                                               .padding(.top, 8)
+//                                           }
+                                       }
+                                         Spacer()
+                                     }
+                                 }
                   .padding(.horizontal)
                   .id(message.id) // Assign a unique ID to each message
 
@@ -750,32 +848,7 @@ struct MessageStartView: View {
     }
 }
 
-// Example of a custom activity indicator view
-struct iActivityIndicator: View {
-    var style: Style
 
-    var body: some View {
-        HStack {
-            ForEach(0..<style.count, id: \.self) { index in
-                Circle()
-                    .scaleEffect(style.scaleRange.contains(CGFloat(index) / CGFloat(style.count - 1)) ? style.scaleRange.upperBound : style.scaleRange.lowerBound)
-                    .animation(
-                        Animation.easeInOut(duration: 0.5)
-                            .repeatForever(autoreverses: true)
-                            .delay(Double(index) * 0.1)
-                    )
-                    .frame(width: 10, height: 10)
-            }
-        }
-    }
-    
-    struct Style {
-        var count: Int
-        var scaleRange: ClosedRange<CGFloat>
-        
-        static let rowOfShapes = Style(count: 3, scaleRange: 0.1...1)
-    }
-}
 
 // 외부 Safari 브라우저 뷰를 지원하는 구조체는 http 및 https URLs만 열도록 제한됩니다.
 // nmap:// 같은 앱 URL은 직접 열도록 처리합니다.

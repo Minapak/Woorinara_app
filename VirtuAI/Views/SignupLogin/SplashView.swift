@@ -28,8 +28,13 @@ struct SplashView: View {
         }
         .onAppear {
             checkLoginStatus()
+            performLogoutAndRedirectToLogin()
         }
     }
+    private func performLogoutAndRedirectToLogin() {
+          logOut()
+          isCheckingLogin = false
+      }
 
     private func checkLoginStatus() {
         if !hasPerformedInitialTokenRefresh {

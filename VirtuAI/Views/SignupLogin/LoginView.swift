@@ -52,10 +52,10 @@ struct LoginView: View {
                     // ID TextField with Placeholder
                     TextField("ID", text: $username)
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.gray, lineWidth: 1))
+                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.gray, lineWidth: 1))
                         .onChange(of: username) { _ in
                             isValidId = true
-                            idErrorMessage = ""
+                            idErrorMessage = "This ID does not exist."
                         }
                     
                     if !isValidId {
@@ -68,10 +68,10 @@ struct LoginView: View {
                     // Password SecureField with Placeholder
                     SecureField("Password", text: $password)
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.gray, lineWidth: 1))
+                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.gray, lineWidth: 1))
                         .onChange(of: password) { _ in
                             isValidPassword = true
-                            passwordErrorMessage = ""
+                            passwordErrorMessage = "Incorrect password."
                         }
                     
                     if !isValidPassword {
@@ -114,26 +114,26 @@ struct LoginView: View {
                 
                 Spacer()
                 
-                VStack {
-                    Text("Log in with SNS account").foregroundColor(.gray).opacity(0.7)
-                }
+//                VStack {
+//                    Text("Log in with SNS account").foregroundColor(.gray).opacity(0.7)
+//                }
                 
-                HStack {
-                    Spacer()
-                    Button(action: { AuthviewModel.googleLogin() }) {
-                        Image("GoogleIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                    }
-                    Button(action: { AuthviewModel.appleLogin() }) {
-                        Image("AppleIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                    }
-                    Spacer()
-                }.padding(.bottom, 10)
+//                HStack {
+//                    Spacer()
+//                    Button(action: { AuthviewModel.googleLogin() }) {
+//                        Image("GoogleIcon")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 24, height: 24)
+//                    }
+//                    Button(action: { AuthviewModel.appleLogin() }) {
+//                        Image("AppleIcon")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 24, height: 24)
+//                    }
+//                    Spacer()
+//                }.padding(.bottom, 10)
             }
             .padding()
             .onAppear {

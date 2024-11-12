@@ -23,6 +23,7 @@ struct ContentView: View {
                             appChatState: _appChatState,
                             typingMessage: ContentView.$typingMessageCurrent
                         ).tag(0)
+                      //  permissionView().tag(0)
                         TranslationView().tag(1)
                         ContentWebView().tag(2)
                         TemporaryLinkView().tag(3)
@@ -34,6 +35,7 @@ struct ContentView: View {
                     }
                 }
             }
+            .navigationBarBackButtonHidden(true) // Hide the back button
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear {
                 VStack(spacing: 20) {

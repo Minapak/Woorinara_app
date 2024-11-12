@@ -141,6 +141,8 @@
 		548203152CDE23940031611A /* SwiftMessages-Dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5412523B2CDDE02200A54C3B /* SwiftMessages-Dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		548203172CE1AE300031611A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548203162CE1AE300031611A /* LocationManager.swift */; };
 		548203192CE1D2F30031611A /* DeleteMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548203182CE1D2F30031611A /* DeleteMemberView.swift */; };
+		5482031B2CE21BDE0031611A /* OpenAIAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5482031A2CE21BDE0031611A /* OpenAIAPI.swift */; };
+		5482031D2CE225D50031611A /* permissionMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5482031C2CE225D50031611A /* permissionMapView.swift */; };
 		549784182CDE036A0018DD23 /* AFARCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 549784172CDE036A0018DD23 /* AFARCView.swift */; };
 		54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */; };
 		54A43CB42CC6686700A64B86 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A43CB32CC6686700A64B86 /* Helper.swift */; };
@@ -355,6 +357,8 @@
 		546DEAD82CCB893B00823A00 /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
 		548203162CE1AE300031611A /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		548203182CE1D2F30031611A /* DeleteMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteMemberView.swift; sourceTree = "<group>"; };
+		5482031A2CE21BDE0031611A /* OpenAIAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIAPI.swift; sourceTree = "<group>"; };
+		5482031C2CE225D50031611A /* permissionMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = permissionMapView.swift; sourceTree = "<group>"; };
 		549784172CDE036A0018DD23 /* AFARCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFARCView.swift; sourceTree = "<group>"; };
 		54A43CAF2CC6685800A64B86 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		54A43CB12CC6686700A64B86 /* UIHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIHelper.swift; sourceTree = "<group>"; };
@@ -463,6 +467,7 @@
 		276E06A02B16723300E75DF5 /* OpenAI */ = {
 			isa = PBXGroup;
 			children = (
+				5482031A2CE21BDE0031611A /* OpenAIAPI.swift */,
 				276E06A12B1672D300E75DF5 /* OpenAIAPI.swift */,
 				276E06A32B1672ED00E75DF5 /* String+Error.swift */,
 				276E06A52B1672F800E75DF5 /* Models.swift */,
@@ -719,6 +724,7 @@
 				54A43CCA2CC6695900A64B86 /* ContentMapView.swift */,
 				54F7C3C12CDB244E00FF3F15 /* GifView.swift */,
 				548203162CE1AE300031611A /* LocationManager.swift */,
+				5482031C2CE225D50031611A /* permissionMapView.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -1052,6 +1058,7 @@
 				27F3116D2A3396D600BB399B /* LanguagesView.swift in Sources */,
 				5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */,
 				542995702CD8C681007E3748 /* MInfoDetailView.swift in Sources */,
+				5482031B2CE21BDE0031611A /* OpenAIAPI.swift in Sources */,
 				27F3117F2A36438200BB399B /* UpgradeViewModel.swift in Sources */,
 				5426B3B22CD2AB2E00BDD084 /* AppChatState.swift in Sources */,
 				277A657E2B225C710057D146 /* ImagePicker.swift in Sources */,
@@ -1142,6 +1149,7 @@
 				5408D5362CDAD373002CF084 /* AFSelectView.swift in Sources */,
 				5429956C2CD892C7007E3748 /* MyInfoView.swift in Sources */,
 				27F296802A2F3D41002470C5 /* MessageModel.swift in Sources */,
+				5482031D2CE225D50031611A /* permissionMapView.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
 				54F7C3C22CDB244E00FF3F15 /* GifView.swift in Sources */,
 				541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */,
@@ -1395,7 +1403,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1445,7 +1453,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

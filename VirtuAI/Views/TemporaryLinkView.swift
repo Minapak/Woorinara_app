@@ -17,13 +17,13 @@ struct TemporaryLinkView: View {
                             NavigationLink("통합 신청서 뷰", destination: AFAutoView())
                             NavigationLink("My Infomation", destination: MyInfoView())
                             NavigationLink("로그아웃", destination: LogOutView())
-                            NavigationLink("core Location", destination: ContentMapView())
-                           NavigationLink("gif", destination: GifView())
-
+                            NavigationLink("permissionMapView", destination: permissionMapView())
+                            NavigationLink("회원 탈퇴", destination: DeleteMemberView())
+               
 //                            passportInfoLink()
 //                            afCenterViewLink()
                             
-//                            NavigationLink("셋팅", destination: SettingsView())
+                            NavigationLink("auto", destination: TranslateView())
                         }
                         .navigationTitle("My Page")
                     }

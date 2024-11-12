@@ -1,6 +1,7 @@
 import SwiftUI
 import VComponents
 
+// Main view for ScanARC
 struct ScanARCView: View {
     @State private var foreignRegistrationNumber: String
     @State private var dateOfBirth: String
@@ -11,29 +12,33 @@ struct ScanARCView: View {
     @State private var residenceCategory2 = "1"
     
     @State private var showError = false
-    @State private var errorMessage = ""  // 에러 메시지를 저장하는 변수
+    @State private var errorMessage = ""  // Stores error messages
     @FocusState private var isFocused: Bool
-    @State private var navigateToAFCenterView = false
+    @State private var navigateToAFARCView = false  // Control navigation to AFARCView
     
-    let countries = ["South Korea", "Japan", "China", "India", "Thailand", "United States", "Canada", "Germany", "France", "United Kingdom"]
-    let residenceCategories1 = (65...90).map { String(UnicodeScalar($0)!) }
+    let countries = [
+        "South Korea", "Japan", "China", "India", "Thailand", "United States", "Canada", "Germany", "France", "United Kingdom",
+        "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Canada", "Chad", "Chile", "China", "Colombia", "Costa Rica", "Czechia (Czech Republic)", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Egypt", "France", "Germany", "Ghana", "India", "Indonesia", "Iran", "Ireland", "Italy", "Japan", "Kazakhstan", "Kyrgyzstan", "Laos", "Malaysia", "Mongolia", "Morocco", "Myanmar (Burma)", "Nepal", "Netherlands", "New Zealand", "Nigeria", "Pakistan", "Peru", "Philippines", "Poland", "Russia", "Saudi Arabia", "Singapore", "South Africa", "Spain", "Sri Lanka", "Sweden", "Switzerland", "Taiwan", "Thailand", "Turkey", "United Kingdom", "United States", "Uzbekistan", "Vietnam"
+    ]
+    let residenceCategories1 = (65...90).map { String(UnicodeScalar($0)!) } // A-Z
     let residenceCategories2 = (1...9).map { String($0) }
     
-    // Initializer with OCRResult data
+    // Initialize with OCRResult data
     init(result: OCRResult) {
-        // Initializing each field with data from OCRResult
-        self._foreignRegistrationNumber = State(initialValue: result.data?.documentNumber ?? "")
+        // Set initial values from OCRResult data
+        self._foreignRegistrationNumber = State(initialValue: result.data?.alienRegNum ?? "")
         self._dateOfBirth = State(initialValue: result.data?.dateOfBirth ?? "")
         self._gender = State(initialValue: result.data?.gender)
-        self._name = State(initialValue: "\(result.data?.givenName ?? "") \(result.data?.surName ?? "")")
+        self._name = State(initialValue: result.data?.name ?? "")
         self._country = State(initialValue: result.data?.nationality ?? "")
         
-        // Initial log for fields
-        print("Initialized foreignRegistrationNumber: \(result.data?.documentNumber ?? "")")
-        print("Initialized dateOfBirth: \(result.data?.dateOfBirth ?? "")")
-        print("Initialized gender: \(result.data?.gender ?? "nil")")
-        print("Initialized name: \(result.data?.givenName ?? "") \(result.data?.surName ?? "")")
-        print("Initialized country: \(result.data?.nationality ?? "")")
+        // Split visa into two parts for residence categories, if available
+        if let visa = result.data?.visa, visa.count >= 3 {
+            let firstPart = String(visa.prefix(1))
+            let secondPart = String(visa.suffix(1))
+            self._residenceCategory1 = State(initialValue: firstPart)
+            self._residenceCategory2 = State(initialValue: secondPart)
+        }
     }
     
     var body: some View {
@@ -48,7 +53,7 @@ struct ScanARCView: View {
                         .foregroundColor(.gray)
                     
                     VStack(alignment: .leading) {
-                        // Type of ID
+                        // ID Type
                         Text("Type of ID")
                             .font(.system(size: 16))
                             .foregroundColor(.black)
@@ -66,7 +71,7 @@ struct ScanARCView: View {
                         Spacer()
                         
                         // Foreign Registration Number
-                        InputField(title: "Foreign registration number", text: $foreignRegistrationNumber, showError: showError && foreignRegistrationNumber.isEmpty, placeholder: "Please enter the content", isRequired: true)
+                        InputField(title: "Foreign Registration Number", text: $foreignRegistrationNumber, showError: showError && foreignRegistrationNumber.isEmpty, placeholder: "Please enter the content", isRequired: true)
                         Spacer()
                         
                         // Date of Birth
@@ -96,20 +101,20 @@ struct ScanARCView: View {
                         DropdownField(title: "Country", selectedValue: $country, options: countries, showError: showError && country.isEmpty, isRequired: true)
                         Spacer()
                         
-                        // 체류자격
+                        // Visa (Residence Category)
                         VStack(alignment: .leading) {
                             HStack {
-                                Text("체류자격")
+                                Text("Visa")
                                     .font(.system(size: 16))
                                     .opacity(0.7)
                                 Text("*").foregroundColor(.red)
                             }
                             HStack {
-                                DropdownField(title: "A", selectedValue: $residenceCategory1, options: residenceCategories1)
-                                DropdownField(title: "1", selectedValue: $residenceCategory2, options: residenceCategories2)
+                                DropdownField(title: "Category", selectedValue: $residenceCategory1, options: residenceCategories1)
+                                DropdownField(title: "Type", selectedValue: $residenceCategory2, options: residenceCategories2)
                             }
                         }
-                    }
+                }
                     
                     Spacer()
                     
@@ -124,11 +129,10 @@ struct ScanARCView: View {
                         
                         Button("Done") {
                             if validateFields() {
-                                // 성공 처리
-                                print("✅ All fields validated successfully.")
+                                // Successfully validated fields, navigate to AFARCView
+                                navigateToAFARCView = true
                             } else {
                                 showError = true
-                                print("❗ Validation failed.")
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -136,6 +140,11 @@ struct ScanARCView: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(8)
+                    }
+                    
+                    // NavigationLink to AFARCView, triggered by navigateToAFARCView
+                    NavigationLink(destination: AFARCView(data: buildData()), isActive: $navigateToAFARCView) {
+                        EmptyView()
                     }
                 }
                 .padding()
@@ -149,15 +158,6 @@ struct ScanARCView: View {
     }
     
     private func validateFields() -> Bool {
-        print("Validating fields...")
-        print("Foreign Registration Number: \(foreignRegistrationNumber)")
-        print("Date of Birth: \(dateOfBirth)")
-        print("Gender: \(gender ?? "nil")")
-        print("Name: \(name)")
-        print("Country: \(country)")
-        print("Residence Category 1: \(residenceCategory1)")
-        print("Residence Category 2: \(residenceCategory2)")
-        
         return !foreignRegistrationNumber.isEmpty && !dateOfBirth.isEmpty && gender != nil && !name.isEmpty && !country.isEmpty
     }
     
@@ -170,6 +170,18 @@ struct ScanARCView: View {
         residenceCategory1 = "A"
         residenceCategory2 = "1"
         showError = false
-        print("Fields reset.")
+    }
+    
+    // Function to build data dictionary for AFARCView
+    private func buildData() -> [String: String] {
+        return [
+            "alienRegNum": foreignRegistrationNumber,
+            "dateOfBirth": dateOfBirth,
+            "gender": gender ?? "",
+            "name": name,
+            "nationality": country,
+            "residenceCategory1": residenceCategory1,
+            "residenceCategory2": residenceCategory2
+        ]
     }
 }

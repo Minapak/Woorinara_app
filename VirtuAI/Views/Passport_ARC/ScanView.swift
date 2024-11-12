@@ -70,7 +70,7 @@ struct ScanView: View {
                         }
 
                         // Skip Button
-                        NavigationLink(destination: SkipView(), isActive: $showSkipView) {
+                        NavigationLink(destination: ContentView(), isActive: $showSkipView) {
                             Button("Skip") {
                                 showSkipView = true
                             }

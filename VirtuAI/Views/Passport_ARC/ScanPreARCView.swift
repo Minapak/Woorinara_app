@@ -51,17 +51,14 @@ struct OCRResult: Codable {
 }
 
 struct OCRData: Codable {
-    var dateOfExpiry: String?
     var inferResult: String?
-    var surName: String?
-    var nationality: String?
     var gender: String?
-    var documentNumber: String?
-    var givenName: String?
-    var issueCountry: String?
-    var middleName: String?
+    var nationality: String?
     var dateOfBirth: String?
+    var visa: String?
+    var name: String?
     var message: String?
+    var alienRegNum: String?
     var userId: String?
 }
 
@@ -76,7 +73,6 @@ struct ScanPreARCView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    ?? "DefaultAccessToken"
     @State private var isManualInput = false // New state
     var body: some View {
         NavigationStack {
