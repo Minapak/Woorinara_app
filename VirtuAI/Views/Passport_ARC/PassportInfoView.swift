@@ -1,8 +1,17 @@
+//
+//  PassportInfoView.swift
+//  VirtuAI
+//
+//  Created by 박은민 on 11/13/24.
+//
+
+
 import SwiftUI
 
-struct ScanView: View {
+struct PassportInfoView: View {
     @State private var showScanPreARCView = false
     @State private var showScanPrePassView = false
+    @State private var showSkipAlert = false
     @State private var showSkipView = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
@@ -14,26 +23,23 @@ struct ScanView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     // Instructions
                     VStack(alignment: .leading, spacing: 0) {
-                        Text("Please prepare your")
-                            .font(.system(size: 32).bold())
-                            .foregroundColor(.black)
-                        
-                        Text("identifiable ID.")
+                        Text("Please prepare your ARC and Passport.")
                             .font(.system(size: 32).bold())
                             .foregroundColor(.black)
                             .padding(.bottom, 8)
                         
-                        Text("From a bright place.")
+                        Text("Prepare to scan your ARC and passport.")
                             .font(.system(size: 16))
                             .foregroundColor(.gray)
                         
-                        Text("Make sure the shadow doesn't fade.")
+                        Text("Make sure the documents are positioned clearly and well-lit for the best results.")
                             .font(.system(size: 16))
                             .foregroundColor(.gray)
                     }
                     .padding(.horizontal, 16)
                     
                     Spacer()
+                    
                     Image("920")
                         .resizable()
                         .scaledToFit()
@@ -44,19 +50,8 @@ struct ScanView: View {
                     
                     Spacer()
 
-                    VStack(alignment: .center, spacing: 10) {
-                        // Alien Registration Card Button
-                        NavigationLink(destination: ScanPreARCView(), isActive: $showScanPreARCView) {
-                            Button("Alien Registration Card") {
-                                showScanPreARCView = true
-                            }
-                            .frame(width: 344, height: 50)
-                            .font(.system(size: 16, weight: .bold))
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
-                        }
 
+                    VStack(alignment: .center, spacing: 10) {
                         // Passport Button
                         NavigationLink(destination: ScanPrePassView(), isActive: $showScanPrePassView) {
                             Button("Passport") {
@@ -68,17 +63,28 @@ struct ScanView: View {
                             .foregroundColor(.white)
                             .cornerRadius(16)
                         }
-
                         // Skip Button
-                        NavigationLink(destination: MyInfoView(), isActive: $showSkipView) {
-                            Button("Skip") {
-                                showSkipView = true
-                            }
-                            .frame(width: 344, height: 30)
-                            .font(.system(size: 16, weight: .regular))
-                            .background(Color.white)
-                            .foregroundColor(.gray)
-                            .cornerRadius(16)
+                        Button("Skip") {
+                            showSkipAlert = true
+                        }
+                        .frame(width: 344, height: 30)
+                        .font(.system(size: 16, weight: .regular))
+                        .background(Color.white)
+                        .foregroundColor(.gray)
+                        .cornerRadius(16)
+                        .alert(isPresented: $showSkipAlert) {
+                            Alert(
+                                title: Text("No user information entered."),
+                                message: Text("To use the auto-fill feature, please enter your information. Prepare to scan your ARC and passport."),
+                                primaryButton: .default(Text("Back")) {
+                                    // Action for "Back" button
+                                    presentationMode.wrappedValue.dismiss()
+                                },
+                                secondaryButton: .default(Text("Scan")) {
+                                    // Action for "Scan" button
+                                    showScanPreARCView = true
+                                }
+                            )
                         }
                     }
                     .padding(.horizontal, 16)
@@ -93,8 +99,6 @@ struct ScanView: View {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(.blue)
                                 .imageScale(.large)
-                            Text("")
-                                .foregroundColor(.blue)
                         })
         }
     }
@@ -102,17 +106,17 @@ struct ScanView: View {
 
 
 
-struct ContentScanView: View {
+struct ContentPassportInfoView: View {
     var body: some View {
-        ScanView()
+        PassportInfoView()
     }
 }
 
 
-struct ScanApp: App {
+struct ScanPassportInfoViewApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentScanView()
+            ContentPassportInfoView()
         }
     }
 }

@@ -9,7 +9,6 @@ struct LoginView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var showingSuccessAlert: Bool = false
-    @State private var isPasswordShow: Bool = false
     @State private var isValidId: Bool = true
     @State private var isValidPassword: Bool = true
     @State private var idErrorMessage: String = ""
@@ -49,13 +48,13 @@ struct LoginView: View {
                 .padding(.top, 30)
                 
                 VStack(spacing: 15) {
-                    // ID TextField with Placeholder
+                    // ID TextField with validation and "This ID does not exist" error handling
                     TextField("ID", text: $username)
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.gray, lineWidth: 1))
-                        .onChange(of: username) { _ in
-                            isValidId = true
-                            idErrorMessage = "This ID does not exist."
+                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(isValidId ? Color.gray : Color.red, lineWidth: 1))
+                        .onChange(of: username) { newValue in
+                            isValidId = validateID(newValue)
+                            idErrorMessage = isValidId ? "" : "Please enter between 5 and 26 characters (letters and/or numbers)"
                         }
                     
                     if !isValidId {
@@ -63,19 +62,29 @@ struct LoginView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if !username.isEmpty && idErrorMessage == "This ID does not exist." {
+                        Text("This ID does not exist.")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     
-                    // Password SecureField with Placeholder
+                    // Password SecureField with validation and "Incorrect password" error handling
                     SecureField("Password", text: $password)
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.gray, lineWidth: 1))
-                        .onChange(of: password) { _ in
-                            isValidPassword = true
-                            passwordErrorMessage = "Incorrect password."
+                        .background(RoundedRectangle(cornerRadius: 16).strokeBorder(isValidPassword ? Color.gray : Color.red, lineWidth: 1))
+                        .onChange(of: password) { newValue in
+                            isValidPassword = validatePassword(newValue)
+                            passwordErrorMessage = isValidPassword ? "" : "Password must be 8-26 characters, including letters and numbers"
                         }
                     
                     if !isValidPassword {
                         Text(passwordErrorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if !password.isEmpty && passwordErrorMessage == "Incorrect password." {
+                        Text("Incorrect password.")
                             .font(.caption)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -84,14 +93,21 @@ struct LoginView: View {
                 .padding(.top, 40)
                 
                 // Login Button
-                AppButton(text: "Login", clicked: {
-                    if username.isEmpty || password.isEmpty {
-                        alertMessage = "Both email & password are required"
-                        showAlert = true
-                    } else {
+                Button(action: {
+                    if isValidId && isValidPassword {
                         loginAction()
+                    } else {
+                        alertMessage = "Please ensure all fields are valid."
+                        showAlert = true
                     }
-                })
+                }) {
+                    Text("Login")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(16)
+                }
                 .alert(isPresented: $showAlert) {
                     Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
                 }
@@ -102,7 +118,7 @@ struct LoginView: View {
                 .padding(.top, 10)
                 
                 HStack {
-                    NavigationLink(destination: SignUpView()) {
+                    NavigationLink(destination: FindPWView()) {
                         Text("Find Password").foregroundColor(.blue)
                     }
                     Spacer()
@@ -113,27 +129,6 @@ struct LoginView: View {
                 .padding(.top, 10)
                 
                 Spacer()
-                
-//                VStack {
-//                    Text("Log in with SNS account").foregroundColor(.gray).opacity(0.7)
-//                }
-                
-//                HStack {
-//                    Spacer()
-//                    Button(action: { AuthviewModel.googleLogin() }) {
-//                        Image("GoogleIcon")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 24, height: 24)
-//                    }
-//                    Button(action: { AuthviewModel.appleLogin() }) {
-//                        Image("AppleIcon")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 24, height: 24)
-//                    }
-//                    Spacer()
-//                }.padding(.bottom, 10)
             }
             .padding()
             .onAppear {
@@ -148,7 +143,7 @@ struct LoginView: View {
     
     private func loginAction() {
         guard !username.isEmpty, !password.isEmpty else {
-            alertMessage = "Both email and password are required"
+            alertMessage = "Both ID and password are required"
             showAlert = true
             return
         }
@@ -179,6 +174,7 @@ struct LoginView: View {
                     return
                 }
                 
+                // Handle specific server responses for non-existent ID and incorrect password
                 if httpResponse.statusCode == 404 {
                     self.isValidId = false
                     self.idErrorMessage = "This ID does not exist."
@@ -223,8 +219,19 @@ extension LoginView {
     func dismissKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-}
 
+    private func validateID(_ id: String) -> Bool {
+        let regex = "^[a-zA-Z0-9]{5,26}$"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
+        return predicate.evaluate(with: id)
+    }
+
+    private func validatePassword(_ password: String) -> Bool {
+        let regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,26}$"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
+        return predicate.evaluate(with: password)
+    }
+}
 
 class TokenManager {
     static let shared = TokenManager()
@@ -233,7 +240,7 @@ class TokenManager {
     private let refreshThreshold: TimeInterval = 24 * 60 * 60
     
     func checkAndRefreshTokenIfNeeded(completion: @escaping (Bool) -> Void) {
-        guard let lastLoginDate = UserDefaults.standard.object(forKey: "lastLoginDate") as? Date else {
+        guard let lastLoginDate = UserDefaults.standard.object(forKey: "tokenDate") as? Date else {
             completion(false)
             return
         }
@@ -248,11 +255,12 @@ class TokenManager {
     }
 
     func updateLastLoginDate() {
-        UserDefaults.standard.set(Date(), forKey: "lastLoginDate")
+        UserDefaults.standard.set(Date(), forKey: "tokenDate")
     }
 
     private func refreshAccessToken(completion: @escaping (Bool) -> Void) {
         guard let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken"),
+              let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
               let url = URL(string: tokenRefreshURL) else {
             print("❗ Refresh token or URL missing.")
             completion(false)

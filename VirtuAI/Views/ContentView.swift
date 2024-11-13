@@ -26,6 +26,7 @@ struct ContentView: View {
                       //  permissionView().tag(0)
                         TranslationView().tag(1)
                         ContentWebView().tag(2)
+                     //MyPageView().tag(3)
                         TemporaryLinkView().tag(3)
                         SettingsView().tag(4)
                     }

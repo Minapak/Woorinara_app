@@ -11,9 +11,9 @@ struct TranslationView: View {
                 // 전체 배경색 지정
                 Color.background.ignoresSafeArea(.container, edges: [])
 
-                VStack(alignment: .center, spacing: 10) {
+                VStack(alignment: .center, spacing: 0) {
                     AppBar(title: "", isMainPage: true)
-                    
+                        .padding(.horizontal, 20)
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Fill out your Application Form")
                             .font(.system(size: 24).bold())

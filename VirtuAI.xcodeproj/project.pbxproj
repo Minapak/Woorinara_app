@@ -118,7 +118,6 @@
 		540B9AFE2CCB134A00760AC1 /* SwiftyChat in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFD2CCB134A00760AC1 /* SwiftyChat */; };
 		540B9B002CCB134A00760AC1 /* SwiftyChatMock in Frameworks */ = {isa = PBXBuildFile; productRef = 540B9AFF2CCB134A00760AC1 /* SwiftyChatMock */; };
 		5412523C2CDDE02200A54C3B /* SwiftMessages-Dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 5412523B2CDDE02200A54C3B /* SwiftMessages-Dynamic */; };
-		541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */; };
 		541F49B42CD1E632004D4D20 /* ScanPassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B02CD1E632004D4D20 /* ScanPassView.swift */; };
 		541F49B52CD1E632004D4D20 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49AF2CD1E632004D4D20 /* ScanView.swift */; };
 		541F49B62CD1E632004D4D20 /* ScanARCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541F49B12CD1E632004D4D20 /* ScanARCView.swift */; };
@@ -138,6 +137,10 @@
 		5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */; };
 		542995702CD8C681007E3748 /* MInfoDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5429956E2CD8C681007E3748 /* MInfoDetailView.swift */; };
 		546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 546DEAD82CCB893B00823A00 /* TranslateView.swift */; };
+		54768F2B2CE4244100AD48B6 /* MyPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54768F2A2CE4244100AD48B6 /* MyPageView.swift */; };
+		54768F2D2CE42A1F00AD48B6 /* MyAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54768F2C2CE42A1F00AD48B6 /* MyAccount.swift */; };
+		54768F2F2CE42BD100AD48B6 /* PassportInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54768F2E2CE42BD100AD48B6 /* PassportInfoView.swift */; };
+		54768F312CE42BF300AD48B6 /* ARCInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54768F302CE42BF300AD48B6 /* ARCInfoView.swift */; };
 		548203152CDE23940031611A /* SwiftMessages-Dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 5412523B2CDDE02200A54C3B /* SwiftMessages-Dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		548203172CE1AE300031611A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548203162CE1AE300031611A /* LocationManager.swift */; };
 		548203192CE1D2F30031611A /* DeleteMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548203182CE1D2F30031611A /* DeleteMemberView.swift */; };
@@ -339,7 +342,6 @@
 		5408D5312CDA1830002CF084 /* PDFClickViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFClickViewer.swift; sourceTree = "<group>"; };
 		5408D5332CDA1A32002CF084 /* LogOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogOutView.swift; sourceTree = "<group>"; };
 		5408D5352CDAD373002CF084 /* AFSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFSelectView.swift; sourceTree = "<group>"; };
-		541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOverlayView.swift; sourceTree = "<group>"; };
 		541F49AF2CD1E632004D4D20 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		541F49B02CD1E632004D4D20 /* ScanPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPassView.swift; sourceTree = "<group>"; };
 		541F49B12CD1E632004D4D20 /* ScanARCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanARCView.swift; sourceTree = "<group>"; };
@@ -355,6 +357,10 @@
 		5429956D2CD8C681007E3748 /* MInfoUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MInfoUpdateView.swift; sourceTree = "<group>"; };
 		5429956E2CD8C681007E3748 /* MInfoDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MInfoDetailView.swift; sourceTree = "<group>"; };
 		546DEAD82CCB893B00823A00 /* TranslateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateView.swift; sourceTree = "<group>"; };
+		54768F2A2CE4244100AD48B6 /* MyPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageView.swift; sourceTree = "<group>"; };
+		54768F2C2CE42A1F00AD48B6 /* MyAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAccount.swift; sourceTree = "<group>"; };
+		54768F2E2CE42BD100AD48B6 /* PassportInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassportInfoView.swift; sourceTree = "<group>"; };
+		54768F302CE42BF300AD48B6 /* ARCInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCInfoView.swift; sourceTree = "<group>"; };
 		548203162CE1AE300031611A /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		548203182CE1D2F30031611A /* DeleteMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteMemberView.swift; sourceTree = "<group>"; };
 		5482031A2CE21BDE0031611A /* OpenAIAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIAPI.swift; sourceTree = "<group>"; };
@@ -708,6 +714,8 @@
 				541F49AF2CD1E632004D4D20 /* ScanView.swift */,
 				541F49B22CD1E632004D4D20 /* ScanPrePassView.swift */,
 				5426B3A92CD2048F00BDD084 /* SkipView.swift */,
+				54768F2E2CE42BD100AD48B6 /* PassportInfoView.swift */,
+				54768F302CE42BF300AD48B6 /* ARCInfoView.swift */,
 			);
 			path = Passport_ARC;
 			sourceTree = "<group>";
@@ -739,6 +747,8 @@
 				27F2965D2A2CCAF5002470C5 /* SettingsView.swift */,
 				27F3116C2A3396D600BB399B /* LanguagesView.swift */,
 				5429956B2CD892C7007E3748 /* MyInfoView.swift */,
+				54768F2A2CE4244100AD48B6 /* MyPageView.swift */,
+				54768F2C2CE42A1F00AD48B6 /* MyAccount.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -775,7 +785,6 @@
 			children = (
 				5408D5312CDA1830002CF084 /* PDFClickViewer.swift */,
 				5426B3B52CD2FD5200BDD084 /* AFCenterView.swift */,
-				541685EF2CD1344E00BA4DED /* PDFOverlayView.swift */,
 				542995652CD4AD7E007E3748 /* AFDoneView.swift */,
 				542995692CD88818007E3748 /* AFAutoView.swift */,
 				5408D52B2CD9E7FE002CF084 /* AFTransView.swift */,
@@ -1054,6 +1063,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54768F2F2CE42BD100AD48B6 /* PassportInfoView.swift in Sources */,
 				27F311892A37902900BB399B /* SplashView.swift in Sources */,
 				27F3116D2A3396D600BB399B /* LanguagesView.swift in Sources */,
 				5429956F2CD8C681007E3748 /* MInfoUpdateView.swift in Sources */,
@@ -1088,6 +1098,7 @@
 				5408D5322CDA1831002CF084 /* PDFClickViewer.swift in Sources */,
 				27F311812A37096600BB399B /* GenericDialogs.swift in Sources */,
 				27B0E0242A312724002CDA33 /* LazyView.swift in Sources */,
+				54768F312CE42BF300AD48B6 /* ARCInfoView.swift in Sources */,
 				5408D5342CDA1A32002CF084 /* LogOutView.swift in Sources */,
 				549784182CDE036A0018DD23 /* AFARCView.swift in Sources */,
 				27B0E01D2A30F5E9002CDA33 /* UserDefaults.swift in Sources */,
@@ -1098,6 +1109,7 @@
 				27F296712A2D2148002470C5 /* BottomNav.swift in Sources */,
 				27F296472A2BC8AC002470C5 /* Extensions.swift in Sources */,
 				27F296782A2F13A8002470C5 /* MessageCard.swift in Sources */,
+				54768F2D2CE42A1F00AD48B6 /* MyAccount.swift in Sources */,
 				27C423A72B21FC400065C328 /* UserModel.swift in Sources */,
 				27F296122A2B9C49002470C5 /* StartChatView.swift in Sources */,
 				27F295E52A2B9966002470C5 /* VirtuAIApp.swift in Sources */,
@@ -1135,6 +1147,7 @@
 				54A43CC22CC668F600A64B86 /* Login2View.swift in Sources */,
 				54A43CC32CC668F600A64B86 /* AppInputBox.swift in Sources */,
 				54A43CC52CC668F600A64B86 /* TranslationView.swift in Sources */,
+				54768F2B2CE4244100AD48B6 /* MyPageView.swift in Sources */,
 				27F296892A2F8B7C002470C5 /* AssistantCard.swift in Sources */,
 				548203172CE1AE300031611A /* LocationManager.swift in Sources */,
 				276E06A42B1672ED00E75DF5 /* String+Error.swift in Sources */,
@@ -1152,7 +1165,6 @@
 				5482031D2CE225D50031611A /* permissionMapView.swift in Sources */,
 				27C312D12B2B1A5900BB3F43 /* VoiceModel.swift in Sources */,
 				54F7C3C22CDB244E00FF3F15 /* GifView.swift in Sources */,
-				541685F02CD1344E00BA4DED /* PDFOverlayView.swift in Sources */,
 				27F2965A2A2CCA16002470C5 /* GenerateImageView.swift in Sources */,
 				27F2965E2A2CCAF5002470C5 /* SettingsView.swift in Sources */,
 				276413FF2B274B39006412D4 /* ImageModel.swift in Sources */,
@@ -1403,7 +1415,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1453,7 +1465,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

@@ -67,17 +67,7 @@ struct permissionMapView: View {
                 }
                 .padding(.horizontal, 16)
 
-                // Bottom navigation bar
-                if !appState.hideBottomNav {
-                    CustomTabMapView(tabs: TabMapType.allCases, selectedIndex: $selectedIndex, isDisabled: !isPermissionGranted(), onTabTapped: { index in
-                        // Check if permission is granted, else show alert
-                        if isPermissionGranted() {
-                            selectedIndex = index
-                        } else {
-                            showPermissionAlert = true
-                        }
-                    })
-                }
+          
             }
             .navigationDestination(isPresented: $navigateToContentView) {
                 ContentView()
@@ -85,13 +75,13 @@ struct permissionMapView: View {
                     .environmentObject(appChatState)
                     .environmentObject(locationManager)
             }
-            .navigationBarBackButtonHidden(true) // Hide the back button
+            .navigationBarBackButtonHidden(false) // Hide the back button
             .onAppear {
-                appState.hideBottomNav = false // Ensure bottom nav is visible on appear
+                appState.hideBottomNav = false// Ensure bottom nav is visible on appear
             }
-            .onDisappear {
-                appState.hideBottomNav = true // Hide bottom nav when navigating away
-            }
+//            .onDisappear {
+//                appState.hideBottomNav = false // Hide bottom nav when navigating away
+//            }
             .alert(isPresented: $showPermissionAlert) {
                 Alert(
                     title: Text("Location Permission Required"),
@@ -115,32 +105,7 @@ struct permissionMapView: View {
 }
 
 // CustomTabView with isDisabled and onTabTapped callback
-struct CustomTabMapView: View {
-    let tabs: [TabMapType]
-    @Binding var selectedIndex: Int
-    var isDisabled: Bool = false  // Disable tabs if true
-    var onTabTapped: ((Int) -> Void)? = nil
 
-    var body: some View {
-        HStack {
-            ForEach(tabs.indices, id: \.self) { index in
-                Button(action: {
-                    if !isDisabled {
-                        onTabTapped?(index) // Invoke callback when tab is tapped
-                    }
-                }) {
-                    Text(tabs[index].title)
-                        .foregroundColor(selectedIndex == index ? .blue : .gray)
-                }
-                .frame(maxWidth: .infinity)
-                .disabled(isDisabled) // Disable button if permission is not granted
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
 
 struct permissionMapView_Previews: PreviewProvider {
     static var previews: some View {

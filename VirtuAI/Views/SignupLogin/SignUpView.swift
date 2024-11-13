@@ -227,7 +227,7 @@ struct SignUpView: View {
     }
 
     private func validateID(_ id: String) -> Bool {
-        let regex = "^[a-zA-Z]{5,26}$"
+        let regex = "^[a-zA-Z0-9]{5,26}$"
         let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
         return predicate.evaluate(with: id)
     }

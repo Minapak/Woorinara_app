@@ -78,45 +78,45 @@ struct AFTransView: View {
             .background(
                 NavigationLink(destination: AFSelectView(), isActive: $showAFSelectView) { EmptyView() }
             )
-//            .alert(isPresented: $showAlertForRedText) {
-//                Alert(
-//                    title: Text("Red text is a sample value, so it will be deleted if not edited"),
-//                    message: Text("Everything else will be saved"),
-//                    primaryButton: .default(Text("Edit")),
-//                    secondaryButton: .default(Text("OK"), action: {
-//                        showAlertForFileName = true
-//                    })
-//                )
-//            }
-//            .alert("Save as...", isPresented: $showAlertForFileName) {
-//                VStack {
-//                    TextField("Enter file name", text: $fileName)
-//                        .padding()
-//                        .background(Color.gray.opacity(0.2))
-//                        .cornerRadius(8)
-//
-//                    Button("Save") {
-//                        showFileTypeSelection = true
-//                    }
-//                    .padding(.top, 10)
-//                    .frame(maxWidth: .infinity)
-//                    .background(Color.blue)
-//                    .foregroundColor(.white)
-//                    .cornerRadius(8)
-//                }
-//                .padding()
-//            }
-//            .actionSheet(isPresented: $showFileTypeSelection) {
-//                ActionSheet(
-//                    title: Text("Save file"),
-//                    message: Text("Choose file format"),
-//                    buttons: [
-//                        .default(Text("PDF"), action: { toggleFileType("pdf") }),
-//                        .default(Text("PNG"), action: { toggleFileType("png") }),
-//                        .default(Text("Done"))
-//                    ]
-//                )
-//            }
+            .alert(isPresented: $showAlertForRedText) {
+                Alert(
+                    title: Text("Red text is a sample value, so it will be deleted if not edited"),
+                    message: Text("Everything else will be saved"),
+                    primaryButton: .default(Text("Edit")),
+                    secondaryButton: .default(Text("OK"), action: {
+                        showAlertForFileName = true
+                    })
+                )
+            }
+            .alert("Save as...", isPresented: $showAlertForFileName) {
+                VStack {
+                    TextField("Enter file name", text: $fileName)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+
+                    Button("Save") {
+                        showFileTypeSelection = true
+                    }
+                    .padding(.top, 10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                .padding()
+            }
+            .actionSheet(isPresented: $showFileTypeSelection) {
+                ActionSheet(
+                    title: Text("Save file"),
+                    message: Text("Choose file format"),
+                    buttons: [
+                        .default(Text("PDF"), action: { toggleFileType("pdf") }),
+                        .default(Text("PNG"), action: { toggleFileType("png") }),
+                        .default(Text("Done"))
+                    ]
+                )
+            }
         }
     }
 

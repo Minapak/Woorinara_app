@@ -17,7 +17,7 @@ struct TemporaryLinkView: View {
                             NavigationLink("통합 신청서 뷰", destination: AFAutoView())
                             NavigationLink("My Infomation", destination: MyInfoView())
                             NavigationLink("로그아웃", destination: LogOutView())
-                            NavigationLink("permissionMapView", destination: permissionMapView())
+                            NavigationLink("위치 권한 허용", destination: permissionMapView())
                             NavigationLink("회원 탈퇴", destination: DeleteMemberView())
                
 //                            passportInfoLink()

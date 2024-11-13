@@ -73,12 +73,12 @@ struct ScanPassView: View {
                             HStack(spacing: 3) {
                                 // 성, 이름, 중간 이름
                                 InputField(title: "Surname", text: $surname, isFocused: _isFocused)
-                                InputField(title: "Given name", text: $givenName,showError: showError && givenName.isEmpty, placeholder: "Required", isRequired: true, isFocused: _isFocused)
+                                InputField(title: "Given name", text: $givenName,showError: showError && givenName.isEmpty, placeholder: "TANAKA", isRequired: true, isFocused: _isFocused)
                                 InputField(title: "Middle name", text: $middleName, isFocused: _isFocused)
                             }
                             Spacer()
                             // 생년월일
-                            InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "yyyyMMdd", isRequired: true, isFocused: _isFocused)
+                            InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19820201", isRequired: true, isFocused: _isFocused)
                             Spacer()
                             Spacer()
                             // 성별 선택
@@ -100,10 +100,10 @@ struct ScanPassView: View {
                             DropdownField(title: "Country / Region", selectedValue: $countryRegion, options: countries, showError: showError && countryRegion.isEmpty, isRequired: true)
                             Spacer()
                             // 여권 번호
-                            InputField(title: "Passport Number", text: $passportNumber, showError: showError && passportNumber.isEmpty, placeholder: "Required", isRequired: true, isFocused: _isFocused)
+                            InputField(title: "Passport Number", text: $passportNumber, showError: showError && passportNumber.isEmpty, placeholder: "J12345678", isRequired: true, isFocused: _isFocused)
                             Spacer()
                             // 여권 만료일
-                            InputField(title: "Passport Expiration Date", text: $passportExpirationDate, showError: showError && passportExpirationDate.isEmpty, placeholder: "yyyyMMdd", isRequired: true, isFocused: _isFocused)
+                            InputField(title: "Passport Expiration Date", text: $passportExpirationDate, showError: showError && passportExpirationDate.isEmpty, placeholder: "20301221", isRequired: true, isFocused: _isFocused)
                             Spacer()
                         }
                         

@@ -71,11 +71,27 @@ struct ScanARCView: View {
                         Spacer()
                         
                         // Foreign Registration Number
-                        InputField(title: "Foreign Registration Number", text: $foreignRegistrationNumber, showError: showError && foreignRegistrationNumber.isEmpty, placeholder: "Please enter the content", isRequired: true)
-                        Spacer()
+                                  InputField(
+                                      title: "Foreign Registration Number",
+                                      text: $foreignRegistrationNumber,
+                                      showError: showError && foreignRegistrationNumber.isEmpty,
+                                      placeholder: "Z123456789",
+                                      isRequired: true
+                                  )
+                                  .onChange(of: foreignRegistrationNumber) { newValue in
+                                      // Add '-' after 6 characters
+                                      if newValue.count == 6 && !newValue.contains("-") {
+                                          foreignRegistrationNumber.insert("-", at: newValue.index(newValue.startIndex, offsetBy: 6))
+                                      }
+                                      // Limit the text length to 14 characters (e.g., yymmdd-1234567)
+                                      if newValue.count > 14 {
+                                          foreignRegistrationNumber = String(newValue.prefix(14))
+                                      }
+                                  }
+                                  Spacer()
                         
                         // Date of Birth
-                        InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "Please enter the content", isRequired: true)
+                        InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19870201", isRequired: true)
                         Spacer()
                         
                         // Gender
@@ -94,7 +110,7 @@ struct ScanARCView: View {
                         Spacer()
                         
                         // Name
-                        InputField(title: "Name", text: $name, showError: showError && name.isEmpty, placeholder: "Please enter the content", isRequired: true)
+                        InputField(title: "Name", text: $name, showError: showError && name.isEmpty, placeholder: "TANAKA", isRequired: true)
                         Spacer()
                         
                         // Country

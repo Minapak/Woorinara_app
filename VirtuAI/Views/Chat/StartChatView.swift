@@ -344,7 +344,8 @@ struct StartChatView: View {
                         }
                     }
                     .onAppear {
-                                                isLoading = true // 로딩 시작
+                         isLoading = true // 로딩 시작
+                        locationManager.requestLocation()
                         // 첫 번째 갱신을 즉시 수행
                         tokenManager.checkAndRefreshTokenIfNeeded { isSuccess in
                             if isSuccess {
@@ -449,58 +450,12 @@ struct StartChatView: View {
             SafariView(url: url)
         }
     }
-    struct PermissionView: View {
-        @Binding var isShowingPermissionView: Bool
-        var onPermissionGranted: () -> Void // 권한 승인 시 실행할 동작
-
-        var body: some View {
-            ZStack {
-                Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
-
-                VStack(spacing: 20) {
-                    Text("Your location is used while the app is in use. Would you like to allow this permission?")
-                        .font(.system(size: 18))
-                        .multilineTextAlignment(.center)
-                        .padding()
-
-                    HStack(spacing: 20) {
-                        Button("Yes") {
-                            isShowingPermissionView = false // 안내 뷰 닫기
-                            onPermissionGranted() // 권한 승인 시 동작 호출
-                        }
-                        .frame(width: 100, height: 44)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-
-                        Button("No") {
-                            isShowingPermissionView = false // 안내 뷰 닫기
-                        }
-                        .frame(width: 100, height: 44)
-                        .background(Color.gray.opacity(0.2))
-                        .foregroundColor(.primary)
-                        .cornerRadius(8)
-                    }
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(16)
-                .padding(.horizontal, 16)
-            }
-        }
-    }
 
     private func handleQuickReplyTap(buttonLabel: String, actionValue: ActionValue?, memberInfo: MemberInfo?) {
         // 로딩 상태 시작
                 isLoading = true
       
-//        // 허가 요청을 위한 로딩 상태 설정 및 권한 확인
-//        if isShowingPermissionView {
-//            PermissionView(isShowingPermissionView: $isShowingPermissionView) {
-//                proceedWithLocationRequestAndMessage(buttonLabel: "Office Location", actionValue: actionValue, memberInfo: memberInfo)
-//            }
-//            return
-//        }
+
         VStack {
             if let actionValueText = actionValue?.text {
                 VStack {
@@ -537,14 +492,19 @@ struct StartChatView: View {
         }
         switch buttonLabel {
             case "Change Visa":
+                locationManager.requestLocation()
                 sendMessage("Change Visa", isButtonClicked: true)
             case "Extend Visa":
+                locationManager.requestLocation()
                 sendMessage("Extend Visa", isButtonClicked: true)
             case "Application Form":
+                locationManager.requestLocation()
                 navigateToTranslateView = true
             case "Fill Application":
                 navigateToTranslateView = true
+                locationManager.requestLocation()
             case "Hikorea Website":
+                locationManager.requestLocation()
                 if let urlString = actionValue?.url, let url = URL(string: urlString) {
                     safariViewURL = url
                 }
@@ -612,6 +572,9 @@ struct StartChatView: View {
     }
     // 메시지 전송 함수
     private func sendMessage(_ message: String, isButtonClicked: Bool = false) {
+        // 위치 요청
+        locationManager.requestLocation()
+
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedMessage.isEmpty else { return }
         
@@ -650,46 +613,7 @@ struct StartChatView: View {
         typingMessageCurrent = ""
     }
 }
-struct permissionView: View {
-    @EnvironmentObject var appState: AppState
-    @EnvironmentObject var appChatState: AppChatState
-    @Environment(\.dismiss) private var dismiss
 
-    var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                Text("Your location is used while the app is in use. Would you like to allow this permission?")
-                    .font(.system(size: 18))
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                
-                HStack(spacing: 20) {
-                    LocationButton(.currentLocation) {
-                        dismiss() // 위치 권한 요청 후 permissionView 닫기
-                    }
-                    .frame(width: 200, height: 44)
-                    .cornerRadius(8)
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-                    
-                    Button(action: {
-                        dismiss() // permissionView 닫기
-                    }) {
-                        Text("No")
-                            .foregroundColor(.primary)
-                            .frame(width: 100, height: 44)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(16)
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-}
 // Extension to allow initialization of Color using hex values
 extension Color {
     init(hex: String) {

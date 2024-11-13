@@ -22,7 +22,7 @@ struct ContentWebView: View {
 
                 VStack(alignment: .center, spacing: 0) {
                     AppBar(title: "", isMainPage: true)
-                    
+                        .padding(.horizontal, 20)
                    
                    // Spacer()
                     NavigationView {
