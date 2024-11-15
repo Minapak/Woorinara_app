@@ -323,7 +323,7 @@ struct StartChatView: View {
                 AppBar(title: "", isMainPage: true)
                     .padding(.horizontal, 20)
                 // TranslateView로의 NavigationLink
-                NavigationLink(destination: TranslateView(), isActive: $navigateToTranslateView) {
+                NavigationLink(destination:  TranslationView(), isActive: $navigateToTranslateView) {
                     EmptyView()
                 }
                                

@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftKeychainWrapper
 import AVFoundation
 
-// OCR API 응답 모델
+// OCR API Response Model
 struct OCRPassResult: Codable {
     var status: Int
     var message: String
@@ -24,7 +24,7 @@ struct OCRPassData: Codable {
     var userId: String?
 }
 
-// 카메라 프리뷰 및 이미지 촬영
+// Camera Preview and Image Capture
 struct CameraCaptureView: UIViewControllerRepresentable {
     @Binding var capturedImage: UIImage?
     @Binding var isPresented: Bool
@@ -52,7 +52,6 @@ struct CameraCaptureView: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
                 parent.capturedImage = image
-                // Save the image to the photo album
                 UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
             }
             parent.isPresented = false
@@ -64,101 +63,103 @@ struct CameraCaptureView: UIViewControllerRepresentable {
     }
 }
 
-// 여권 정보를 스캔하고 서버에 전송하는 메인 View
 struct ScanPrePassView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToResultPassView = false
+    @State private var navigateToContentView = false // New state for "Skip" button
     @State private var capturedImage: UIImage?
-    @State private var isCameraPresented = true // Set to true to auto-present camera
+    @State private var isCameraPresented = true
     @State private var ocrPassResult: OCRPassResult?
     @State private var isLoading = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
-    @State var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    @State private var isManualInput = false // New state variable for manual input navigation
-
+    @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
+    @State private var isManualInput = false
+    @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
     var body: some View {
         NavigationStack {
             ZStack {
-                Image("background")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+                Color.black.opacity(0.6).ignoresSafeArea()
 
-                VStack(spacing: 30) {
-                    Spacer().frame(height: 0)
+                VStack(spacing: 10) {
+                    Spacer().frame(height: 10)
 
-                    Text("Place your Passport within the frame and tap the capture button to scan.")
+                    // Instruction Text
+                    Text("Place your Passport within \nthe frame and tap the capture \nbutton to scan.")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
-                    
+
                     ZStack {
                         if let image = capturedImage {
                             Image(uiImage: image)
                                 .resizable()
-                                .scaledToFill()
-                                .frame(width: 280, height: 180)
+                                .scaledToFit()
+                                .frame(width: 580, height: 380)
                                 .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 3)
-                                )
+                             
                         } else {
                             Color.gray.opacity(0.1)
-                                .frame(width: 280, height: 180)
+                                .frame(width: 580, height: 380)
                                 .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 3)
+                        }
+                    }
+
+                    HStack(spacing:30) {
+                        Button(action: {
+                            passportDataSaved = true // Simulate saving passport data
+                            navigateToResultPassView = true
+                        }) {
+                            Text("Scan")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 100, height: 44)
+                                .background(Capsule().fill(Color.blue))
+                        }
+
+                        Button(action: {
+                            capturedImage = nil
+                            isCameraPresented = true
+                        }) {
+                            Text("Re-take")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.blue)
+                                .frame(width: 100, height: 44)
+                                .background(Capsule().fill(Color.white))
+                        }
+                    }.padding(.bottom, 10)
+
+                    Button(action: {
+                        isManualInput = true
+                    }) {
+                        VStack(spacing: 4) { // Adjust spacing if needed
+                            Text("Manual input")
+                                .font(.system(size: 16, weight: .regular))
+                                .foregroundColor(.white)
+                                .padding(.top, 0)
+                                .background(
+                                    GeometryReader { geometry in
+                                        Rectangle()
+                                            .frame(width: geometry.size.width, height: 1) // Match width of the text
+                                            .foregroundColor(.white)
+                                            .offset(y: 24) // Position the line just below the text
+                                    }
                                 )
                         }
+                        .fixedSize(horizontal: true, vertical: false) // Prevents VStack from expanding
                     }
-                    Button(action: {
-                        isCameraPresented = true
-                    }) {
-                        Image(systemName: "camera.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.white)
-                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 70, height: 70))
-                    }
-                    
-                    Button("Send Image for OCR") {
-                        if let image = capturedImage {
-                            captureAndSendImage(image)
-                        } else {
-                            errorMessage = "No image captured."
-                            showErrorAlert = true
-                        }
-                    }
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
-                    .disabled(capturedImage == nil)
-                    .padding(.bottom, 30)
 
-                    Button("Manual input") {
-                        isManualInput = true
-                    }
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(.white)
-                    .padding(.top, 20)
-                    .overlay(
-                        Rectangle()
-                            .frame(height: 1)
-                            .foregroundColor(.white),
-                        alignment: .bottom
-                    )
+                
                 }
                 
+                // Loading Overlay
                 if isLoading {
                     Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
                     ProgressView().scaleEffect(2)
                 }
             }
             .onAppear {
-                // Automatically present the camera when view appears
                 isCameraPresented = true
             }
             .navigationBarBackButtonHidden(true)
@@ -166,7 +167,7 @@ struct ScanPrePassView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "chevron.left")
-                    .foregroundColor(.blue)
+                    .foregroundColor(.white)
                     .imageScale(.large)
             })
             .sheet(isPresented: $isCameraPresented) {
@@ -176,8 +177,10 @@ struct ScanPrePassView: View {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
             
+         
+            
             NavigationLink(
-                destination: ocrPassResult.map { ScanPassView(result: $0) },
+                destination: ScanPassView(result: ocrPassResult ?? OCRPassResult(status: 0, message: "", data: OCRPassData())),
                 isActive: $navigateToResultPassView
             ) {
                 EmptyView()
@@ -186,6 +189,13 @@ struct ScanPrePassView: View {
             NavigationLink(
                 destination: ScanPassView(result: OCRPassResult(status: 0, message: "", data: OCRPassData())),
                 isActive: $isManualInput
+            ) {
+                EmptyView()
+            }
+
+            NavigationLink(
+                destination: ContentView(),
+                isActive: $navigateToContentView
             ) {
                 EmptyView()
             }
@@ -247,7 +257,7 @@ struct ScanPrePassView: View {
                         self.ocrPassResult = self.convertNilValues(result)
                         self.navigateToResultPassView = true
                     } else {
-                        self.errorMessage = "\(result.data?.userId ?? "User")님, OCR 결과를 추출하지 못했습니다. 다시 시도하십시오."
+                        self.errorMessage = "OCR result extraction failed. Please try again."
                         self.showErrorAlert = true
                         self.resetScanPrePassView()
                     }
@@ -286,12 +296,3 @@ struct ScanPrePassView: View {
         self.navigateToResultPassView = false
     }
 }
-
-struct ScanPrePassView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            ScanPrePassView()
-        }
-    }
-}
- 

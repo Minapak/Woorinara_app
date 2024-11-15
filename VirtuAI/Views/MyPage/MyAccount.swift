@@ -1,28 +1,21 @@
-//
-//  MyaccountView.swift
-//  VirtuAI
-//
-//  Created by 박은민 on 11/13/24.
-//
-
 import SwiftUI
 
 struct MyAccount: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Title and Subtitle
-            Text("My account")
+            Text("My Account")
                 .font(.system(size: 28, weight: .bold))
                 .padding(.top)
             
-            Text("If the recognized content is different from the real thing, it will be limited to use")
+            Text("If the recognized content is different from the real thing, usage may be restricted.")
                 .font(.system(size: 16))
                 .foregroundColor(.gray)
                 .padding(.bottom)
             
             // List of account options
             VStack(spacing: 20) {
-                NavigationLink(destination: Text("My Information")) {
+                NavigationLink(destination: MyInfoView()) {
                     AccountOptionRow(title: "My Information")
                 }
                 
@@ -30,15 +23,15 @@ struct MyAccount: View {
                     AccountOptionRow(title: "My ID & Nickname")
                 }
                 
-                NavigationLink(destination: Text("Change Password")) {
+                NavigationLink(destination: ChangePWView()) {
                     AccountOptionRow(title: "Change Password")
                 }
                 
-                NavigationLink(destination: Text("Log Out")) {
+                NavigationLink(destination: LogOutView()) {
                     AccountOptionRow(title: "Log Out")
                 }
                 
-                NavigationLink(destination: Text("Delete Account")) {
+                NavigationLink(destination: DeleteMemberView()) {
                     AccountOptionRow(title: "Delete Account")
                 }
             }

@@ -16,13 +16,13 @@ struct ContentWebView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 // 전체 배경색 지정
                 Color.background.ignoresSafeArea(.container, edges: [])
 
                 VStack(alignment: .center, spacing: 0) {
                     AppBar(title: "", isMainPage: true)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal)
                    
                    // Spacer()
                     NavigationView {

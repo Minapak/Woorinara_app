@@ -2,7 +2,7 @@ import SwiftUI
 import AVFoundation
 import SwiftKeychainWrapper
 
-// 카메라 프리뷰 및 이미지 촬영
+// Camera Capture Component
 struct CameraCaptureARCView: UIViewControllerRepresentable {
     @Binding var capturedImage: UIImage?
     @Binding var isPresented: Bool
@@ -11,7 +11,6 @@ struct CameraCaptureARCView: UIViewControllerRepresentable {
         let picker = UIImagePickerController()
         picker.sourceType = .camera
         picker.delegate = context.coordinator
-        print("Camera opened") // Log for camera opening
         return picker
     }
 
@@ -31,19 +30,17 @@ struct CameraCaptureARCView: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
                 parent.capturedImage = image
-                print("Image captured: \(image)") // Log for captured image
             }
             parent.isPresented = false
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            print("Camera cancelled") // Log for camera cancellation
             parent.isPresented = false
         }
     }
 }
 
-// OCR API 응답 모델
+// OCR Result Model
 struct OCRResult: Codable {
     var status: Int
     var message: String
@@ -62,10 +59,11 @@ struct OCRData: Codable {
     var userId: String?
 }
 
-// Main view for scanning the ARC
+// Main View for ARC Scanning
 struct ScanPreARCView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToResultView = false
+    @State private var navigateToContentView = false // For navigating back to ContentView
     @State private var capturedImage: UIImage?
     @State private var isCameraPresented = false
     @State private var ocrResult: OCRResult?
@@ -73,87 +71,82 @@ struct ScanPreARCView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    @State private var isManualInput = false // New state
+    @State private var isManualInput = false
+    @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
     var body: some View {
         NavigationStack {
             ZStack {
-                Image("background")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+                Color.black.opacity(0.6).ignoresSafeArea()
 
-                VStack(spacing: 30) {
-                    Spacer().frame(height: 0)
-
+                VStack(spacing: 10) {
+                    Spacer().frame(height: 10)
                     Text("Place your ARC within\nthe frame and tap the capture\nbutton to scan.")
                         .font(.system(size: 22, weight: .bold))
-                        .multilineTextAlignment(.center)
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
-                    
+
                     ZStack {
                         if let image = capturedImage {
                             Image(uiImage: image)
                                 .resizable()
-                                .scaledToFill()
-                                .frame(width: 280, height: 180)
+                                .scaledToFit()
+                                .frame(width: 580, height: 380)
                                 .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 3)
-                                )
-                           
+                             
                         } else {
                             Color.gray.opacity(0.1)
-                                .frame(width: 280, height: 180)
+                                .frame(width: 580, height: 380)
                                 .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 3)
-                                )
-                      
                         }
                     }
+                    
+                    HStack(spacing:30) {
+                        Button(action: {
+                            arcDataSaved = true // Simulate saving ARC data
+                            navigateToResultView = true
+                        }) {
+                            Text("Scan")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 100, height: 44)
+                                .background(Capsule().fill(Color.blue))
+                        }
+
+                        Button(action: {
+                            capturedImage = nil
+                            isCameraPresented = true
+                        }) {
+                            Text("Re-take")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.blue)
+                                .frame(width: 100, height: 44)
+                                .background(Capsule().fill(Color.white))
+                        }
+                    }.padding(.bottom, 10)
                     
                     Button(action: {
-                        isCameraPresented = true
+                        isManualInput = true
                     }) {
-                        Image(systemName: "camera.circle.fill")
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.white)
-                            .background(Circle().fill(Color.white.opacity(0.1)).frame(width: 70, height: 70))
-                    }
-                    
-                    Button("Send Image for OCR") {
-                        if let image = capturedImage {
-                            print("Preparing to send image for OCR") // Log before sending image
-                            captureAndSendImage(image)
-                        } else {
-                            errorMessage = "No image captured."
-                            showErrorAlert = true
-                            print("Error: No image captured") // Log for missing image error
+                        VStack(spacing: 4) { // Adjust spacing if needed
+                            Text("Manual input")
+                                .font(.system(size: 16, weight: .regular))
+                                .foregroundColor(.white)
+                                .padding(.top, 0)
+                                .background(
+                                    GeometryReader { geometry in
+                                        Rectangle()
+                                            .frame(width: geometry.size.width, height: 1) // Match width of the text
+                                            .foregroundColor(.white)
+                                            .offset(y: 24) // Position the line just below the text
+                                    }
+                                )
                         }
+                        .fixedSize(horizontal: true, vertical: false) // Prevents VStack from expanding
                     }
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
-                    .disabled(capturedImage == nil)
-                    .padding(.bottom, 30)
+
                     
-                    
-                        Button("Manual input") {
-                            isManualInput = true // Trigger manual input navigation
-                        }
-                        .font(.system(size: 18, weight: .regular))
-                        .foregroundColor(.white)
-                        .padding(.top, 20)
-                        .overlay(
-                            Rectangle()
-                                .frame(height: 1) // 1px height
-                                .foregroundColor(.white), // White color for the stroke
-                            alignment: .bottom // Align it to the bottom of the button
-                        )
-                    
+            
                 }
                 
                 if isLoading {
@@ -162,7 +155,6 @@ struct ScanPreARCView: View {
                 }
             }
             .onAppear {
-                // Automatically present the camera when view appears
                 isCameraPresented = true
             }
             .navigationBarBackButtonHidden(true)
@@ -170,9 +162,8 @@ struct ScanPreARCView: View {
                 presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "chevron.left")
-                    .foregroundColor(.blue)
+                    .foregroundColor(.white)
                     .imageScale(.large)
-            
             })
             .sheet(isPresented: $isCameraPresented) {
                 CameraCaptureARCView(capturedImage: $capturedImage, isPresented: $isCameraPresented)
@@ -182,31 +173,30 @@ struct ScanPreARCView: View {
             }
             
             NavigationLink(
-                destination: ocrResult.map { ScanARCView(result: $0) },
+                destination: ScanARCView(result: ocrResult ?? OCRResult(status: 0, message: "", data: OCRData())),
                 isActive: $navigateToResultView
             ) {
-                EmptyView() // NavigationLink를 위한 EmptyView
+                EmptyView()
             }
             
-            // NavigationLink for manual input
-                        NavigationLink(
-                            destination: ScanARCView(result: OCRResult(status: 0, message: "", data: OCRData())),
-                            isActive: $isManualInput
-                        ) {
-                            EmptyView()
-                        }
+            NavigationLink(
+                destination: ScanARCView(result: OCRResult(status: 0, message: "", data: OCRData())),
+                isActive: $isManualInput
+            ) {
+                EmptyView()
+            }
+
+            NavigationLink(
+                destination: ContentView(),
+                isActive: $navigateToContentView
+            ) {
+                EmptyView()
+            }
         }
     }
 
     private func captureAndSendImage(_ image: UIImage) {
-        // Save the captured image to the photo album
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        print("Image saved to photo album") // Log to confirm saving to the album
-
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            print("Failed to convert image to JPEG data")
-            return
-        }
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
 
         let url = URL(string: "http://43.203.237.202:18080/api/v1/naver-ocr")!
         var request = URLRequest(url: url)
@@ -230,17 +220,17 @@ struct ScanPreARCView: View {
         request.httpBody = body
 
         isLoading = true
-        print("Sending image data to OCR server...")
 
         URLSession.shared.dataTask(with: request) { data, response, error in
-            DispatchQueue.main.async { self.isLoading = false }
+            DispatchQueue.main.async {
+                self.isLoading = false
+            }
 
             if let error = error {
                 DispatchQueue.main.async {
                     self.errorMessage = "Network error: \(error.localizedDescription)"
                     self.showErrorAlert = true
                 }
-                print("Network error: \(error.localizedDescription)")
                 return
             }
 
@@ -249,21 +239,18 @@ struct ScanPreARCView: View {
                     self.errorMessage = "No data received from server."
                     self.showErrorAlert = true
                 }
-                print("Error: No data received from server")
                 return
             }
 
             do {
                 let result = try JSONDecoder().decode(OCRResult.self, from: data)
                 DispatchQueue.main.async {
-                    if let ocrData = result.data {
+                    if result.status == 200, result.data != nil {
                         self.ocrResult = result
                         self.navigateToResultView = true
-                        print("OCR Result received: \(ocrData)")
                     } else {
                         self.errorMessage = "No valid OCR data received."
                         self.showErrorAlert = true
-                        print("Error: No valid OCR data received")
                     }
                 }
             } catch {
@@ -271,8 +258,6 @@ struct ScanPreARCView: View {
                     self.errorMessage = "Failed to decode response: \(error)"
                     self.showErrorAlert = true
                 }
-                print("Decoding error: \(error)")
-                print("Received data: \(String(data: data, encoding: .utf8) ?? "No readable data")")
             }
         }.resume()
     }

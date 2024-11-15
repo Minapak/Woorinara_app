@@ -9,7 +9,12 @@ struct AFAutoView: View {
     @State private var selectedBox: (title: String, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, text: String)?
     @State private var selectedImage: Image? = nil // 선택한 이미지를 저장할 변수
     @State private var isLoading = false
-    
+    // AppStorage for Data
+    @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
+    @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
+    @AppStorage("myInfoSaved") private var myInfoSaved: Bool = false
+   // @AppStorage("myInfoSignatureImage") private var signatureImageData: Data? = nil
+
     // 텍스트나 체크박스를 수정할 상자들
     @State private var boxes: [(title: String, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, text: String)] = [
         ("FOREIGN RESIDENT REGISTRATION", 35, 64, 6, 6, "✓"),
@@ -22,7 +27,7 @@ struct AFAutoView: View {
         ("ALTERATION OF RESIDENCE", 113, 93, 6, 6, "✓"),
         ("GRANTING STATUS OF SOJOURN", 113, 104, 6, 6, "✓"),
         ("CHANGE OF INFORMATION ON REGISTRATION", 113, 121, 6, 6, "✓"),
-        ("희망 자격 1", 183, 63, 15, 6, "D-2"),
+        ("희망 자격 1", 187, 65, 15, 6, "D-2"),
         ("희망 자격 2", 97, 104, 15, 6, "D-2"),
         ("희망 자격 3", 97, 122, 15, 6,"D-2"),
         ("성 Surname", 73, 147, 64, 5, "YUKI"),
@@ -30,8 +35,8 @@ struct AFAutoView: View {
         ("년 yyyy", 81, 160, 36, 5, "1987"),
         ("월 mm", 120, 160, 12, 4, "02"),
         ("일 dd", 140, 160, 12, 4, "01"),
-        ("남 M", 183, 153, 4, 4, "✓"),
-        ("여 F", 183, 158, 4, 4, ""),
+        ("남 M", 185, 155, 4, 4, "✓"),
+        ("여 F", 185, 158, 4, 4, ""),
         ("국적 Nationality", 252, 160, 24, 21, "JAPAN"),
         ("외국인 등록 번호 1", 97, 167, 7, 7, "J"),
         ("외국인 등록 번호 2", 109, 167, 7, 7, "1"),
@@ -88,23 +93,10 @@ struct AFAutoView: View {
     @State private var fileURL: URL? // URL to share the generated file
     var body: some View {
         VStack(spacing: 0) {
-            // Top warning message
-//            HStack {
-//                Image(systemName: "exclamationmark.triangle")
-//                    .foregroundColor(.red)
-//                Text("You should edit or delete the red texts before submitting")
-//                    .font(.system(size: 14))
-//                    .foregroundColor(.red)
-//            }
-//            .padding()
-//            .background(Color.red.opacity(0.1))
-//            .cornerRadius(10)
-//            .padding(.horizontal)
+
             
-            // Main content area with form image and boxes
-            
-            if isLoading {
-                LoadingAlertView()
+           // if isLoading {
+               // LoadingAlertView()
                 GeometryReader { geometry in
                     let canvasWidth: CGFloat = 298 * scaleFactor
                     let canvasHeight: CGFloat = 422 * scaleFactor
@@ -144,9 +136,9 @@ struct AFAutoView: View {
                     }
                     .frame(width: canvasWidth, height: canvasHeight)
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-                }
-            }
-            .frame(height: 422 * scaleFactor)
+                }.frame(height: 422 * scaleFactor)
+            //}
+         
             
             Spacer()
             

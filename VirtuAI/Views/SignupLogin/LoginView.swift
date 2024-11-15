@@ -54,7 +54,7 @@ struct LoginView: View {
                         .background(RoundedRectangle(cornerRadius: 16).strokeBorder(isValidId ? Color.gray : Color.red, lineWidth: 1))
                         .onChange(of: username) { newValue in
                             isValidId = validateID(newValue)
-                            idErrorMessage = isValidId ? "" : "Please enter between 5 and 26 characters (letters and/or numbers)"
+                            idErrorMessage = isValidId ? "" : "Please enter between 5 and 26 characters \n(letters and/or numbers)"
                         }
                     
                     if !isValidId {
@@ -62,6 +62,7 @@ struct LoginView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     } else if !username.isEmpty && idErrorMessage == "This ID does not exist." {
                         Text("This ID does not exist.")
                             .font(.caption)
@@ -75,7 +76,7 @@ struct LoginView: View {
                         .background(RoundedRectangle(cornerRadius: 16).strokeBorder(isValidPassword ? Color.gray : Color.red, lineWidth: 1))
                         .onChange(of: password) { newValue in
                             isValidPassword = validatePassword(newValue)
-                            passwordErrorMessage = isValidPassword ? "" : "Password must be 8-26 characters, including letters and numbers"
+                            passwordErrorMessage = isValidPassword ? "" : "Password must be 8-26 characters, \nincluding letters and numbers"
                         }
                     
                     if !isValidPassword {
@@ -83,6 +84,7 @@ struct LoginView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true) 
                     } else if !password.isEmpty && passwordErrorMessage == "Incorrect password." {
                         Text("Incorrect password.")
                             .font(.caption)

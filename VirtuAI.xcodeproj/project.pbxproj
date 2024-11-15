@@ -175,6 +175,10 @@
 		54E0BE372CC8CE9C00D41163 /* MembersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E0BE362CC8CE9C00D41163 /* MembersViewModel.swift */; };
 		54E0BE392CC8D25F00D41163 /* UserViewModel.txt in Resources */ = {isa = PBXBuildFile; fileRef = 54E0BE382CC8D25F00D41163 /* UserViewModel.txt */; };
 		54E7FCB12CC69CD600D1D098 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 54E7FCB02CC69CD600D1D098 /* Alamofire */; };
+		54EA3C4C2CE6DD920039A2ED /* AlertInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C4B2CE6DD920039A2ED /* AlertInfoView.swift */; };
+		54EA3C4E2CE73C640039A2ED /* SavedDocView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */; };
+		54EA3C502CE73D5D0039A2ED /* TrashDocView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */; };
+		54EA3C522CE73ECB0039A2ED /* ChangePWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C512CE73ECB0039A2ED /* ChangePWView.swift */; };
 		54F1CD392CCB513B0018B30E /* WebView in Frameworks */ = {isa = PBXBuildFile; productRef = 54F1CD382CCB513B0018B30E /* WebView */; };
 		54F1CD3B2CCB57F00018B30E /* ContentWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */; };
 		54F7C3BE2CDB23FB00FF3F15 /* AnimatedImage in Frameworks */ = {isa = PBXBuildFile; productRef = 54F7C3BD2CDB23FB00FF3F15 /* AnimatedImage */; };
@@ -385,6 +389,10 @@
 		54E0BE342CC8C48900D41163 /* WooriChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooriChatViewModel.swift; sourceTree = "<group>"; };
 		54E0BE362CC8CE9C00D41163 /* MembersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersViewModel.swift; sourceTree = "<group>"; };
 		54E0BE382CC8D25F00D41163 /* UserViewModel.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = UserViewModel.txt; sourceTree = "<group>"; };
+		54EA3C4B2CE6DD920039A2ED /* AlertInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertInfoView.swift; sourceTree = "<group>"; };
+		54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedDocView.swift; sourceTree = "<group>"; };
+		54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashDocView.swift; sourceTree = "<group>"; };
+		54EA3C512CE73ECB0039A2ED /* ChangePWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePWView.swift; sourceTree = "<group>"; };
 		54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentWebView.swift; sourceTree = "<group>"; };
 		54F7C3C12CDB244E00FF3F15 /* GifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifView.swift; sourceTree = "<group>"; };
 		54FC8CF52CC76774004A23C2 /* GoogleServiceEx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleServiceEx-Info.plist"; sourceTree = "<group>"; };
@@ -701,6 +709,7 @@
 				5429955A2CD4A5BA007E3748 /* FindPWView.swift */,
 				5408D5332CDA1A32002CF084 /* LogOutView.swift */,
 				548203182CE1D2F30031611A /* DeleteMemberView.swift */,
+				54EA3C512CE73ECB0039A2ED /* ChangePWView.swift */,
 			);
 			path = SignupLogin;
 			sourceTree = "<group>";
@@ -749,6 +758,9 @@
 				5429956B2CD892C7007E3748 /* MyInfoView.swift */,
 				54768F2A2CE4244100AD48B6 /* MyPageView.swift */,
 				54768F2C2CE42A1F00AD48B6 /* MyAccount.swift */,
+				54EA3C4B2CE6DD920039A2ED /* AlertInfoView.swift */,
+				54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */,
+				54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -1086,8 +1098,10 @@
 				27F295E72A2B9966002470C5 /* ContentView.swift in Sources */,
 				276E06A82B1681E800E75DF5 /* FirebaseViewModel.swift in Sources */,
 				27F296662A2CE3BD002470C5 /* LanguageManager.swift in Sources */,
+				54EA3C522CE73ECB0039A2ED /* ChangePWView.swift in Sources */,
 				54F1CD3B2CCB57F00018B30E /* ContentWebView.swift in Sources */,
 				27F296682A2CE6C5002470C5 /* StartChatViewModel.swift in Sources */,
+				54EA3C4C2CE6DD920039A2ED /* AlertInfoView.swift in Sources */,
 				276E06A62B1672F800E75DF5 /* Models.swift in Sources */,
 				54E0BE2F2CC8789900D41163 /* ContentResultView.swift in Sources */,
 				27F2964F2A2BE2AA002470C5 /* ShimmerEffect.swift in Sources */,
@@ -1122,6 +1136,7 @@
 				27F296852A2F5109002470C5 /* Constants.swift in Sources */,
 				27F3115A2A334D7400BB399B /* LottieView.swift in Sources */,
 				54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */,
+				54EA3C502CE73D5D0039A2ED /* TrashDocView.swift in Sources */,
 				27B0E0222A30FFEE002CDA33 /* RewardedAd.swift in Sources */,
 				27F3117D2A362D6B00BB399B /* UpgradeView.swift in Sources */,
 				541F49B42CD1E632004D4D20 /* ScanPassView.swift in Sources */,
@@ -1153,6 +1168,7 @@
 				276E06A42B1672ED00E75DF5 /* String+Error.swift in Sources */,
 				27F311692A33857800BB399B /* Appearance.swift in Sources */,
 				5408D52C2CD9E7FE002CF084 /* AFTransView.swift in Sources */,
+				54EA3C4E2CE73C640039A2ED /* SavedDocView.swift in Sources */,
 				54E0BE332CC892FE00D41163 /* PDFPractice.swift in Sources */,
 				546DEAD92CCB893B00823A00 /* TranslateView.swift in Sources */,
 				27F311782A362B5200BB399B /* ViewExtensions.swift in Sources */,
@@ -1415,7 +1431,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 24;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1465,7 +1481,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 24;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

@@ -48,20 +48,20 @@ struct MyPageView: View {
                                 Text("Registered ID")
                                     .font(.headline)
                                 
-                                NavigationLink(destination: Text("Passport")) {
+                                NavigationLink(destination: ScanPassView()) {
                                     HStack {
                                         Text("Passport")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.black.opacity(0.5))
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .foregroundColor(.gray)
                                     }
                                 }
                                 
-                                NavigationLink(destination: Text("Alien Registration Card")) {
+                                NavigationLink(destination: ScanARCView()) {
                                     HStack {
                                         Text("Alien Registration Card")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.black.opacity(0.5))
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .foregroundColor(.gray)
@@ -77,20 +77,20 @@ struct MyPageView: View {
                                 Text("My Document Folder")
                                     .font(.headline)
                                 
-                                NavigationLink(destination: Text("Saved Documents")) {
+                                NavigationLink(destination: SavedDocView()) {
                                     HStack {
                                         Text("Saved Documents")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.black.opacity(0.5))
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .foregroundColor(.gray)
                                     }
                                 }
                                 
-                                NavigationLink(destination: Text("Trash")) {
+                                NavigationLink(destination: TrashDocView()) {
                                     HStack {
                                         Text("Trash")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.black.opacity(0.5))
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .foregroundColor(.gray)
@@ -99,7 +99,43 @@ struct MyPageView: View {
                             }
                             .padding(.horizontal)
                             
-                            Spacer()
+                        
+                            Divider()
+                            // My Document Folder Section
+                            VStack(alignment: .leading, spacing: 20) {
+                                Text("Test")
+                                    .font(.headline)
+                                
+                                NavigationLink(destination: AFAutoView()) {
+                                    HStack {
+                                        Text("통합 신청서 완성")
+                                            .foregroundColor(.black.opacity(0.5))
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                                
+                                NavigationLink(destination: permissionMapView()) {
+                                    HStack {
+                                        Text("위치 권한")
+                                            .foregroundColor(.black.opacity(0.5))
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                                NavigationLink(destination:ARCInfoView()) {
+                                    HStack {
+                                        Text("최초 로그인")
+                                            .foregroundColor(.black.opacity(0.5))
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
                         }
                         .padding(.top, 10)
                     }
@@ -107,7 +143,7 @@ struct MyPageView: View {
                 .padding(.bottom, 5)
                 .padding(16)
                 
-//                // Custom Bottom Navigation
+                // Uncomment the following lines if you need a custom tab view
 //                CustomTabView(
 //                    tabs: TabType.allCases.map { $0.tabItem },
 //                    selectedIndex: $selectedIndex

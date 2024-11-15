@@ -15,15 +15,14 @@ struct TemporaryLinkView: View {
                         List {
                             NavigationLink("여권 / 외국인 등록증 프로세스", destination: ScanView())
                             NavigationLink("통합 신청서 뷰", destination: AFAutoView())
-                            NavigationLink("My Infomation", destination: MyInfoView())
-                            NavigationLink("로그아웃", destination: LogOutView())
                             NavigationLink("위치 권한 허용", destination: permissionMapView())
-                            NavigationLink("회원 탈퇴", destination: DeleteMemberView())
-               
+                            NavigationLink("My Page", destination: MyPageView())
+                            NavigationLink("최초 로그인", destination: ARCInfoView())
+                           //                           NavigationLink("로그아웃", destination: LogOutView())
+ //                           NavigationLink("회원 탈퇴", destination: DeleteMemberView())
 //                            passportInfoLink()
 //                            afCenterViewLink()
-                            
-                            NavigationLink("auto", destination: TranslateView())
+ //                           NavigationLink("auto", destination: TranslateView())
                         }
                         .navigationTitle("My Page")
                     }

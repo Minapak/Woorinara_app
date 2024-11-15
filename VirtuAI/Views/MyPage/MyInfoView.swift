@@ -2,7 +2,6 @@ import SwiftUI
 import AVFoundation
 
 struct MyInfoView: View {
-    // 기본 정보 필드
     @State private var koreaAddress: String = "City Plaza, 4th-7th floors, 17 Gukjegeumyung-ro 2-gil, Yeongdeungpo-gu, Seoul Special City"
     @State private var telephoneNumber: String = "02-1234-5677"
     @State private var phoneNumber: String = "010-1234-5678"
@@ -24,49 +23,41 @@ struct MyInfoView: View {
     @State private var showSignaturePad = false
     @State private var showAlert = false
     @State private var alertMessage = ""
-    
-    // 저장 기능
-    private func saveInfo() {
-        let updateRequest = MemberUpdateRequest(
-            phoneNumber: phoneNumber,
-            annualIncome: Int(incomeAmount) ?? 0,
-            workplaceName: originalWorkplaceName,
-            workplaceRegistrationNumber: originalWorkplaceRegistrationNumber,
-            workplacePhoneNumber: originalWorkplacePhoneNumber,
-            futureWorkplaceName: futureWorkplaceName,
-            futureWorkplaceRegistrationNumber: "",
-            futureWorkplacePhoneNumber: futureWorkplacePhoneNumber,
-            profileImageUrl: "https://example.com/profile.jpg",
-            signatureUrl: "https://example.com/signature.png",
-            koreaAddress: koreaAddress,
-            telephoneNumber: telephoneNumber,
-            homelandAddress: homelandAddress,
-            homelandPhoneNumber: homelandPhoneNumber,
-            schoolStatus: schoolStatus,
-            schoolName: schoolName,
-            schoolPhoneNumber: schoolPhoneNumber,
-            schoolType: schoolType,
-            originalWorkplaceName: originalWorkplaceName,
-            originalWorkplaceRegistrationNumber: originalWorkplaceRegistrationNumber,
-            originalWorkplacePhoneNumber: originalWorkplacePhoneNumber,
-            incomeAmount: Int(incomeAmount) ?? 0,
-            job: job,
-            refundAccountNumber: refundAccountNumber
-        )
-        
-        MInfoUpdateView().updateMemberInfo(updateRequest)
+    @State private var showAlertInfo = false
+    @State private var showContentView = false // Navigation flag
+
+    // Reset all fields to default values
+    private func resetFields() {
+        koreaAddress = ""
+        telephoneNumber = ""
+        phoneNumber = ""
+        homelandAddress = ""
+        homelandPhoneNumber = ""
+        schoolStatus = ""
+        schoolName = ""
+        schoolPhoneNumber = ""
+        schoolType = ""
+        originalWorkplaceName = ""
+        originalWorkplaceRegistrationNumber = ""
+        originalWorkplacePhoneNumber = ""
+        futureWorkplaceName = ""
+        futureWorkplacePhoneNumber = ""
+        incomeAmount = ""
+        job = ""
+        refundAccountNumber = ""
+        signatureImage = nil
     }
-   
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("My Information")
-                        .font(.title)
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
 
                     Text("Please provide any information that cannot be determined from the ID.")
-                        .font(.subheadline)
+                        .font(.system(size: 18))
                         .foregroundColor(.gray)
 
                     VStack(alignment: .leading) {
@@ -75,11 +66,11 @@ struct MyInfoView: View {
                         SectionView(title: "Cellphone No.", text: $phoneNumber)
                         SectionView(title: "Home Country Address", text: $homelandAddress)
                         SectionView(title: "Home Country Phone Number", text: $homelandPhoneNumber)
-                        
+
                         DropdownInfoField(title: "Enrollment Status", selectedValue: $schoolStatus, options: ["High School", "University", "Other"], isRequired: true)
                         SectionView(title: "School Name", text: $schoolName)
                         SectionView(title: "School Phone Number", text: $schoolPhoneNumber)
-                        
+
                         DropdownInfoField(title: "Type of School", selectedValue: $schoolType, options: ["Unaccredited by the Office of..", "Accredited by Government"], isRequired: true)
                         SectionView(title: "Previous Employer Name", text: $originalWorkplaceName)
                         SectionView(title: "Previous Employer Business Registration Number", text: $originalWorkplaceRegistrationNumber)
@@ -89,14 +80,14 @@ struct MyInfoView: View {
                         SectionView(title: "Annual Income", text: $incomeAmount)
                         SectionView(title: "Occupation", text: $job)
                         SectionView(title: "Refund Account Number", text: $refundAccountNumber)
-                        
+
                         VStack(alignment: .leading) {
-                            Text("Upload ID Photo with White Background")
+                            Text("Enter Signature")
                                 .font(.headline)
                             if let image = signatureImage {
                                 Image(uiImage: image)
                                     .resizable()
-                                    .frame(height: 150)
+                                    .frame(height: 100)
                                     .background(Color.gray.opacity(0.1))
                                     .cornerRadius(16)
                             } else {
@@ -104,29 +95,36 @@ struct MyInfoView: View {
                                     VStack {
                                         Image(systemName: "plus")
                                             .font(.largeTitle)
-                                        Text("Upload Image")
-                                            .font(.subheadline)
+                                            
                                     }
-                                    .frame(maxWidth: .infinity, minHeight: 150)
-                                    .background(Color.gray.opacity(0.1))
+                                    .frame(maxWidth: .infinity, minHeight: 100)
+                                    .background(Color.white)
                                     .cornerRadius(16)
                                 }
                             }
                         }
                     }
-                    .padding()
 
                     Spacer()
 
-                    Button(action: saveInfo) {
-                        Text("Save Info")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(8)
+                    HStack {
+                        Button("Retry") {
+                            resetFields()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue, lineWidth: 2))
+
+                        Button("Done") {
+                            showContentView = true // Navigate to ContentView
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                     }
+
                 }
                 .padding()
             }
@@ -138,6 +136,22 @@ struct MyInfoView: View {
             }
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
+            .overlay(
+                Group {
+                    if showAlertInfo {
+                        Color.black.opacity(0.1).edgesIgnoringSafeArea(.all)
+                    //    AlertInfoView(isPresented: $showAlertInfo)
+                    }
+                }
+            )
+
+            // NavigationLink to ContentView
+            NavigationLink(
+                destination: ContentView(),
+                isActive: $showContentView
+            ) {
+                EmptyView()
             }
         }
     }

@@ -1,10 +1,3 @@
-//
-//  DeleteMemberView.swift
-//  VirtuAI
-//
-//  Created by 박은민 on 11/11/24.
-//
-
 import SwiftUI
 import SwiftKeychainWrapper
 
@@ -12,57 +5,91 @@ struct DeleteMemberView: View {
     @State private var navigateToLogin = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
+    @State private var isAgreed = false
+    @State private var showAgreementAlert = false
     
     private var authToken: String {
-        // Keychain에 저장된 토큰을 가져옵니다.
         KeychainWrapper.standard.string(forKey: "accessToken") ?? ""
     }
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Are you sure you want to delete your account?")
-                    .font(.title2)
-                    .foregroundColor(.primary)
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Delete Account")
+                    .font(.title)
+                    .bold()
+                
+                Text("Please make sure to check before deleting your account.")
+                    .foregroundColor(.gray)
+                    .padding(.bottom)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(.red)
+                        Text("All information related to your account will be completely deleted after 30 days of account deletion.")
+                            .foregroundColor(.red)
+                    }
                     .padding()
-
-                Spacer()
-
-                HStack(spacing: 20) {
-                    Button(action: {
-                        deleteAccount()
-                    }) {
-                        Text("Delete Account")
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.red)
-                            .cornerRadius(8)
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(8)
+                    
+                    Text("Precautions")
+                        .font(.headline)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("• After 7 days, you will not be able to log in or sign up with the same ID again.")
+                        Text("• If you log in within 7 days, the account deletion will be canceled, and you can continue using the service.")
+                        Text("• You can re-register with the same personal information after 30 days.")
                     }
-                    .alert(isPresented: $showErrorAlert) {
-                        Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
-                    }
-
-                    Button(action: {
-                        navigateToLogin = true
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(.primary)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
                 }
-                .padding()
+                
+                Toggle(isOn: $isAgreed) {
+                    Text("I have understood the above and agree to the account deletion.")
+                        .font(.subheadline)
+                }
+                .toggleStyle(CheckboxToggleStyle())
+                .padding(.vertical)
 
-                Spacer()
+                HStack {
+                    Button("Continue using") {
+                        navigateToLogin = true
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue, lineWidth: 1)
+                    )
+                    
+                    Button("Next") {
+                        if isAgreed {
+                            deleteAccount()
+                        } else {
+                            showAgreementAlert = true
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isAgreed ? Color.blue : Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
             }
             .padding()
             .fullScreenCover(isPresented: $navigateToLogin) {
                 LoginView() // Ensure LoginView is implemented separately
             }
-            .navigationTitle("Delete Account")
+            .alert(isPresented: $showAgreementAlert) {
+                Alert(title: Text("Agreement Required"), message: Text("Please agree to the terms before proceeding."), dismissButton: .default(Text("OK")))
+            }
+            .alert(isPresented: $showErrorAlert) {
+                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            }
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -107,6 +134,18 @@ struct DeleteMemberView: View {
         UserDefaults.standard.removeObject(forKey: "userRole")
         print("Logged out successfully.")
         navigateToLogin = true
+    }
+}
+
+struct CheckboxToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button(action: { configuration.isOn.toggle() }) {
+            HStack {
+                Image(systemName: configuration.isOn ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(configuration.isOn ? .blue : .gray)
+                configuration.label
+            }
+        }
     }
 }
 

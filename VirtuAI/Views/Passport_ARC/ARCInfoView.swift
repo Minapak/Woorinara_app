@@ -1,17 +1,9 @@
-//
-//  ARCInfoView.swift
-//  VirtuAI
-//
-//  Created by 박은민 on 11/13/24.
-//
-
 import SwiftUI
-
 
 struct ARCInfoView: View {
     @State private var showScanPreARCView = false
     @State private var showSkipAlert = false
-    @Environment(\.dismiss) private var dismiss
+    @State private var showContentView = false
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -51,36 +43,37 @@ struct ARCInfoView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         // ARC Button
-                        NavigationLink(destination: ScanPreARCView(), isActive: $showScanPreARCView) {
-                            Button("ARC") {
-                                showScanPreARCView = true
-                            }
-                            .frame(width: 344, height: 50)
-                            .font(.system(size: 16, weight: .bold))
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
+                        Button(action: {
+                            showScanPreARCView = true
+                        }) {
+                            Text("ARC")
+                                .frame(width: 344, height: 50)
+                                .font(.system(size: 16, weight: .bold))
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
                         }
-
+                        
                         // Skip Button
-                        Button("Skip") {
-                            showSkipAlert = true
+                        Button(action: {
+                          //  showSkipAlert = true
+                            showContentView = true
+                        }) {
+                            Text("Skip")
+                                .frame(width: 344, height: 30)
+                                .font(.system(size: 16, weight: .regular))
+                                .background(Color.white)
+                                .foregroundColor(.gray)
+                                .cornerRadius(16)
                         }
-                        .frame(width: 344, height: 30)
-                        .font(.system(size: 16, weight: .regular))
-                        .background(Color.white)
-                        .foregroundColor(.gray)
-                        .cornerRadius(16)
                         .alert(isPresented: $showSkipAlert) {
                             Alert(
                                 title: Text("No user information entered."),
                                 message: Text("To use the auto-fill feature, please enter your information. Prepare to scan your ARC and passport."),
                                 primaryButton: .default(Text("Back")) {
-                                    // Action for "Back" button
                                     presentationMode.wrappedValue.dismiss()
                                 },
                                 secondaryButton: .default(Text("Scan")) {
-                                    // Action for "Scan" button
                                     showScanPreARCView = true
                                 }
                             )
@@ -90,28 +83,39 @@ struct ARCInfoView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 5)
+                
+                // Navigation Links outside the VStack to avoid nesting issues
+                NavigationLink(
+                    destination: ScanPreARCView(),
+                    isActive: $showScanPreARCView
+                ) {
+                    EmptyView()
+                }
+                
+                NavigationLink(
+                    destination: ContentView(),
+                    isActive: $showContentView
+                ) {
+                    EmptyView()
+                }
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.blue)
-                                .imageScale(.large)
-                        })
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(.blue)
+                    .imageScale(.large)
+            })
         }
     }
 }
-
-
-
 
 struct ContentARCInfoView: View {
     var body: some View {
         ARCInfoView()
     }
 }
-
 
 struct ScanARCInfoViewApp: App {
     var body: some Scene {
