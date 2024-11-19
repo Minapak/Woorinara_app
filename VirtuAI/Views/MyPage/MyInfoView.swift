@@ -1,32 +1,91 @@
 import SwiftUI
 import AVFoundation
+import VComponents
+import SwiftKeychainWrapper
 
 struct MyInfoView: View {
-    @State private var koreaAddress: String = "City Plaza, 4th-7th floors, 17 Gukjegeumyung-ro 2-gil, Yeongdeungpo-gu, Seoul Special City"
-    @State private var telephoneNumber: String = "02-1234-5677"
-    @State private var phoneNumber: String = "010-1234-5678"
-    @State private var homelandAddress: String = "5-2-1 Ginza, Chuo-ku, Tokyo, 170-3923"
-    @State private var homelandPhoneNumber: String = "06-1234-1234"
-    @State private var schoolStatus: String = "High School"
-    @State private var schoolName: String = "Fafa school"
-    @State private var schoolPhoneNumber: String = "06-1234-1234"
-    @State private var schoolType: String = "Unaccredited by the Office of.."
-    @State private var originalWorkplaceName: String = "Fafa Inc"
-    @State private var originalWorkplaceRegistrationNumber: String = "123456789"
-    @State private var originalWorkplacePhoneNumber: String = "02-1234-9876"
+    @AppStorage("myInfoDataSaved") private var myInfoDataSaved: Bool = false
+    @State private var koreaAddress: String = ""
+    @State private var telephoneNumber: String = ""
+    @State private var phoneNumber: String = ""
+    @State private var homelandAddress: String = ""
+    @State private var homelandPhoneNumber: String = ""
+    @State private var schoolStatus: String = ""
+    @State private var schoolName: String = ""
+    @State private var schoolPhoneNumber: String = ""
+    @State private var schoolType: String = ""
+    @State private var originalWorkplaceName: String = ""
+    @State private var originalWorkplaceRegistrationNumber: String = ""
+    @State private var originalWorkplacePhoneNumber: String = ""
     @State private var futureWorkplaceName: String = ""
     @State private var futureWorkplacePhoneNumber: String = ""
-    @State private var incomeAmount: String = "5000 ten thousand won"
+    @State private var incomeAmount: String = ""
     @State private var job: String = ""
-    @State private var refundAccountNumber: String = "KOOKMIN, 123456-12-34566"
+    @State private var refundAccountNumber: String = ""
     @State private var signatureImage: UIImage? = nil
     @State private var showSignaturePad = false
     @State private var showAlert = false
     @State private var alertMessage = ""
-    @State private var showAlertInfo = false
     @State private var showContentView = false // Navigation flag
+    @State private var isLoading = false
 
-    // Reset all fields to default values
+    let endpoint = "http://43.203.237.202:18080/api/v1/members/details"
+    
+    private func fetchData() {
+        guard let url = URL(string: endpoint),
+              let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("Invalid URL or missing access token.")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        isLoading = true
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                isLoading = false
+            }
+
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("No data received.")
+                return
+            }
+
+            do {
+                let decodedData = try JSONDecoder().decode([String: String].self, from: data)
+                DispatchQueue.main.async {
+                    self.koreaAddress = decodedData["koreaAddress"] ?? ""
+                    self.telephoneNumber = decodedData["telephoneNumber"] ?? ""
+                    self.phoneNumber = decodedData["phoneNumber"] ?? ""
+                    self.homelandAddress = decodedData["homelandAddress"] ?? ""
+                    self.homelandPhoneNumber = decodedData["homelandPhoneNumber"] ?? ""
+                    self.schoolStatus = decodedData["schoolStatus"] ?? ""
+                    self.schoolName = decodedData["schoolName"] ?? ""
+                    self.schoolPhoneNumber = decodedData["schoolPhoneNumber"] ?? ""
+                    self.schoolType = decodedData["schoolType"] ?? ""
+                    self.originalWorkplaceName = decodedData["originalWorkplaceName"] ?? ""
+                    self.originalWorkplaceRegistrationNumber = decodedData["originalWorkplaceRegistrationNumber"] ?? ""
+                    self.originalWorkplacePhoneNumber = decodedData["originalWorkplacePhoneNumber"] ?? ""
+                    self.futureWorkplaceName = decodedData["futureWorkplaceName"] ?? ""
+                    self.futureWorkplacePhoneNumber = decodedData["futureWorkplacePhoneNumber"] ?? ""
+                    self.incomeAmount = decodedData["incomeAmount"] ?? ""
+                    self.job = decodedData["job"] ?? ""
+                    self.refundAccountNumber = decodedData["refundAccountNumber"] ?? ""
+                }
+            } catch {
+                print("Failed to decode JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+
     private func resetFields() {
         koreaAddress = ""
         telephoneNumber = ""
@@ -48,6 +107,39 @@ struct MyInfoView: View {
         signatureImage = nil
     }
 
+    private func saveData() {
+        let myInfoData: [String: String] = [
+            "koreaAddress": koreaAddress,
+            "telephoneNumber": telephoneNumber,
+            "phoneNumber": phoneNumber,
+            "homelandAddress": homelandAddress,
+            "homelandPhoneNumber": homelandPhoneNumber,
+            "schoolStatus": schoolStatus,
+            "schoolName": schoolName,
+            "schoolPhoneNumber": schoolPhoneNumber,
+            "schoolType": schoolType,
+            "originalWorkplaceName": originalWorkplaceName,
+            "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
+            "futureWorkplaceName": futureWorkplaceName,
+            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+            "incomeAmount": incomeAmount,
+            "job": job,
+            "refundAccountNumber": refundAccountNumber
+        ]
+
+        do {
+            let encodedData = try JSONEncoder().encode(myInfoData)
+            UserDefaults.standard.set(encodedData, forKey: "SavedMyInfoData")
+            myInfoDataSaved = true
+            alertMessage = "Your information has been saved successfully."
+        } catch {
+            alertMessage = "Failed to save your information: \(error.localizedDescription)"
+        }
+
+        showAlert = true
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -61,25 +153,42 @@ struct MyInfoView: View {
                         .foregroundColor(.gray)
 
                     VStack(alignment: .leading) {
-                        SectionView(title: "Address in Korea", text: $koreaAddress)
-                        SectionView(title: "Telephone No.", text: $telephoneNumber)
-                        SectionView(title: "Cellphone No.", text: $phoneNumber)
-                        SectionView(title: "Home Country Address", text: $homelandAddress)
-                        SectionView(title: "Home Country Phone Number", text: $homelandPhoneNumber)
+                        Spacer()
+                        SectionInfoView(title: "Address in Korea", text: $koreaAddress, placeholder: "Seoul Special City")
+                        Spacer()
+                                           SectionInfoView(title: "Telephone No.", text: $telephoneNumber, placeholder: "02-1234-5677")
+                        Spacer()
+                                           SectionInfoView(title: "Cellphone No.", text: $phoneNumber, placeholder: "010-1234-5678")
+                        Spacer()
+                                           SectionInfoView(title: "Home Country Address", text: $homelandAddress, placeholder: "5-2-1 Ginza, Chuo-ku, Tokyo, 170-3923")
+                        Spacer()
+                                           SectionInfoView(title: "Home Country Phone Number", text: $homelandPhoneNumber, placeholder: "06-1234-1234")
+                        Spacer()
+                                           DropdownInfoField(title: "Enrollment Status", selectedValue: $schoolStatus, options: ["High School", "University", "Other"], placeholder: "High School", isRequired: true)
+                        Spacer()
+                                           SectionInfoView(title: "School Name", text: $schoolName, placeholder: "Fafa School")
+                        Spacer()
+                                           SectionInfoView(title: "School Phone Number", text: $schoolPhoneNumber, placeholder: "06-1234-1234")
+                        Spacer()
+                                           DropdownInfoField(title: "Type of School", selectedValue: $schoolType, options: ["Unaccredited", "Accredited"], placeholder: "Unaccredited by the Office of..", isRequired: true)
+                        Spacer()
+                                           SectionInfoView(title: "Previous Employer Name", text: $originalWorkplaceName, placeholder: "Fafa Inc")
+                        Spacer()
+                                           SectionInfoView(title: "Previous Employer Business Registration Number", text: $originalWorkplaceRegistrationNumber, placeholder: "123456789")
+                        Spacer()
+                                           SectionInfoView(title: "Previous Employer Phone Number", text: $originalWorkplacePhoneNumber, placeholder: "02-1234-9876")
+                        Spacer()
+                                           SectionInfoView(title: "Prospective Employer Name", text: $futureWorkplaceName, placeholder: "Enter employer name")
+                        Spacer()
+                                           SectionInfoView(title: "Prospective Employer Phone Number", text: $futureWorkplacePhoneNumber, placeholder: "Enter phone number")
+                        Spacer()
+                                           SectionInfoView(title: "Annual Income", text: $incomeAmount, placeholder: "5000 ten thousand won")
+                        Spacer()
+                                           SectionInfoView(title: "Occupation", text: $job, placeholder: "Enter your occupation")
+                        Spacer()
+                                           SectionInfoView(title: "Refund Account Number", text: $refundAccountNumber, placeholder: "KOOKMIN, 123456-12-34566")
+                        Spacer()
 
-                        DropdownInfoField(title: "Enrollment Status", selectedValue: $schoolStatus, options: ["High School", "University", "Other"], isRequired: true)
-                        SectionView(title: "School Name", text: $schoolName)
-                        SectionView(title: "School Phone Number", text: $schoolPhoneNumber)
-
-                        DropdownInfoField(title: "Type of School", selectedValue: $schoolType, options: ["Unaccredited by the Office of..", "Accredited by Government"], isRequired: true)
-                        SectionView(title: "Previous Employer Name", text: $originalWorkplaceName)
-                        SectionView(title: "Previous Employer Business Registration Number", text: $originalWorkplaceRegistrationNumber)
-                        SectionView(title: "Previous Employer Phone Number", text: $originalWorkplacePhoneNumber)
-                        SectionView(title: "Prospective Employer Name", text: $futureWorkplaceName)
-                        SectionView(title: "Prospective Employer Phone Number", text: $futureWorkplacePhoneNumber)
-                        SectionView(title: "Annual Income", text: $incomeAmount)
-                        SectionView(title: "Occupation", text: $job)
-                        SectionView(title: "Refund Account Number", text: $refundAccountNumber)
 
                         VStack(alignment: .leading) {
                             Text("Enter Signature")
@@ -95,7 +204,6 @@ struct MyInfoView: View {
                                     VStack {
                                         Image(systemName: "plus")
                                             .font(.largeTitle)
-                                            
                                     }
                                     .frame(maxWidth: .infinity, minHeight: 100)
                                     .background(Color.white)
@@ -116,7 +224,8 @@ struct MyInfoView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue, lineWidth: 2))
 
                         Button("Done") {
-                            showContentView = true // Navigate to ContentView
+                            saveData()
+                            showContentView = true
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -124,7 +233,6 @@ struct MyInfoView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                     }
-
                 }
                 .padding()
             }
@@ -134,24 +242,12 @@ struct MyInfoView: View {
                     self.saveImageToAlbum(savedImage)
                 }
             }
-            .alert(isPresented: $showAlert) {
-                Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-            }
-            .overlay(
-                Group {
-                    if showAlertInfo {
-                        Color.black.opacity(0.1).edgesIgnoringSafeArea(.all)
-                    //    AlertInfoView(isPresented: $showAlertInfo)
-                    }
-                }
-            )
-
-            // NavigationLink to ContentView
-            NavigationLink(
-                destination: ContentView(),
-                isActive: $showContentView
-            ) {
-                EmptyView()
+            .onAppear(perform: fetchData)
+                      .alert(isPresented: $showAlert) {
+                          Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                      }
+            .navigationDestination(isPresented: $showContentView) {
+                ContentView()
             }
         }
     }
@@ -163,24 +259,40 @@ struct MyInfoView: View {
     }
 }
 
-// SectionView 및 DropdownField 컴포넌트
-struct SectionView: View {
+// SectionView 및 DropdownInfoField 컴포넌트
+struct SectionInfoView: View {
     var title: String
     @Binding var text: String
-    
+    var showError: Bool = false
+    var placeholder: String = ""
+    var isRequired: Bool = false
+
     var body: some View {
         VStack(alignment: .leading) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.gray)
-            TextField("\(title)", text: $text)
-                .padding()
-                .background(Color.white)
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
+            HStack {
+                Text(title)
+                    .font(.system(size: 16))
+                    .opacity(0.7)
+                if isRequired { Text("*").foregroundColor(.red) }
+            }
+            ZStack(alignment: .leading) {
+                // Placeholder
+                if text.isEmpty {
+                    Text(placeholder)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 8)
+                }
+                // Text 입력 필드
+                TextField("", text: $text)
+                    .foregroundColor(.black)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(showError && text.isEmpty ? Color.red : Color.gray, lineWidth: 1)
+                    )
+            }
         }
     }
 }
@@ -189,8 +301,9 @@ struct DropdownInfoField: View {
     var title: String
     @Binding var selectedValue: String
     var options: [String]
+    var placeholder: String
     var isRequired: Bool = false
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -209,7 +322,7 @@ struct DropdownInfoField: View {
                 }
             } label: {
                 HStack {
-                    Text(selectedValue.isEmpty ? "\(title)" : selectedValue)
+                    Text(selectedValue.isEmpty ? placeholder : selectedValue)
                         .foregroundColor(selectedValue.isEmpty ? .gray : .black)
                     Spacer()
                     Image(systemName: "chevron.down")

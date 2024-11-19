@@ -11,6 +11,7 @@ struct SignUpView: View {
 
     // Validation
     @State private var isValidId: Bool = true
+    @State private var isIdDuplicate: Bool = false // 아이디 중복 여부
     @State private var isValidPassword: Bool = true
     @State private var isValidConfirmPassword: Bool = true
     @EnvironmentObject var viewModel: AlertViewModel
@@ -42,7 +43,7 @@ struct SignUpView: View {
                 
                 Spacer()
                 
-                VStack(spacing: 16){
+                VStack(spacing: 16) {
                     // ID Input
                     TextField("ID", text: $username)
                         .padding(.horizontal)
@@ -50,14 +51,19 @@ struct SignUpView: View {
                         .background(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(isValidId ? Color.gray : Color.red)
+                                .stroke((isValidId && !isIdDuplicate) ? Color.gray : Color.red)
                         )
                         .onChange(of: username) { _ in
-                            isValidId = validateID(username)
+                            validateID(username)
                         }
                     
                     if !isValidId {
                         Text("Please enter between 5 and 26 characters")
+                            .foregroundColor(.red)
+                            .font(.system(size: 12))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if isIdDuplicate {
+                        Text("This ID is already taken. Please choose another.")
                             .foregroundColor(.red)
                             .font(.system(size: 12))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -89,7 +95,7 @@ struct SignUpView: View {
                             isValidConfirmPassword = confirmPassword == password
                         }
                     
-                    if isValidId && isValidPassword && isValidConfirmPassword {
+                    if isValidId && isValidPassword && isValidConfirmPassword && !isIdDuplicate {
                         HStack {
                             Text("8-26 Characters")
                                 .foregroundColor(.green)
@@ -104,7 +110,7 @@ struct SignUpView: View {
                 
                 // Sign Up Button
                 Button(action: {
-                    if isValidId && isValidPassword && isValidConfirmPassword {
+                    if isValidId && isValidPassword && isValidConfirmPassword && !isIdDuplicate {
                         signUpAction()
                     } else {
                         showAlert = true
@@ -203,13 +209,6 @@ struct SignUpView: View {
 
                 if httpResponse.statusCode == 200 {
                     self.processSuccessResponse(data: data)
-                    self.showingSuccessAlert = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        withAnimation {
-                            self.showingSuccessAlert = false
-                            self.navigateToLogin = true // LoginView로 네비게이션
-                        }
-                    }
                 } else {
                     self.processErrorResponse(data: data)
                 }
@@ -219,6 +218,12 @@ struct SignUpView: View {
 
     private func processSuccessResponse(data: Data?) {
         showingSuccessAlert = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showingSuccessAlert = false // 성공 알림 숨기기
+                navigateToLogin = true      // LoginView로 이동
+            }
+        }
     }
 
     private func processErrorResponse(data: Data?) {
@@ -226,10 +231,39 @@ struct SignUpView: View {
         showAlert = true
     }
 
-    private func validateID(_ id: String) -> Bool {
+    private func validateID(_ id: String) {
         let regex = "^[a-zA-Z0-9]{5,26}$"
         let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return predicate.evaluate(with: id)
+        isValidId = predicate.evaluate(with: id)
+        
+        // 아이디 중복 확인
+        checkDuplicateID(id)
+    }
+
+    private func checkDuplicateID(_ id: String) {
+        guard let url = URL(string: "http://43.203.237.202:18080/api/v1/members/check-duplicate") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let json = ["username": id]
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: json) else { return }
+        
+        URLSession.shared.uploadTask(with: request, from: jsonData) { data, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                    self.isIdDuplicate = true // 중복된 아이디 처리
+                    return
+                }
+
+                self.isIdDuplicate = false // 중복되지 않은 아이디
+            }
+        }.resume()
     }
 
     private func validatePassword(_ password: String) -> Bool {

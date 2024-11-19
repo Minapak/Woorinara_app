@@ -84,7 +84,7 @@ struct LoginView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .fixedSize(horizontal: false, vertical: true) 
+                            .fixedSize(horizontal: false, vertical: true)
                     } else if !password.isEmpty && passwordErrorMessage == "Incorrect password." {
                         Text("Incorrect password.")
                             .font(.caption)

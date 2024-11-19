@@ -179,6 +179,8 @@
 		54EA3C4E2CE73C640039A2ED /* SavedDocView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */; };
 		54EA3C502CE73D5D0039A2ED /* TrashDocView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */; };
 		54EA3C522CE73ECB0039A2ED /* ChangePWView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C512CE73ECB0039A2ED /* ChangePWView.swift */; };
+		54EA3C542CEBD3800039A2ED /* AFInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C532CEBD37F0039A2ED /* AFInfoView.swift */; };
+		54EA3C562CEC48540039A2ED /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EA3C552CEC48530039A2ED /* UserData.swift */; };
 		54F1CD392CCB513B0018B30E /* WebView in Frameworks */ = {isa = PBXBuildFile; productRef = 54F1CD382CCB513B0018B30E /* WebView */; };
 		54F1CD3B2CCB57F00018B30E /* ContentWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */; };
 		54F7C3BE2CDB23FB00FF3F15 /* AnimatedImage in Frameworks */ = {isa = PBXBuildFile; productRef = 54F7C3BD2CDB23FB00FF3F15 /* AnimatedImage */; };
@@ -393,6 +395,8 @@
 		54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedDocView.swift; sourceTree = "<group>"; };
 		54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashDocView.swift; sourceTree = "<group>"; };
 		54EA3C512CE73ECB0039A2ED /* ChangePWView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePWView.swift; sourceTree = "<group>"; };
+		54EA3C532CEBD37F0039A2ED /* AFInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AFInfoView.swift; sourceTree = "<group>"; };
+		54EA3C552CEC48530039A2ED /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		54F1CD3A2CCB57F00018B30E /* ContentWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentWebView.swift; sourceTree = "<group>"; };
 		54F7C3C12CDB244E00FF3F15 /* GifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifView.swift; sourceTree = "<group>"; };
 		54FC8CF52CC76774004A23C2 /* GoogleServiceEx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleServiceEx-Info.plist"; sourceTree = "<group>"; };
@@ -761,6 +765,7 @@
 				54EA3C4B2CE6DD920039A2ED /* AlertInfoView.swift */,
 				54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */,
 				54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */,
+				54EA3C532CEBD37F0039A2ED /* AFInfoView.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -780,6 +785,7 @@
 			children = (
 				27F3117C2A362D6B00BB399B /* UpgradeView.swift */,
 				54E0BE2E2CC8789900D41163 /* ContentResultView.swift */,
+				54EA3C552CEC48530039A2ED /* UserData.swift */,
 			);
 			path = etc;
 			sourceTree = "<group>";
@@ -1136,6 +1142,7 @@
 				27F296852A2F5109002470C5 /* Constants.swift in Sources */,
 				27F3115A2A334D7400BB399B /* LottieView.swift in Sources */,
 				54A43CB02CC6685800A64B86 /* AlertViewModel.swift in Sources */,
+				54EA3C542CEBD3800039A2ED /* AFInfoView.swift in Sources */,
 				54EA3C502CE73D5D0039A2ED /* TrashDocView.swift in Sources */,
 				27B0E0222A30FFEE002CDA33 /* RewardedAd.swift in Sources */,
 				27F3117D2A362D6B00BB399B /* UpgradeView.swift in Sources */,
@@ -1155,6 +1162,7 @@
 				27F296552A2CB85C002470C5 /* AppBar.swift in Sources */,
 				54E0BE352CC8C48A00D41163 /* WooriChatViewModel.swift in Sources */,
 				27F296172A2B9F85002470C5 /* UrbanistFontModifier.swift in Sources */,
+				54EA3C562CEC48540039A2ED /* UserData.swift in Sources */,
 				27F2965C2A2CCAE0002470C5 /* HistoryView.swift in Sources */,
 				27F2966B2A2CE840002470C5 /* ContentViewModel.swift in Sources */,
 				54A43CC02CC668F600A64B86 /* AppButton.swift in Sources */,
@@ -1431,7 +1439,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1481,7 +1489,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = VirtuAI/VirtuAI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"VirtuAI/Preview Content\"";
 				DEVELOPMENT_TEAM = QXT586NGNR;
 				ENABLE_HARDENED_RUNTIME = YES;

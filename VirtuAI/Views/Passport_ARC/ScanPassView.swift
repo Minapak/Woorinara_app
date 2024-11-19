@@ -21,7 +21,7 @@ struct ScanPassView: View {
     @State private var navigateToMyInfoView = false
     @State private var showAlertInfo = false
     @State private var navigateToScanPrePassView = false // Navigation flag for ScanPrePassView
-
+    let endpoint = "http://43.203.237.202:18080/api/v1/passport"
     let countries = [
         "South Korea", "Japan", "China", "India", "Thailand", "United States", "Canada", "Germany", "France", "United Kingdom",
         "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -78,13 +78,16 @@ struct ScanPassView: View {
                                         .stroke(Color.gray, lineWidth: 2)
                                 )
                                 .foregroundColor(.gray)
-
-                            InputField(title: "Surname", text: $surname, isFocused: _isFocused)
-                            InputField(title: "Given name", text: $givenName, showError: showError && givenName.isEmpty, placeholder: "TANAKA", isRequired: true, isFocused: _isFocused)
-                            InputField(title: "Middle name", text: $middleName, isFocused: _isFocused)
-
-                            InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19820201", isRequired: true, isFocused: _isFocused)
-
+                            Spacer()
+                            InputPassField(title: "Surname", text: $surname, isFocused: _isFocused)
+                            Spacer()
+                            InputPassField(title: "Given name", text: $givenName, showError: showError && givenName.isEmpty, placeholder: "TANAKA", isRequired: true, isFocused: _isFocused)
+                            Spacer()
+                            InputPassField(title: "Middle name", text: $middleName, isFocused: _isFocused)
+                            Spacer()
+                            InputPassField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19820201", isRequired: true, isFocused: _isFocused)
+                            Spacer()
+                            Spacer()
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack {
                                     Text("Gender")
@@ -93,20 +96,21 @@ struct ScanPassView: View {
                                     Text("*").foregroundColor(.red)
                                 }
                                 HStack {
-                                    RadioButtonPass(text: "Female", isSelected: $gender, tag: "F", showError: showError && gender == nil)
-                                    RadioButtonPass(text: "Male", isSelected: $gender, tag: "M", showError: showError && gender == nil)
+                                    RadioPassButton(text: "Female", isSelected: $gender, tag: "F", showError: showError && gender == nil)
+                                    RadioPassButton(text: "Male", isSelected: $gender, tag: "M", showError: showError && gender == nil)
                                 }
                             }
-
-                            DropdownField(title: "Country / Region", selectedValue: $countryRegion, options: countries, showError: showError && countryRegion.isEmpty, isRequired: true)
-
-                            InputField(title: "Passport Number", text: $passportNumber, showError: showError && passportNumber.isEmpty, placeholder: "M12345678", isRequired: true, isFocused: _isFocused)
-
-                            InputField(title: "Passport Expiration Date", text: $passportExpirationDate, showError: showError && passportExpirationDate.isEmpty, placeholder: "20301231", isRequired: true, isFocused: _isFocused)
-
-                            InputField(title: "Passport Issue Date", text: $dateOfIssue, showError: false, placeholder: "20201231", isFocused: _isFocused)
+                            Spacer()
+                            Spacer()
+                            DropdownPassField(title: "Country / Region", selectedValue: $countryRegion, options: countries, showError: showError && countryRegion.isEmpty, isRequired: true)
+                            Spacer()
+                            InputPassField(title: "Passport Number", text: $passportNumber, showError: showError && passportNumber.isEmpty, placeholder: "M12345678", isRequired: true, isFocused: _isFocused)
+                            Spacer()
+                            InputPassField(title: "Passport Expiration Date", text: $passportExpirationDate, showError: showError && passportExpirationDate.isEmpty, placeholder: "20301231", isRequired: true, isFocused: _isFocused)
+                            Spacer()
+                            InputPassField(title: "Passport Issue Date", text: $dateOfIssue, showError: false, placeholder: "20201231", isFocused: _isFocused)
                         }
-
+                        Spacer()
                         HStack {
                             Button("Retry") {
                                 navigateToScanPrePassView = true
@@ -141,12 +145,58 @@ struct ScanPassView: View {
                     EmptyView()
                 }
             }
-            .alert(isPresented: $showError) {
-                Alert(title: Text("Incomplete Form"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
-            }
+            .onAppear {
+                               fetchData()
+                           }
         }
     }
+    private func fetchData() {
+        guard let url = URL(string: endpoint),
+              let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("Invalid URL or missing access token.")
+            return
+        }
 
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        isLoading = true
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.main.async {
+                isLoading = false
+            }
+
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
+                return
+            }
+
+            guard let data = data else {
+                print("No data received.")
+                return
+            }
+
+            do {
+                let decodedData = try JSONDecoder().decode([String: String].self, from: data)
+                DispatchQueue.main.async {
+                    self.surname = decodedData["surName"] ?? ""
+                    self.givenName = decodedData["givenName"] ?? ""
+                    self.middleName = decodedData["middleName"] ?? ""
+                    self.dateOfBirth = decodedData["dateOfBirth"] ?? ""
+                    self.gender = decodedData["gender"]
+                    self.countryRegion = decodedData["issueCountry"] ?? ""
+                    self.passportNumber = decodedData["documentNumber"] ?? ""
+                    self.passportExpirationDate = decodedData["dateOfExpiry"] ?? ""
+                    self.passportNationality = decodedData["nationality"] ?? ""
+                    self.dateOfIssue = decodedData["dateOfIssue"] ?? ""
+                }
+            } catch {
+                print("Failed to decode JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
     private func validateFields() -> Bool {
         return !dateOfBirth.isEmpty && gender != nil && !countryRegion.isEmpty && !passportNumber.isEmpty && !passportExpirationDate.isEmpty
     }
@@ -254,7 +304,7 @@ struct ScanPassView: View {
          return nil
      }
  
-struct InputField: View {
+struct InputPassField: View {
     var title: String
     @Binding var text: String
     var showError: Bool = false
@@ -287,7 +337,7 @@ struct InputField: View {
 
 
 
-struct RadioButtonPass: View {
+struct RadioPassButton: View {
     var text: String
     @Binding var isSelected: String?
     var tag: String
@@ -309,7 +359,7 @@ struct RadioButtonPass: View {
     }
 }
 
-struct DropdownField: View {
+struct DropdownPassField: View {
     var title: String
     @Binding var selectedValue: String
     var options: [String]

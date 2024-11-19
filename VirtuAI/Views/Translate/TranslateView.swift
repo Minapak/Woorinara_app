@@ -54,15 +54,15 @@ struct ZoomableScrollView<Content: View>: UIViewRepresentable {
 
 // Main TranslateView
 struct TranslateView: View {
-    var showPDFOverlayView = false
     var languageOptions = ["Korean", "English", "Vietnamese", "Chinese", "Japanese"]
     var imageOptions = ["af", "af_e", "af_v", "af_c", "af_j"]
     
     @State private var selectedLanguage: String? = nil
     @State private var isLanguageDropdownOpen = false
-    @State private var selectedImage = "af"
-    @State private var navigateToScanView = false // New state variable for navigation
-    
+    @State private var selectedImage = "af_high"
+    @State private var navigateToAFInfoView = false // Navigation to AFInfoView
+    @State private var translationCompleted = false // Show success banner
+    @State private var buttonLabel = "Translation" // Button label
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -110,20 +110,44 @@ struct TranslateView: View {
 
                     Spacer()
 
-                    // "Auto-Fill" Button with NavigationLink
+                    // Button
                     HStack {
-                        Button("Auto-Fill") {
-                            navigateToScanView = true // Trigger navigation
+                        Button(buttonLabel) {
+                            if translationCompleted {
+                                navigateToAFInfoView = true
+                            } else {
+                                translationCompleted = true
+                                buttonLabel = "Auto-fill"
+                            }
                         }
                         .frame(width: 350, height: 50)
                         .font(.system(size: 16, weight: .bold))
-                        .background(Color.blue)
+                        .background(translationCompleted ? Color.blue : Color.gray)
                         .foregroundColor(.white)
                         .cornerRadius(16)
                     }
                 }
                 .padding(.bottom, 5)
                 .padding(16)
+
+                if translationCompleted {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Text("✔ Translation completed!")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.blue)
+                                .padding(8)
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .shadow(radius: 5)
+                                .padding(.trailing, 20)
+                                .transition(.move(edge: .top))
+                                .animation(.easeInOut, value: translationCompleted)
+                        }
+                        Spacer()
+                    }
+                }
 
                 if isLanguageDropdownOpen {
                     VStack {
@@ -170,8 +194,8 @@ struct TranslateView: View {
                     .foregroundColor(.black)
             })
             
-            // NavigationLink triggered by `navigateToScanView`
-            NavigationLink(destination: ScanView(), isActive: $navigateToScanView) {
+            // NavigationLink triggered by `navigateToAFInfoView`
+            NavigationLink(destination: AFInfoView(), isActive: $navigateToAFInfoView) {
                 EmptyView()
             }
         }

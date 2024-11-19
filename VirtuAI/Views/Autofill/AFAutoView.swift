@@ -10,83 +10,81 @@ struct AFAutoView: View {
     @State private var selectedImage: Image? = nil // 선택한 이미지를 저장할 변수
     @State private var isLoading = false
     // AppStorage for Data
-    @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
-    @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
-    @AppStorage("myInfoSaved") private var myInfoSaved: Bool = false
+    @AppStorage("SavedARCData") private var savedARCData: Data?
+     @AppStorage("SavedPassportData") private var savedPassportData: Data?
+     @AppStorage("SavedMyInfoData") private var savedMyInfoData: Data?
    // @AppStorage("myInfoSignatureImage") private var signatureImageData: Data? = nil
 
     // 텍스트나 체크박스를 수정할 상자들
     @State private var boxes: [(title: String, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, text: String)] = [
-        ("FOREIGN RESIDENT REGISTRATION", 35, 64, 6, 6, "✓"),
-        ("ENGAGE IN ACTIVITIES NOT COVERED BY THE STATUS OF SOJOURN", 35, 80, 6, 6, "✓"),
-        ("REISSUANCE OF REGISTRATION CARD", 35, 93, 6, 6, "✓"),
-        ("CHANGE OR ADDITION OF WORKPLACE", 35, 103, 6, 6, "✓"),
-        ("EXTENSION OF SOJOURN PERIOD", 35, 121, 6, 6, "✓"),
-        ("REENTRY PERMIT (SINGLE, MULTIPLE)", 113, 65, 6, 6, "✓"),
-        ("CHANGE OF STATUS OF SOJOURN", 113, 82, 6, 6, "✓"),
-        ("ALTERATION OF RESIDENCE", 113, 93, 6, 6, "✓"),
-        ("GRANTING STATUS OF SOJOURN", 113, 104, 6, 6, "✓"),
-        ("CHANGE OF INFORMATION ON REGISTRATION", 113, 121, 6, 6, "✓"),
-        ("희망 자격 1", 187, 65, 15, 6, "D-2"),
-        ("희망 자격 2", 97, 104, 15, 6, "D-2"),
-        ("희망 자격 3", 97, 122, 15, 6,"D-2"),
-        ("성 Surname", 73, 147, 64, 5, "YUKI"),
-        ("명 Given names", 146, 147, 74, 5, "TANAKA"),
-        ("년 yyyy", 81, 160, 36, 5, "1987"),
-        ("월 mm", 120, 160, 12, 4, "02"),
-        ("일 dd", 140, 160, 12, 4, "01"),
-        ("남 M", 185, 155, 4, 4, "✓"),
-        ("여 F", 185, 158, 4, 4, ""),
-        ("국적 Nationality", 252, 160, 24, 21, "JAPAN"),
-        ("외국인 등록 번호 1", 97, 167, 7, 7, "J"),
-        ("외국인 등록 번호 2", 109, 167, 7, 7, "1"),
-        ("외국인 등록 번호 3", 118, 167, 7, 7, "2"),
-        ("외국인 등록 번호 4", 128, 167, 7, 7, "3"),
-        ("외국인 등록 번호 5", 138, 167, 7, 7, "7"),
-        ("외국인 등록 번호 6", 148, 167, 7, 7, "5"),
-        ("외국인 등록 번호 7", 158, 167, 7, 7, "4"),
-        ("외국인 등록 번호 8", 169, 167, 7, 7, "6"),
-        ("외국인 등록 번호 9", 176, 167, 7, 7, "7"),
-        ("외국인 등록 번호 10", 185, 167, 7, 7, "8"),
-        ("외국인 등록 번호 11", 194, 167, 7, 7, "9"),
-        ("외국인 등록 번호 12", 203, 167, 7, 7, "0"),
-        ("외국인 등록 번호 13", 211, 167, 7, 7, "0"),
-        ("여권 번호 Passport No.", 91, 180, 55, 9, "J12345678"),
-        ("여권 발급 일자 Passport Issue Date", 170, 178, 45, 8, "20290402"),
-        ("여권 유효 기간 Passport Expiry Date", 255, 178, 55, 8, "20290402"),
-        ("대한민국 내 주소", 97, 190, 243, 9, "서울시 성북구 고려대로10길 39"),
-        ("전화번호", 115, 198, 56, 6, "02-1234-5677"),
-        ("휴대전화", 240, 198, 56, 6, "010-1234-5677"),
-        ("본국 주소", 150, 206, 166, 9, "5-2-1 Ginza, Chuo-ku, Tokyo, 170-3923"),
-        ("전화번호1", 255, 206, 50, 6, "016-1234-5677"),
-        ("미취학", 82, 215, 4, 4, "✓"),
-        ("초", 108, 215, 4, 4, "✓"),
-        ("중", 125, 215, 4, 4, "✓"),
-        ("고", 140, 215, 4, 4, "✓"),
-        ("학교이름", 190, 215, 56, 9, "Fafa school"),
-        ("전화번호2", 255, 215, 50, 9, "016-7734-5677"),
-        ("교욱청인가", 187, 225, 4, 4, "✓"),
-        ("교육청비인가", 254, 225, 4, 4, "✓"),
-        ("원 근무처", 115, 240, 24, 8, "Fafa Inc"),
-        ("사업자 등록 번호1", 191, 240, 29, 8, "12345678"),
-        ("전화 번호3", 252, 240, 56, 8, "016-7734-5677"),
-        ("예정 근무처", 116, 250, 24, 8, "Fafa Inc"),
-        ("사업자 등록 번호2", 191, 250, 29, 8, "12345678"),
-        ("전화 번호4", 252, 250, 56, 8, "016-7734-5677"),
-        ("연소득금액", 115, 257, 22, 5, "5000"),
-        ("직업", 253, 257, 27, 5, "student"),
-        ("재입국신청기간", 117, 265, 29, 8, "20301212"),
-        ("email", 209, 265, 88, 5, "zypher.kr@gmail.com"),
-        ("반환용계좌번호", 221, 274, 91, 9, "KOOKMIN, 123456-12-234456"),
-        ("신청일", 130, 283, 42, 6, "20301212"),
-        ("Signature Box1", 234, 284, 36, 18, ""),
-        ("Signature Box2", 64, 343, 36, 18, "")
-    ]
+         ("FOREIGN RESIDENT REGISTRATION", 35, 64, 6, 6, ""),
+         ("ENGAGE IN ACTIVITIES NOT COVERED BY THE STATUS OF SOJOURN", 35, 80, 6, 6, "✓"),
+         ("REISSUANCE OF REGISTRATION CARD", 35, 93, 6, 6, ""),
+         ("CHANGE OR ADDITION OF WORKPLACE", 35, 103, 6, 6, ""),
+         ("EXTENSION OF SOJOURN PERIOD", 35, 121, 6, 6, ""),
+         ("REENTRY PERMIT (SINGLE, MULTIPLE)", 113, 65, 6, 6, ""),
+         ("CHANGE OF STATUS OF SOJOURN", 113, 82, 6, 6, ""),
+         ("ALTERATION OF RESIDENCE", 113, 93, 6, 6, ""),
+         ("GRANTING STATUS OF SOJOURN", 113, 104, 6, 6, ""),
+         ("CHANGE OF INFORMATION ON REGISTRATION", 113, 121, 6, 6, ""),
+         ("희망 자격 1", 187, 65, 15, 6, ""),
+         ("희망 자격 2", 97, 104, 15, 6, ""),
+         ("희망 자격 3", 97, 122, 15, 6, ""),
+         ("성 Surname", 73, 147, 64, 5, ""),
+         ("명 Given names", 146, 147, 74, 5, ""),
+         ("년 yyyy", 81, 160, 36, 5, ""),
+         ("월 mm", 120, 160, 12, 4, ""),
+         ("일 dd", 140, 160, 12, 4, ""),
+         ("남 M", 185, 155, 4, 4, ""),
+         ("여 F", 185, 158, 4, 4, ""),
+         ("국적 Nationality", 252, 160, 24, 21, ""),
+         ("외국인 등록 번호 1", 97, 167, 7, 7, ""),
+         ("외국인 등록 번호 2", 109, 167, 7, 7, ""),
+         ("외국인 등록 번호 3", 118, 167, 7, 7, ""),
+         ("외국인 등록 번호 4", 128, 167, 7, 7, ""),
+         ("외국인 등록 번호 5", 138, 167, 7, 7, ""),
+         ("외국인 등록 번호 6", 148, 167, 7, 7, ""),
+         ("외국인 등록 번호 7", 158, 167, 7, 7, ""),
+         ("외국인 등록 번호 8", 169, 167, 7, 7, ""),
+         ("외국인 등록 번호 9", 176, 167, 7, 7, ""),
+         ("외국인 등록 번호 10", 185, 167, 7, 7, ""),
+         ("외국인 등록 번호 11", 194, 167, 7, 7, ""),
+         ("외국인 등록 번호 12", 203, 167, 7, 7, ""),
+         ("외국인 등록 번호 13", 211, 167, 7, 7, ""),
+         ("여권 번호 Passport No.", 91, 180, 55, 9, ""),
+         ("여권 발급 일자 Passport Issue Date", 170, 178, 45, 8, ""),
+         ("여권 유효 기간 Passport Expiry Date", 255, 178, 55, 8, ""),
+         ("대한민국 내 주소", 97, 190, 243, 9, ""),
+         ("전화번호", 115, 198, 56, 6, ""),
+         ("휴대전화", 240, 198, 56, 6, ""),
+         ("본국 주소", 150, 206, 166, 9, ""),
+         ("전화번호1", 255, 206, 50, 6, ""),
+         ("미취학", 82, 215, 4, 4, ""),
+         ("초", 108, 215, 4, 4, ""),
+         ("중", 125, 215, 4, 4, ""),
+         ("고", 140, 215, 4, 4, ""),
+         ("학교이름", 190, 215, 56, 9, ""),
+         ("전화번호2", 255, 215, 50, 9, ""),
+         ("교욱청인가", 187, 225, 4, 4, ""),
+         ("교육청비인가", 254, 225, 4, 4, ""),
+         ("원 근무처", 115, 240, 24, 8, ""),
+         ("사업자 등록 번호1", 191, 240, 29, 8, ""),
+         ("전화 번호3", 252, 240, 56, 8, ""),
+         ("예정 근무처", 116, 250, 24, 8, ""),
+         ("전화 번호4", 252, 250, 56, 8, ""),
+         ("연소득금액", 115, 257, 22, 5, ""),
+         ("직업", 253, 257, 27, 5, ""),
+         ("email", 209, 265, 88, 5, ""),
+         ("반환용계좌번호", 221, 274, 91, 9, ""),
+         ("신청일", 130, 283, 42, 6, ""),
+         ("Signature Box1", 234, 284, 36, 18, ""),
+         ("Signature Box2", 64, 343, 36, 18, "")
+     ]
     @State private var showAlertForFileName = false
     @State private var showFileTypeSelection = false
     @State private var fileName = ""
     @State private var fileType: String = ""
-    @State private var navigateToMyInfoView = false
+    @State private var navigateToAFInfoView = false
     @State private var selectedFileTypes: [String] = ["pdf"]
     @State private var selectedFileType: String = "pdf" // Change to single String
     @State private var showShareSheet = false
@@ -102,7 +100,7 @@ struct AFAutoView: View {
                     let canvasHeight: CGFloat = 422 * scaleFactor
                     
                     ZStack {
-                        Image("af")
+                        Image("af_high")
                             .resizable()
                             .scaledToFit()
                             .frame(width: canvasWidth, height: canvasHeight)
@@ -137,24 +135,29 @@ struct AFAutoView: View {
                     .frame(width: canvasWidth, height: canvasHeight)
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }.frame(height: 422 * scaleFactor)
-            //}
+          
          
             
             Spacer()
             
             // Bottom buttons
-            HStack {
-                Button(action: {
-                    navigateToMyInfoView = true
-                }) {
-                    Text("Edit")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue.opacity(0.2))
-                        .foregroundColor(.blue)
-                        .cornerRadius(10)
-                }
+                     HStack {
+                         NavigationLink(destination: AFInfoView(), isActive: $navigateToAFInfoView) {
+                             EmptyView()
+                         }
+                         
+                         Button(action: {
+                             navigateToAFInfoView = true
+                         }) {
+                             Text("Edit")
+                                 .font(.headline)
+                                 .frame(maxWidth: .infinity)
+                                 .padding()
+                                 .background(Color.blue.opacity(0.2))
+                                 .foregroundColor(.blue)
+                                 .cornerRadius(10)
+                         }
+                         
                 
                 Button(action: {
                     showAlertForFileName = true
@@ -172,6 +175,7 @@ struct AFAutoView: View {
             .padding(.bottom, 20)
         }
         .background(Color.white)
+        .onAppear(perform: loadSavedData)
         .alert("Save as...", isPresented: $showAlertForFileName) {
             VStack {
                 TextField("Enter file name", text: $fileName)
@@ -207,7 +211,91 @@ struct AFAutoView: View {
               }
           })
       }
-    
+    // Load saved data
+    private func loadSavedData() {
+        if let arcData = savedARCData, let arcDict = try? JSONDecoder().decode([String: String].self, from: arcData) {
+            if let foreignRegistrationNumber = arcDict["foreignRegistrationNumber"] {
+                for (index, char) in foreignRegistrationNumber.enumerated() {
+                    let boxKey = "외국인 등록 번호 \(index + 1)"
+                    boxes.updateText(for: boxKey, with: String(char))
+                }
+            }
+        }
+
+        if let passportData = savedPassportData, let passportDict = try? JSONDecoder().decode([String: String].self, from: passportData) {
+            boxes.updateText(for: "성 Surname", with: passportDict["surName"] ?? "")
+            boxes.updateText(for: "명 Given names", with: passportDict["givenName"] ?? "")
+            boxes.updateText(for: "국적 Nationality", with: passportDict["nationality"] ?? "")
+            boxes.updateText(for: "여권 번호 Passport No.", with: passportDict["documentNumber"] ?? "")
+            boxes.updateText(for: "여권 발급 일자 Passport Issue Date", with: passportDict["dateOfIssue"] ?? "")
+            boxes.updateText(for: "여권 유효 기간 Passport Expiry Date", with: passportDict["dateOfExpiry"] ?? "")
+        }
+
+        if let myInfoData = savedMyInfoData, let myInfoDict = try? JSONDecoder().decode([String: String].self, from: myInfoData) {
+            boxes.updateText(for: "대한민국 내 주소", with: myInfoDict["koreaAddress"] ?? "")
+            boxes.updateText(for: "전화번호", with: myInfoDict["telephoneNumber"] ?? "")
+            boxes.updateText(for: "휴대전화", with: myInfoDict["phoneNumber"] ?? "")
+            boxes.updateText(for: "본국 주소", with: myInfoDict["homelandAddress"] ?? "")
+            boxes.updateText(for: "전화번호1", with: myInfoDict["homelandPhoneNumber"] ?? "")
+            boxes.updateText(for: "학교이름", with: myInfoDict["schoolName"] ?? "")
+            boxes.updateText(for: "전화번호2", with: myInfoDict["schoolPhoneNumber"] ?? "")
+            boxes.updateText(for: "원 근무처", with: myInfoDict["originalWorkplaceName"] ?? "")
+            boxes.updateText(for: "사업자 등록 번호1", with: myInfoDict["originalWorkplaceRegistrationNumber"] ?? "")
+            boxes.updateText(for: "전화 번호3", with: myInfoDict["originalWorkplacePhoneNumber"] ?? "")
+            boxes.updateText(for: "예정 근무처", with: myInfoDict["futureWorkplaceName"] ?? "")
+            boxes.updateText(for: "전화 번호4", with: myInfoDict["futureWorkplacePhoneNumber"] ?? "")
+            boxes.updateText(for: "연소득금액", with: myInfoDict["incomeAmount"] ?? "")
+            boxes.updateText(for: "직업", with: myInfoDict["job"] ?? "")
+            boxes.updateText(for: "email", with: myInfoDict["email"] ?? "")
+            boxes.updateText(for: "반환용계좌번호", with: myInfoDict["refundAccountNumber"] ?? "")
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        boxes.updateText(for: "신청일", with: formatter.string(from: Date()))
+    }
+    // Handle selection logic
+    private func handleBoxSelection(at index: Int) {
+        // Clear all top category selections first
+        if boxes[index].title == "EXTENSION OF SOJOURN PERIOD" ||
+            boxes[index].title == "REENTRY PERMIT (SINGLE, MULTIPLE)" ||
+            boxes[index].title == "CHANGE OF STATUS OF SOJOURN" {
+
+            for i in boxes.indices {
+                if ["EXTENSION OF SOJOURN PERIOD", "REENTRY PERMIT (SINGLE, MULTIPLE)", "CHANGE OF STATUS OF SOJOURN"].contains(boxes[i].title) {
+                    boxes[i].text = ""
+                }
+            }
+
+            // Select the clicked box
+            boxes[index].text = "✓"
+
+            // Update corresponding 희망 자격 fields
+            updateHopeQualification(for: boxes[index].title)
+        }
+    }
+
+    // Update "희망 자격" fields
+    private func updateHopeQualification(for selectedTitle: String) {
+        // Clear all 희망 자격 fields
+        for i in boxes.indices {
+            if ["희망 자격 1", "희망 자격 2", "희망 자격 3"].contains(boxes[i].title) {
+                boxes[i].text = ""
+            }
+        }
+
+        // Set the corresponding 희망 자격 field
+        switch selectedTitle {
+        case "EXTENSION OF SOJOURN PERIOD":
+            boxes.updateText(for: "희망 자격 1", with: "D-2")
+        case "REENTRY PERMIT (SINGLE, MULTIPLE)":
+            boxes.updateText(for: "희망 자격 2", with: "D-2")
+        case "CHANGE OF STATUS OF SOJOURN":
+            boxes.updateText(for: "희망 자격 3", with: "D-2")
+        default:
+            break
+        }
+    }
     private func saveFile(as fileType: String) {
         self.selectedFileType = fileType
         // Generate the file based on the selected file type
@@ -283,7 +371,7 @@ struct AFAutoView: View {
                 let canvasHeight: CGFloat = 422 * scaleFactor
                 
                 ZStack {
-                    Image("af")
+                    Image("af_high")
                         .resizable()
                         .scaledToFit()
                         .frame(width: canvasWidth, height: canvasHeight)
@@ -333,6 +421,15 @@ struct AFAutoView: View {
 
 
 }
+// Extension to update text
+extension Array where Element == (title: String, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, text: String) {
+    mutating func updateText(for title: String, with text: String) {
+        if let index = firstIndex(where: { $0.title == title }) {
+            self[index].text = text
+        }
+    }
+}
+
 struct LoadingAlertView: View {
     var body: some View {
         ZStack {

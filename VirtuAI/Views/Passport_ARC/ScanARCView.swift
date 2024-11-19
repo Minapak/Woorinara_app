@@ -94,7 +94,7 @@ struct ScanARCView: View {
                         
                         Spacer()
                         
-                        InputField(
+                        InputARCField(
                             title: "Foreign Registration Number",
                             text: $foreignRegistrationNumber,
                             showError: showError && foreignRegistrationNumber.isEmpty,
@@ -111,9 +111,9 @@ struct ScanARCView: View {
                         }
                         Spacer()
                         
-                        InputField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19870201", isRequired: true)
+                        InputARCField(title: "Date of Birth", text: $dateOfBirth, showError: showError && dateOfBirth.isEmpty, placeholder: "19870201", isRequired: true)
                         Spacer()
-                        
+                        Spacer()
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Text("Gender")
@@ -122,16 +122,16 @@ struct ScanARCView: View {
                                 Text("*").foregroundColor(.red)
                             }
                             HStack {
-                                RadioButtonPass(text: "Female", isSelected: $gender, tag: "Female", showError: showError && gender == nil)
-                                RadioButtonPass(text: "Male", isSelected: $gender, tag: "Male", showError: showError && gender == nil)
+                                RadioARCButton(text: "Female", isSelected: $gender, tag: "Female", showError: showError && gender == nil)
+                                RadioARCButton(text: "Male", isSelected: $gender, tag: "Male", showError: showError && gender == nil)
                             }
                         }
                         Spacer()
-                        
-                        InputField(title: "Name", text: $name, showError: showError && name.isEmpty, placeholder: "TANAKA", isRequired: true)
+                        Spacer()
+                        InputARCField(title: "Name", text: $name, showError: showError && name.isEmpty, placeholder: "TANAKA", isRequired: true)
                         Spacer()
                         
-                        DropdownField(title: "Country", selectedValue: $country, options: countries, showError: showError && country.isEmpty, isRequired: true)
+                        DropdownARCField(title: "Country", selectedValue: $country, options: countries, showError: showError && country.isEmpty, isRequired: true)
                         Spacer()
                         
                         VStack(alignment: .leading) {
@@ -143,7 +143,7 @@ struct ScanARCView: View {
                             }
                             HStack {
                                 // Dropdown for Residence Category 1
-                                DropdownField(
+                                DropdownARCField(
                                     title: "Category",
                                     selectedValue: $residenceCategory1,
                                     options: residenceCategories1
@@ -152,7 +152,7 @@ struct ScanARCView: View {
                                     .font(.system(size: 16))
                                     .opacity(0.7)
                                 // Dropdown for Residence Category 2
-                                DropdownField(
+                                DropdownARCField(
                                     title: "Type",
                                     selectedValue: $residenceCategory2,
                                     options: residenceCategories2
@@ -211,9 +211,9 @@ struct ScanARCView: View {
             }
             .navigationTitle("")
             .navigationBarBackButtonHidden(false)
-            .alert(isPresented: $showError) {
-                Alert(title: Text("Incomplete Form"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
-            }
+            .onAppear {
+                            fetchData()
+                        }
             .overlay(
                       Group {
                           if showAlertInfo {
@@ -228,7 +228,52 @@ struct ScanARCView: View {
     // Function to update visaType
     private func updateVisaType() {
         visaType = "\(residenceCategory1)-\(residenceCategory2)"
+        
     }
+    private func fetchData() {
+         guard let url = URL(string: endpoint),
+               let token = accessToken else {
+             return
+         }
+
+         var request = URLRequest(url: url)
+         request.httpMethod = "GET"
+         request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+         isLoading = true
+
+         URLSession.shared.dataTask(with: request) { data, response, error in
+             DispatchQueue.main.async {
+                 isLoading = false
+             }
+
+             if let error = error {
+                 print("Error: \(error.localizedDescription)")
+                 return
+             }
+
+             guard let data = data else {
+                 print("No data received.")
+                 return
+             }
+
+             do {
+                 let decodedData = try JSONDecoder().decode([String: String].self, from: data)
+                 DispatchQueue.main.async {
+                     self.foreignRegistrationNumber = decodedData["foreignRegistrationNumber"] ?? ""
+                     self.dateOfBirth = decodedData["birthDate"] ?? ""
+                     self.gender = decodedData["gender"]
+                     self.name = decodedData["name"] ?? ""
+                     self.country = decodedData["nationality"] ?? ""
+                     self.residenceCategory1 = decodedData["residenceCategory1"] ?? "A"
+                     self.residenceCategory2 = decodedData["residenceCategory2"] ?? "1"
+                 }
+             } catch {
+                 print("Failed to decode JSON: \(error.localizedDescription)")
+             }
+         }.resume()
+     }
+
     // Save ARC Data to UserDefaults
     private func saveARCData() {
         let arcData: [String: String] = [
@@ -380,5 +425,111 @@ struct ScanARCView: View {
         }.resume()
     }
 }
+// InputField 컴포넌트 수정
+struct InputARCField: View {
+    var title: String
+    @Binding var text: String
+    var showError: Bool = false
+    var placeholder: String = ""
+    var isRequired: Bool = false
 
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 16))
+                    .opacity(0.7)
+                if isRequired { Text("*").foregroundColor(.red) }
+            }
+            ZStack(alignment: .leading) {
+                // Placeholder
+                if text.isEmpty {
+                    Text(placeholder)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 8)
+                }
+                // Text 입력 필드
+                TextField("", text: $text)
+                    .foregroundColor(.black)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(showError && text.isEmpty ? Color.red : Color.gray, lineWidth: 1)
+                    )
+            }
+        }
+    }
+}
 
+// DropdownField 컴포넌트 수정
+struct DropdownARCField: View {
+    var title: String
+    @Binding var selectedValue: String
+    var options: [String]
+    var showError: Bool = false
+    var isRequired: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 16))
+                    .opacity(0.7)
+                if isRequired { Text("*").foregroundColor(.red) }
+            }
+            Menu {
+                ForEach(options, id: \.self) { option in
+                    Button(action: {
+                        selectedValue = option
+                    }) {
+                        Text(option)
+                    }
+                }
+            } label: {
+                HStack {
+                    if selectedValue.isEmpty {
+                        Text("Select \(title)")
+                            .foregroundColor(.gray)
+                    } else {
+                        Text(selectedValue)
+                            .foregroundColor(.black)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 16).stroke(showError && selectedValue.isEmpty ? Color.red : Color.gray, lineWidth: 1))
+            }
+        }
+    }
+}
+struct RadioARCButton: View {
+    var text: String
+    @Binding var isSelected: String?
+    var tag: String
+    var showError: Bool
+
+    var body: some View {
+        Button(action: {
+            isSelected = tag
+        }) {
+            HStack {
+                // 라디오 버튼 아이콘
+                Image(systemName: isSelected == tag ? "largecircle.fill.circle" : "circle")
+                    .foregroundColor(showError && isSelected == nil ? .red : .blue)
+                    .font(.system(size: 18))
+
+                // 텍스트
+                Text(text)
+                    .foregroundColor(.black)
+                    .font(.system(size: 16))
+                    .opacity(0.7)
+            }
+            .padding(.vertical, 8)
+        }
+        .buttonStyle(PlainButtonStyle()) // 기본 버튼 스타일 제거
+    }
+}
