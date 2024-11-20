@@ -1,117 +1,133 @@
 import SwiftUI
-import CoreLocationUI
+import Foundation
 import CoreLocation
-
-// TabMapType 열거형을 외부에 정의하여 모든 뷰에서 접근 가능하게 설정
-enum TabMapType: CaseIterable {
-    case chat, translation, community, mypage
-
-    var title: String {
-        switch self {
-        case .chat: return "Chat"
-        case .translation: return "Translation"
-        case .community: return "Community"
-        case .mypage: return "My Page"
-        }
-    }
-}
+import Combine
+import CoreLocationUI
+import MapKit
 
 struct permissionMapView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var appChatState: AppChatState
     @EnvironmentObject var locationManager: LocationManager
-    @State private var selectedIndex: Int = 6  // Set to an invalid index so no tab is initially selected
-    @State private var showPermissionAlert = false  // Control alert display for location permission
-    @State private var navigateToContentView = false  // Navigate to ContentView when permission is granted
-
+    @State private var selectedIndex: Int = 0
+    @State private var showPermissionAlert = false
+    @State private var navigateToContentView = false
+    @State private var showLocationOverlay = false
+    @State private var navigateToARCInfo = false
+    @AppStorage(Constants.isFirstLogin) private var isFirstLogin = true
+    
+    private var tabItems: [TabItemData] {
+        TabType.allCases.map { $0.tabItem }
+    }
+    
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                Color.background.ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    AppBar(title: "", isMainPage: true)
-
-                    Spacer()
-
-                    VStack(spacing: 30) {
-                        Text("Your location is used while the app is in use. Would you like to allow this permission?")
-                            .font(.system(size: 18))
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.center)
-                            .padding()
-
-                        HStack(spacing: 20) {
-                            // Yes button - requests location permission and closes the view
-                            LocationButton(.currentLocation) {
-                                locationManager.requestLocationPermissions()
-                            }
-                            .frame(width: 200, height: 44)
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
-
-                            // No button - closes the view
-                            Button(action: {
-                                showPermissionAlert = true
-                            }) {
-                                Text("No")
-                                    .foregroundColor(.primary)
-                                    .frame(width: 100, height: 44)
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(16)
-                            }
-                        }
+        ZStack(alignment: .bottom) {
+            // 배경색
+            Color.background.ignoresSafeArea(.all)
+            
+            // 메인 컨텐츠
+            VStack(spacing: 0) {
+                // 앱바
+                AppBar(title: "", isMainPage: true)
+                    .padding(.horizontal)
+                
+                // 맵과 오버레이
+                ZStack {
+                    Map(coordinateRegion: $locationManager.region, showsUserLocation: true)
+                    
+                    if !showLocationOverlay {
+                        Color.black.opacity(0.1)
+                        permissionRequestView
                     }
-
-                    Spacer()
                 }
-                .padding(.horizontal, 16)
+                
+                Spacer(minLength: 0)
+            }
+            
+            // 탭바
+            if !appState.hideBottomNav {
 
-          
             }
-            .navigationDestination(isPresented: $navigateToContentView) {
-                ContentView()
-                    .environmentObject(appState)
-                    .environmentObject(appChatState)
-                    .environmentObject(locationManager)
-            }
-            .navigationBarBackButtonHidden(false) // Hide the back button
-            .onAppear {
-                appState.hideBottomNav = false// Ensure bottom nav is visible on appear
-            }
-//            .onDisappear {
-//                appState.hideBottomNav = false // Hide bottom nav when navigating away
-//            }
-            .alert(isPresented: $showPermissionAlert) {
-                Alert(
-                    title: Text("Location Permission Required"),
-                    message: Text("Please grant location access to use this feature."),
-                    dismissButton: .default(Text("OK"))
-                )
-            }
-            .onChange(of: locationManager.authorizationStatus) { newStatus in
-                // Navigate to ContentView when permission is granted
-                if isPermissionGranted() {
-                    navigateToContentView = true
+        }
+        // ARCInfoView로 이동하는 NavigationLink
+        .navigationDestination(isPresented: $navigateToARCInfo) {
+            ARCInfoView()
+                .environmentObject(appState)
+                .environmentObject(appChatState)
+        }
+        // 일반 ContentView로 이동하는 NavigationLink
+        .navigationDestination(isPresented: $navigateToContentView) {
+            ContentView()
+                .environmentObject(appState)
+                .environmentObject(appChatState)
+                .environmentObject(locationManager)
+        }
+        .navigationBarBackButtonHidden(true)
+        .alert(isPresented: $showPermissionAlert) {
+            Alert(
+                title: Text("Location Permission Required"),
+                message: Text("Please grant location access to use this feature."),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .onChange(of: locationManager.authorizationStatus) { newStatus in
+            if isPermissionGranted() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    if isFirstLogin {
+                        navigateToARCInfo = true
+                    } else {
+                        navigateToContentView = true
+                    }
                 }
+            }
+        }
+        .onChange(of: selectedIndex) { newIndex in
+            if !isPermissionGranted() {
+                showPermissionAlert = true
+                selectedIndex = 0  // 위치 권한이 없으면 첫 번째 탭으로 강제 이동
             }
         }
     }
     
-    // Check if location permission is granted
-    private func isPermissionGranted() -> Bool {
-        return locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways
+    // 권한 요청 뷰
+    private var permissionRequestView: some View {
+        VStack(spacing: 30) {
+            Text("Your location is used while the app is in use. Would you like to allow this permission?")
+                .font(.system(size: 18))
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .padding()
+            
+            HStack(spacing: 20) {
+                LocationButton(.currentLocation) {
+                    locationManager.requestLocationPermissions()
+                    withAnimation {
+                        showLocationOverlay = true
+                    }
+                }
+                .frame(width: 200, height: 44)
+                .foregroundColor(.white)
+                .cornerRadius(16)
+                
+                Button(action: {
+                    showPermissionAlert = true
+                }) {
+                    Text("No")
+                        .foregroundColor(.primary)
+                        .frame(width: 100, height: 44)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(16)
+                }
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.9))
+        .cornerRadius(20)
+        .padding()
     }
-}
-
-// CustomTabView with isDisabled and onTabTapped callback
-
-
-struct permissionMapView_Previews: PreviewProvider {
-    static var previews: some View {
-        permissionMapView()
-            .environmentObject(AppState())
-            .environmentObject(AppChatState())
-            .environmentObject(LocationManager())
+    
+    private func isPermissionGranted() -> Bool {
+        return locationManager.authorizationStatus == .authorizedWhenInUse ||
+               locationManager.authorizationStatus == .authorizedAlways
     }
 }

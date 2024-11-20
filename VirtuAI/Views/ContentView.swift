@@ -8,75 +8,69 @@ struct ContentView: View {
     @EnvironmentObject var upgradeViewModel: UpgradeViewModel
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var appChatState: AppChatState
-    @EnvironmentObject var locationManager: LocationManager // LocationManager injected as an environment object
+    @EnvironmentObject var locationManager: LocationManager
     @State static var typingMessageCurrent: String = ""
     
-    @State private var showLocationAlert = false // State variable to control alert display
-
+    @State private var showLocationAlert = false
+    @State private var isLocationPermissionGranted = false
+    @AppStorage(Constants.isFirstLogin) private var isFirstLogin = true
+    @AppStorage(Constants.hasCompletedARC) private var hasCompletedARC = false
+    
     var body: some View {
         if appChatState.isUserLoggedIn {
             NavigationStack {
                 ZStack(alignment: .bottom) {
                     TabView(selection: $selectedIndex) {
-                        StartChatView(
-                            appState: _appState,
-                            appChatState: _appChatState,
-                            typingMessage: ContentView.$typingMessageCurrent
-                        ).tag(0)
-                      //  permissionView().tag(0)
+                        if !isLocationPermissionGranted {
+                            permissionMapView()
+                                .environmentObject(appState)
+                                .environmentObject(appChatState)
+                                .environmentObject(locationManager)
+                                .tag(0)
+                        } else if isFirstLogin{
+                            ARCInfoView()
+                                .environmentObject(appState)
+                                .environmentObject(appChatState)
+                                .tag(0)
+                        } else {
+                            StartChatView(
+                                appState: _appState,
+                                appChatState: _appChatState,
+                                typingMessage: ContentView.$typingMessageCurrent
+                            )
+                            .tag(0)
+                        }
+                        
                         TranslationView().tag(1)
                         ContentWebView().tag(2)
-                     MyPageView().tag(3)
-                        //TemporaryLinkView().tag(3)
-                        SettingsView().tag(4)
+                        MyPageView().tag(3)
                     }
                     
-                    if !appState.hideBottomNav {
-                        CustomTabView(tabs: TabType.allCases.map({ $0.tabItem }), selectedIndex: $selectedIndex)
-                    }
+                    if !appState.hideBottomNav && !(isFirstLogin) {
+                                          CustomTabView(tabs: TabType.allCases.map({ $0.tabItem }), selectedIndex: $selectedIndex)
+                                      }
                 }
             }
-            .navigationBarBackButtonHidden(true) // Hide the back button
+            .navigationBarBackButtonHidden(true)
             .navigationViewStyle(StackNavigationViewStyle())
-            .onAppear {
-                VStack(spacing: 20) {
-                    Text("Location Permission Required")
-                        .font(.headline)
-                        .padding(.top)
-                    
-                    Text("This app requires location access to provide better services. Please allow location access.")
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    
-                    LocationButton(.currentLocation) {
-                        locationManager.requestLocationPermissions()
-                        showLocationAlert = false // Dismiss the alert after permission is requested
-                    }
-                    .symbolVariant(.fill)
-                    .labelStyle(.titleAndIcon)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding()
-                    
-                    Button("Cancel") {
-                        showLocationAlert = false // Dismiss alert on cancel
-                    }
-                    .foregroundColor(.red)
-                    .padding(.bottom)
+            .onChange(of: locationManager.authorizationStatus) { newStatus in
+                withAnimation {
+                    isLocationPermissionGranted = (newStatus == .authorizedWhenInUse || newStatus == .authorizedAlways)
                 }
-                .padding()
-                .frame(width: 300, height: 250)
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 10)
             }
-         
+            .onAppear {
+                isLocationPermissionGranted = (locationManager.authorizationStatus == .authorizedWhenInUse ||
+                                            locationManager.authorizationStatus == .authorizedAlways)
+                
+                if !isLocationPermissionGranted {
+                    selectedIndex = 0
+                }
+            }
         } else {
             LoginView()
         }
     }
 }
-
 // Custom Location Permission Request View
 struct LocationPermissionRequestView: View {
     @Binding var showLocationAlert: Bool

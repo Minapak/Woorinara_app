@@ -5,11 +5,13 @@ struct ARCInfoView: View {
     @State private var showSkipAlert = false
     @State private var showContentView = false
     @Environment(\.presentationMode) var presentationMode
+    @AppStorage(Constants.isFirstLogin) private var isFirstLogin = true
+    @AppStorage(Constants.hasCompletedARC) private var hasCompletedARC = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(.white).ignoresSafeArea()
+                Color(.white).ignoresSafeArea(.all)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     // Instructions
@@ -56,7 +58,8 @@ struct ARCInfoView: View {
                         
                         // Skip Button
                         Button(action: {
-                          //  showSkipAlert = true
+                            isFirstLogin = false
+                            hasCompletedARC = true
                             showContentView = true
                         }) {
                             Text("Skip")

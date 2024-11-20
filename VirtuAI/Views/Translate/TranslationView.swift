@@ -10,7 +10,7 @@ struct TranslationView: View {
      @State private var navigateToScanPreARCView = false
      @State private var navigateToScanPrePassView = false
      @State private var navigateToMyInfoView = false
-     
+    @State private var navigateToTranslateView = false
      @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
      @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
      @AppStorage("myInfoSaved") private var myInfoSaved: Bool = false
@@ -56,7 +56,8 @@ struct TranslationView: View {
 
                        HStack {
                            Button("Translation") {
-                               handleAutoFillNavigation()
+                              // handleAutoFillNavigation()
+                               navigateToTranslateView = true
                            }
                            .frame(width: 150, height: 50)
                            .font(.system(size: 16, weight: .bold))
@@ -65,7 +66,8 @@ struct TranslationView: View {
                            .cornerRadius(16)
 
                            Button("Auto-Fill") {
-                               handleAutoFillNavigation()
+                              // navigateToScanPreARCView = true
+                            handleAutoFillNavigation()
                            }
                            .frame(width: 150, height: 50)
                            .font(.system(size: 16, weight: .bold))
@@ -85,7 +87,10 @@ struct TranslationView: View {
                        }
                    }
                }
-     
+               .navigationDestination(isPresented: $navigateToTranslateView) {
+                            TranslateView()
+                        }
+                  
             .navigationDestination(isPresented: $navigateToScanARCView) {
                            ScanARCView()
                        }
@@ -104,28 +109,32 @@ struct TranslationView: View {
         }
     }
     
-    // Handles Auto-Fill Button Logic
     private func handleAutoFillNavigation() {
-        if !arcDataSaved && !passportDataSaved && !myInfoSaved {
+        if !arcDataSaved || !passportDataSaved || !myInfoSaved {
             showAlertInfo = true
-        } else if arcDataSaved && !passportDataSaved {
-            navigateToScanPrePassView = true
-        } else if arcDataSaved && passportDataSaved && !myInfoSaved {
-            navigateToMyInfoView = true
-        } else if arcDataSaved && passportDataSaved && myInfoSaved {
+        }
+//        else if arcDataSaved && !passportDataSaved {
+//            navigateToScanPrePassView = true
+//        }
+//        else if arcDataSaved && passportDataSaved && !myInfoSaved {
+//            navigateToMyInfoView = true
+//        }
+        else if arcDataSaved || passportDataSaved || myInfoSaved{
             navigateToAFAutoView = true
         }
     }
 
     // Handles Scan Button Logic
     private func handleScanNavigation() {
-        if !arcDataSaved {
+        if !arcDataSaved || !passportDataSaved || !myInfoSaved {
             navigateToScanPreARCView = true
-        } else if arcDataSaved && !passportDataSaved {
-            navigateToScanPrePassView = true
-        } else if arcDataSaved && passportDataSaved && !myInfoSaved {
-            navigateToMyInfoView = true
-        } else if arcDataSaved && passportDataSaved && myInfoSaved {
+        }
+//        else if arcDataSaved && !passportDataSaved {
+//            navigateToScanPrePassView = true
+//        } else if arcDataSaved && passportDataSaved && !myInfoSaved {
+//            navigateToMyInfoView = true
+//        }
+        else if arcDataSaved && passportDataSaved && myInfoSaved {
             navigateToAFAutoView = true
         }
     }

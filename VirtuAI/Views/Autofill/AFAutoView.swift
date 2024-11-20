@@ -10,10 +10,12 @@ struct AFAutoView: View {
     @State private var selectedImage: Image? = nil // 선택한 이미지를 저장할 변수
     @State private var isLoading = false
     // AppStorage for Data
-    @AppStorage("SavedARCData") private var savedARCData: Data?
-     @AppStorage("SavedPassportData") private var savedPassportData: Data?
-     @AppStorage("SavedMyInfoData") private var savedMyInfoData: Data?
+    @AppStorage("arcDataSaved") private var savedARCData: Data?
+     @AppStorage("passportDataSaved") private var savedPassportData: Data?
+     @AppStorage("myInfoDataSaved") private var savedMyInfoData: Data?
    // @AppStorage("myInfoSignatureImage") private var signatureImageData: Data? = nil
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) var presentationMode
 
     // 텍스트나 체크박스를 수정할 상자들
     @State private var boxes: [(title: String, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, text: String)] = [
@@ -90,90 +92,116 @@ struct AFAutoView: View {
     @State private var showShareSheet = false
     @State private var fileURL: URL? // URL to share the generated file
     var body: some View {
-        VStack(spacing: 0) {
-
-            
-           // if isLoading {
-               // LoadingAlertView()
+        NavigationStack {
+            VStack(spacing: 0) {
+//                
+//                Spacer()
+//                Text("You should edit or delete the red texts \nbefore submitting")
+//                    .font(.system(size: 14))
+//                    .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
+//                    .frame(maxWidth: .infinity, alignment: .center)
+//                    .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
+//                    .foregroundColor(.red)
+//                    .padding(12) // 프레임에 12씩 패딩 추가
+//                    .background(Color.red.opacity(0.1))
+//                    .cornerRadius(8)
+//
+//                Spacer()
+                // if isLoading {
+                // LoadingAlertView()
                 GeometryReader { geometry in
                     let canvasWidth: CGFloat = 298 * scaleFactor
                     let canvasHeight: CGFloat = 422 * scaleFactor
                     
                     ZStack {
-                        Image("af_high")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: canvasWidth, height: canvasHeight)
-                            .offset(y: -30)
-                            .scaleEffect(zoomScale)
-                        
-                        ForEach(boxes.indices, id: \.self) { index in
-                            BoxAutoView(
-                                title: boxes[index].title,
-                                width: boxes[index].width * scaleFactor,
-                                height: boxes[index].height * scaleFactor,
-                                xPosition: boxes[index].x * scaleFactor,
-                                yPosition: boxes[index].y * scaleFactor - 20,
-                                text: boxes[index].text,
-                                selectedImage: selectedImage,
-                                isSelected: selectedBox?.title == boxes[index].title,
-                                onSelect: {
-                                    selectedBox = boxes[index]
+                        VStack(alignment: .center, spacing: 0) {
+
+                            Image("af_high")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: canvasWidth, height: canvasHeight)
+                                .offset(y: -30)
+                                .scaleEffect(zoomScale)
+                            
+                            ForEach(boxes.indices, id: \.self) { index in
+                                BoxAutoView(
+                                    title: boxes[index].title,
+                                    width: boxes[index].width * scaleFactor,
+                                    height: boxes[index].height * scaleFactor,
+                                    xPosition: boxes[index].x * scaleFactor,
+                                    yPosition: boxes[index].y * scaleFactor - 20,
+                                    text: boxes[index].text,
+                                    selectedImage: selectedImage,
+                                    isSelected: selectedBox?.title == boxes[index].title,
+                                    onSelect: {
+                                        selectedBox = boxes[index]
+                                    }
+                                )
+                            }
+                            
+                            if let selectedBox = selectedBox {
+                                ZoomedBoxView(box: selectedBox, selectedImage: $selectedImage) { newText in
+                                    if let index = boxes.firstIndex(where: { $0.title == selectedBox.title }) {
+                                        boxes[index].text = newText
+                                    }
+                                    self.selectedBox = nil
                                 }
-                            )
-                        }
-                        
-                        if let selectedBox = selectedBox {
-                            ZoomedBoxView(box: selectedBox, selectedImage: $selectedImage) { newText in
-                                if let index = boxes.firstIndex(where: { $0.title == selectedBox.title }) {
-                                    boxes[index].text = newText
-                                }
-                                self.selectedBox = nil
                             }
                         }
                     }
                     .frame(width: canvasWidth, height: canvasHeight)
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }.frame(height: 422 * scaleFactor)
-          
-         
-            
-            Spacer()
-            
-            // Bottom buttons
-                     HStack {
-                         NavigationLink(destination: AFInfoView(), isActive: $navigateToAFInfoView) {
-                             EmptyView()
-                         }
-                         
-                         Button(action: {
-                             navigateToAFInfoView = true
-                         }) {
-                             Text("Edit")
-                                 .font(.headline)
-                                 .frame(maxWidth: .infinity)
-                                 .padding()
-                                 .background(Color.blue.opacity(0.2))
-                                 .foregroundColor(.blue)
-                                 .cornerRadius(10)
-                         }
-                         
                 
-                Button(action: {
-                    showAlertForFileName = true
-                }) {
-                    Text("Save")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                
+                
+                Spacer()
+                
+                // Bottom buttons
+                HStack {
+                    NavigationLink(destination: AFInfoView(), isActive: $navigateToAFInfoView) {
+                        EmptyView()
+                    }
+                    
+                    Button(action: {
+                        navigateToAFInfoView = true
+                    }) {
+                        Text("Edit")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue.opacity(0.2))
+                            .foregroundColor(.blue)
+                            .cornerRadius(10)
+                    }
+                    
+                    
+                    Button(action: {
+                        showAlertForFileName = true
+                    }) {
+                        Text("Save")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.bottom, 20)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 20)
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                            .imageScale(.large)
+                        Text("")
+                            .foregroundColor(.black)
+                    })
         .background(Color.white)
         .onAppear(perform: loadSavedData)
         .alert("Save as...", isPresented: $showAlertForFileName) {

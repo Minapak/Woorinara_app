@@ -49,7 +49,7 @@ struct LogOutView: View {
             }
             .padding()
             .fullScreenCover(isPresented: $navigateToLogin) {
-                LoginView() // Ensure LoginView is implemented separately
+                SplashView() // Ensure LoginView is implemented separately
             }
             .navigationTitle("Log Out") // Sets the title for navigation
             .navigationBarTitleDisplayMode(.inline) // Centers the title

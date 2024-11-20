@@ -642,137 +642,113 @@ extension Color {
 
 struct MessageStartView: View {
     @StateObject var locationManager: LocationManager = .init()
-    
     @State private var userLatitude: Double = 0.0
     @State private var userLongitude: Double = 0.0
     var message: WooriMessageData
-    @State private var safariViewURL: URL? // Safari URL을 열기 위한 상태 변수
+    @State private var safariViewURL: URL?
     @Binding var typingMessageCurrent: String
-    var currentUser: String 
+    var currentUser: String
     var onQuickReplyTap: (String, ActionValue?, MemberInfo?) -> Void
-    @Binding var isLoading: Bool // 상위 뷰에서 전달받은 로딩 상태
-  
+    @Binding var isLoading: Bool
+    
     @State private var alertMessage = ""
     @FocusState private var isActionTextFocused: Bool
     @FocusState private var isContentOrLabelFocused: Bool
     @State private var shouldFocusOnActionText: Bool = false
-    @State private var openMapFocused: Bool = false // "Open Map" 버튼 포커스 상태
-    @State private var focusedButtonLabel: String? // 현재 포커스된 버튼의 레이블
-    @State private var lastMessageId: UUID? // Track the latest message ID
-  
+    @State private var openMapFocused: Bool = false
+    @State private var focusedButtonLabel: String?
+    @State private var lastMessageId: UUID?
 
-      var body: some View {
-          ScrollViewReader { proxy in
-              VStack {
-                  HStack {
-                      if message.sender == currentUser {
-                                       Spacer()
-                                       Text(message.content)
-                                           .padding()
-                                           .background(Color.gray)
-                                           .foregroundColor(.white)
-                                           .cornerRadius(14)
-                                   } else {
-                                       // 봇 응답 시 로고와 메시지 표시
-                                       Image("chatLogo")
-                                           .resizable()
-                                           .scaledToFit()
-                                           .frame(width: 34, height: 34)
-
-                                       VStack(alignment: .leading) {
-                                           // 봇의 응답 메시지 표시
-                                           Text(message.content)
-                                               .padding()
-                                               .foregroundColor(.black)
-                                               .background(Color.blue.opacity(0.1))
-                                               .cornerRadius(14)
-                                           // 사용자가 메시지를 보낸 후, 봇 응답이 오기 전 로딩 인디케이터 표시
-//                                           if isLoading && message.sender == "BOT" && message.id == lastMessageId {
-//                                               // 로딩 인디케이터 표시
-//                                               HStack(alignment: .center, spacing: 24) {
-//                                                   Image("chatLoading")
-//                                                       .resizable()
-//                                                       .scaledToFit()
-//                                                       .frame(width: 100, height: 34)
-//                                               }
-//                                               .padding(.top, 8)
-//                                           }
-                                       }
-                                         Spacer()
-                                     }
-                                 }
-                  .padding(.horizontal)
-                  .id(message.id) // Assign a unique ID to each message
-
-
-                ScrollView(.horizontal, showsIndicators: true) {
-                    HStack(spacing: 10) {
-                        if let quickReplyButtons = message.quickReplyButtons {
+    var body: some View {
+        ScrollViewReader { proxy in
+            VStack(alignment: message.sender == currentUser ? .trailing : .leading, spacing: 8) {
+                // Message Content
+                HStack(alignment: .top, spacing: 8) {
+                    if message.sender != currentUser {
+                        // Bot Avatar
+                        Image("chatLogo")
+                            .resizable()
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    }
+                    
+                    // Message Bubble
+                    if message.sender == currentUser {
+                        Spacer()
+                        Text(message.content)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(Color(hex: "#414A57")) // Use hex color
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .padding(.leading, 10)
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(message.content)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color(hex: "F2F7FF")) // Light blue background
+                                .foregroundColor(.black)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .padding(.trailing, 10)
+                        Spacer()
+                    }
+                }
+                .id(message.id)
+                
+                // Quick Reply Buttons
+                if let quickReplyButtons = message.quickReplyButtons {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
                             ForEach(quickReplyButtons, id: \.label) { button in
                                 Button(action: {
-                                    onQuickReplyTap(button.label, button.actionValue, MemberInfo.init(latitude: 0.0, longitude: 0.0))
-                                    lastMessageId = message.id // Update lastMessageId to focus on the latest message
+                                    onQuickReplyTap(button.label, button.actionValue, MemberInfo(latitude: 0.0, longitude: 0.0))
+                                    lastMessageId = message.id
                                     if button.actionType == "map" {
                                         openMapFocused = true
                                     }
                                 }) {
-                                    VStack {
-                                        if let actionText = button.actionValue?.text {
-                                            VStack {
-                                                Text(button.label)
-                                                    .font(.system(size: 16, weight: .bold))
-                                                    .foregroundColor(.blue)
-                                                Text(actionText)
-                                                    .font(.system(size: 14))
-                                                    .foregroundColor(.gray)
-                                                    .padding(.leading, 2)
-                                            }
-                                            .padding(.vertical, 1)
-                                            .padding(.horizontal, 12)
-                                            .background(Color.white)
-                                            .cornerRadius(16)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                    .stroke(Color.blue, lineWidth: 2)
-                                            )
-                                            .padding(.horizontal, 8)
-                                        } else {
+                                    if let actionText = button.actionValue?.text {
+                                        VStack(alignment: .leading, spacing: 4) {
                                             Text(button.label)
-                                                .font(.system(size: 16, weight: .bold))
-                                                .foregroundColor(.blue)
-                                                .padding(.vertical, 1)
-                                                .padding(.top, 3)
-                                                .padding(.horizontal, 12)
-                                                .background(Color.white)
-                                                .cornerRadius(16)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 16)
-                                                        .stroke(Color.blue, lineWidth: 2)
-                                                )
-                                                .padding(.horizontal, 8)
-                                                .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundColor(Color(hex: "3B8AFF"))
+                                            Text(actionText)
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.gray)
                                         }
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal, 12)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(Color(hex: "#EBF3FF").opacity(0.3))
+                                                //.shadow(color: Color.black.opacity(0.1), radius: 1)
+                                        )
+                                    } else {
+                                        Text(button.label)
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(Color(hex: "3B8AFF"))
+                                            .padding(.vertical, 8)
+                                            .padding(.horizontal, 12)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .fill(Color(hex: "#EBF3FF").opacity(0.5))
+                                                    .shadow(color: Color.black.opacity(0.1), radius: 1)
+                                            )
+                                            .focused($isActionTextFocused, equals: openMapFocused && button.label == "Open Map")
                                     }
                                 }
                             }
                         }
-                    }
-                    .onAppear {
-                        if openMapFocused {
-                            isActionTextFocused = true
-                        } else {
-                            isContentOrLabelFocused = true
-                        }
+                        .padding(.vertical, 4)
                     }
                 }
-       
-            
             }
+            .padding(.horizontal)
         }
     }
 }
-
-
 
 // 외부 Safari 브라우저 뷰를 지원하는 구조체는 http 및 https URLs만 열도록 제한됩니다.
 // nmap:// 같은 앱 URL은 직접 열도록 처리합니다.

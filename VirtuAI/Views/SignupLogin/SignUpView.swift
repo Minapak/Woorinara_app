@@ -51,7 +51,7 @@ struct SignUpView: View {
                         .background(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke((isValidId && !isIdDuplicate) ? Color.gray : Color.red)
+                                .stroke((isValidId ) ? Color.gray : Color.red)
                         )
                         .onChange(of: username) { _ in
                             validateID(username)
@@ -62,12 +62,13 @@ struct SignUpView: View {
                             .foregroundColor(.red)
                             .font(.system(size: 12))
                             .frame(maxWidth: .infinity, alignment: .leading)
-                    } else if isIdDuplicate {
-                        Text("This ID is already taken. Please choose another.")
-                            .foregroundColor(.red)
-                            .font(.system(size: 12))
-                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+//                    else if isIdDuplicate {
+//                        Text("This ID is already taken. Please choose another.")
+//                            .foregroundColor(.red)
+//                            .font(.system(size: 12))
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                    }
                     
                     // Password Input
                     SecureField("Password", text: $password)
@@ -110,7 +111,7 @@ struct SignUpView: View {
                 
                 // Sign Up Button
                 Button(action: {
-                    if isValidId && isValidPassword && isValidConfirmPassword && !isIdDuplicate {
+                    if isValidId && isValidPassword && isValidConfirmPassword {
                         signUpAction()
                     } else {
                         showAlert = true
@@ -217,15 +218,18 @@ struct SignUpView: View {
     }
 
     private func processSuccessResponse(data: Data?) {
+        // Set first login flags
+        UserDefaults.standard.set(true, forKey: Constants.isFirstLogin)
+        UserDefaults.standard.set(false, forKey: Constants.hasCompletedARC)
+        
         showingSuccessAlert = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation {
-                showingSuccessAlert = false // 성공 알림 숨기기
-                navigateToLogin = true      // LoginView로 이동
+                showingSuccessAlert = false
+                navigateToLogin = true
             }
         }
     }
-
     private func processErrorResponse(data: Data?) {
         alertMessage = "Signup failed: Please try again."
         showAlert = true

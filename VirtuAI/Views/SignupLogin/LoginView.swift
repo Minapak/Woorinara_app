@@ -194,27 +194,34 @@ struct LoginView: View {
     }
 
     private func processSuccessResponse(data: Data?) {
-        guard let data = data,
-              let token = try? JSONDecoder().decode(LoginToken.self, from: data) else {
-            alertMessage = "Failed to decode response."
-            showAlert = true
-            return
+            guard let data = data,
+                  let token = try? JSONDecoder().decode(LoginToken.self, from: data) else {
+                alertMessage = "Failed to decode response."
+                showAlert = true
+                return
+            }
+            
+            // Save authentication data
+            KeychainWrapper.standard.set(username, forKey: "username")
+            KeychainWrapper.standard.set(password, forKey: "password")
+            KeychainWrapper.standard.set(token.accessToken, forKey: "accessToken")
+            KeychainWrapper.standard.set(token.refreshToken, forKey: "refreshToken")
+            UserDefaults.standard.set(Date(), forKey: "tokenDate")
+            
+            // Check if this is first login
+            let isFirstLogin = UserDefaults.standard.bool(forKey: Constants.isFirstLogin)
+            if isFirstLogin {
+                UserDefaults.standard.set(true, forKey: Constants.isFirstLogin)
+                UserDefaults.standard.set(false, forKey: Constants.hasCompletedARC)
+            }
+            
+            appChatState.username = username
+            appChatState.password = password
+            appChatState.isUserLoggedIn = true
+            isLoggedIn = true
+            
+            showingSuccessAlert = true
         }
-        
-        KeychainWrapper.standard.set(username, forKey: "username")
-        KeychainWrapper.standard.set(password, forKey: "password")
-        KeychainWrapper.standard.set(token.accessToken, forKey: "accessToken")
-        KeychainWrapper.standard.set(token.refreshToken, forKey: "refreshToken")
-        UserDefaults.standard.set(Date(), forKey: "tokenDate")
-        
-        appChatState.username = username
-        appChatState.password = password
-        appChatState.isUserLoggedIn = true
-        isLoggedIn = true
-        
-        showingSuccessAlert = true
-        print("Login successful, user details saved.")
-    }
 }
 
 extension LoginView {
