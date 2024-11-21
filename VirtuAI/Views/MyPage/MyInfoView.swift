@@ -29,10 +29,104 @@ struct MyInfoData: Codable {
     var incomeAmount: String
     var job: String
     var refundAccountNumber: String
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Required fields with default empty string if missing
+        phoneNumber = try container.decodeIfPresent(String.self, forKey: .phoneNumber) ?? ""
+        workplaceName = try container.decodeIfPresent(String.self, forKey: .workplaceName) ?? ""
+        workplaceRegistrationNumber = try container.decodeIfPresent(String.self, forKey: .workplaceRegistrationNumber) ?? ""
+        workplacePhoneNumber = try container.decodeIfPresent(String.self, forKey: .workplacePhoneNumber) ?? ""
+        futureWorkplaceName = try container.decodeIfPresent(String.self, forKey: .futureWorkplaceName) ?? ""
+        futureWorkplaceRegistrationNumber = try container.decodeIfPresent(String.self, forKey: .futureWorkplaceRegistrationNumber) ?? ""
+        futureWorkplacePhoneNumber = try container.decodeIfPresent(String.self, forKey: .futureWorkplacePhoneNumber) ?? ""
+        koreaAddress = try container.decodeIfPresent(String.self, forKey: .koreaAddress) ?? ""
+        telephoneNumber = try container.decodeIfPresent(String.self, forKey: .telephoneNumber) ?? ""
+        homelandAddress = try container.decodeIfPresent(String.self, forKey: .homelandAddress) ?? ""
+        homelandPhoneNumber = try container.decodeIfPresent(String.self, forKey: .homelandPhoneNumber) ?? ""
+        schoolStatus = try container.decodeIfPresent(String.self, forKey: .schoolStatus) ?? ""
+        schoolName = try container.decodeIfPresent(String.self, forKey: .schoolName) ?? ""
+        schoolPhoneNumber = try container.decodeIfPresent(String.self, forKey: .schoolPhoneNumber) ?? ""
+        schoolType = try container.decodeIfPresent(String.self, forKey: .schoolType) ?? ""
+        originalWorkplaceName = try container.decodeIfPresent(String.self, forKey: .originalWorkplaceName) ?? ""
+        originalWorkplaceRegistrationNumber = try container.decodeIfPresent(String.self, forKey: .originalWorkplaceRegistrationNumber) ?? ""
+        originalWorkplacePhoneNumber = try container.decodeIfPresent(String.self, forKey: .originalWorkplacePhoneNumber) ?? ""
+        incomeAmount = try container.decodeIfPresent(String.self, forKey: .incomeAmount) ?? ""
+        job = try container.decodeIfPresent(String.self, forKey: .job) ?? ""
+        refundAccountNumber = try container.decodeIfPresent(String.self, forKey: .refundAccountNumber) ?? ""
+        
+        // Optional fields
+        annualIncome = try container.decodeIfPresent(Int.self, forKey: .annualIncome)
+        profileImageUrl = try container.decodeIfPresent(String.self, forKey: .profileImageUrl)
+        signatureUrl = try container.decodeIfPresent(String.self, forKey: .signatureUrl)
+    }
+    
+    // Dictionary initializer for convenience
+    init(dictionary: [String: Any]) {
+        self.phoneNumber = dictionary["phoneNumber"] as? String ?? ""
+        self.annualIncome = dictionary["annualIncome"] as? Int
+        self.workplaceName = dictionary["workplaceName"] as? String ?? ""
+        self.workplaceRegistrationNumber = dictionary["workplaceRegistrationNumber"] as? String ?? ""
+        self.workplacePhoneNumber = dictionary["workplacePhoneNumber"] as? String ?? ""
+        self.futureWorkplaceName = dictionary["futureWorkplaceName"] as? String ?? ""
+        self.futureWorkplaceRegistrationNumber = dictionary["futureWorkplaceRegistrationNumber"] as? String ?? ""
+        self.futureWorkplacePhoneNumber = dictionary["futureWorkplacePhoneNumber"] as? String ?? ""
+        self.profileImageUrl = dictionary["profileImageUrl"] as? String
+        self.signatureUrl = dictionary["signatureUrl"] as? String
+        self.koreaAddress = dictionary["koreaAddress"] as? String ?? ""
+        self.telephoneNumber = dictionary["telephoneNumber"] as? String ?? ""
+        self.homelandAddress = dictionary["homelandAddress"] as? String ?? ""
+        self.homelandPhoneNumber = dictionary["homelandPhoneNumber"] as? String ?? ""
+        self.schoolStatus = dictionary["schoolStatus"] as? String ?? ""
+        self.schoolName = dictionary["schoolName"] as? String ?? ""
+        self.schoolPhoneNumber = dictionary["schoolPhoneNumber"] as? String ?? ""
+        self.schoolType = dictionary["schoolType"] as? String ?? ""
+        self.originalWorkplaceName = dictionary["originalWorkplaceName"] as? String ?? ""
+        self.originalWorkplaceRegistrationNumber = dictionary["originalWorkplaceRegistrationNumber"] as? String ?? ""
+        self.originalWorkplacePhoneNumber = dictionary["originalWorkplacePhoneNumber"] as? String ?? ""
+        self.incomeAmount = dictionary["incomeAmount"] as? String ?? ""
+        self.job = dictionary["job"] as? String ?? ""
+        self.refundAccountNumber = dictionary["refundAccountNumber"] as? String ?? ""
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case phoneNumber
+        case annualIncome
+        case workplaceName
+        case workplaceRegistrationNumber
+        case workplacePhoneNumber
+        case futureWorkplaceName
+        case futureWorkplaceRegistrationNumber
+        case futureWorkplacePhoneNumber
+        case profileImageUrl
+        case signatureUrl
+        case koreaAddress
+        case telephoneNumber
+        case homelandAddress
+        case homelandPhoneNumber
+        case schoolStatus
+        case schoolName
+        case schoolPhoneNumber
+        case schoolType
+        case originalWorkplaceName
+        case originalWorkplaceRegistrationNumber
+        case originalWorkplacePhoneNumber
+        case incomeAmount
+        case job
+        case refundAccountNumber
+    }
 }
 
 struct MyInfoView: View {
-    @AppStorage("myInfoDataSaved") private var myInfoDataSaved: Bool = false
+    // MARK: - Properties
+    @AppStorage("myInfoDataSaved") private var myInfoDataSaved: Bool = false {
+        didSet {
+            print("\n📢 myInfoDataSaved changed from \(oldValue) to \(myInfoDataSaved)")
+        }
+    }
+    
+    // State Properties
     @State private var koreaAddress: String = ""
     @State private var telephoneNumber: String = ""
     @State private var phoneNumber: String = ""
@@ -58,10 +152,11 @@ struct MyInfoView: View {
     @State private var isLoading = false
     @State private var profileImageUrl: String? = nil
     @State private var signatureUrl: String? = nil
-
+    @State private var errorMessage: String = ""
     // Update API endpoint
     let endpoint = "http://43.203.237.202:18080/api/v1/members/details/update"
-    
+
+    // MARK: - Body
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -75,48 +170,113 @@ struct MyInfoView: View {
                         .foregroundColor(.gray)
 
                     VStack(alignment: .leading) {
-                        Spacer()
-                        SectionInfoView(title: "Address in Korea", text: $koreaAddress, placeholder: "Seoul Special City")
-                        Spacer()
-                        SectionInfoView(title: "Telephone No.", text: $telephoneNumber, placeholder: "02-1234-5677")
-                        Spacer()
-                        SectionInfoView(title: "Cellphone No.", text: $phoneNumber, placeholder: "010-1234-5678")
-                        Spacer()
-                        SectionInfoView(title: "Home Country Address", text: $homelandAddress, placeholder: "5-2-1 Ginza, Chuo-ku, Tokyo, 170-3923")
-                        Spacer()
-                        SectionInfoView(title: "Home Country Phone Number", text: $homelandPhoneNumber, placeholder: "06-1234-1234")
-                        Spacer()
-                        DropdownInfoField(title: "Enrollment Status", selectedValue: $schoolStatus, options: ["NonSchool", "Elementary", "Middle", "High"], placeholder: "High School", isRequired: true)
-                        Spacer()
-                        SectionInfoView(title: "School Name", text: $schoolName, placeholder: "Fafa School")
-                        Spacer()
-                        SectionInfoView(title: "School Phone Number", text: $schoolPhoneNumber, placeholder: "06-1234-1234")
-                        Spacer()
-                        DropdownInfoField(title: "Type of School", selectedValue: $schoolType, options: ["Accredited", "NonAccredited", "Alternative"], placeholder: "Unaccredited by the Office of..", isRequired: true)
-                        Spacer()
-                        SectionInfoView(title: "Previous Employer Name", text: $originalWorkplaceName, placeholder: "Fafa Inc")
-                        Spacer()
-                        SectionInfoView(title: "Previous Employer Business Registration Number", text: $originalWorkplaceRegistrationNumber, placeholder: "123456789")
-                        Spacer()
-                        SectionInfoView(title: "Previous Employer Phone Number", text: $originalWorkplacePhoneNumber, placeholder: "02-1234-9876")
-                        Spacer()
-                        SectionInfoView(title: "Prospective Employer Name", text: $futureWorkplaceName, placeholder: "Enter employer name")
-                        Spacer()
-                        SectionInfoView(title: "Prospective Employer Phone Number", text: $futureWorkplacePhoneNumber, placeholder: "Enter phone number")
-                        Spacer()
                         SectionInfoView(
-                                  title: "Annual Income",
-                                  text: Binding(
-                                      get: { String(incomeAmount) },
-                                      set: { incomeAmount = Int($0) ?? 0 }
-                                  ),
-                                  placeholder: "5000 ten thousand won"
-                              )
-                        Spacer()
-                        SectionInfoView(title: "Occupation", text: $job, placeholder: "Enter your occupation")
-                        Spacer()
-                        SectionInfoView(title: "Refund Account Number", text: $refundAccountNumber, placeholder: "KOOKMIN, 123456-12-34566")
-                        Spacer()
+                            title: "Address in Korea",
+                            text: $koreaAddress,
+                            placeholder: "Seoul Special City",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Telephone No.",
+                            text: $telephoneNumber,
+                            placeholder: "02-1234-5677",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Cellphone No.",
+                            text: $phoneNumber,
+                            placeholder: "010-1234-5678",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Home Country Address",
+                            text: $homelandAddress,
+                            placeholder: "5-2-1 Ginza, Chuo-ku, Tokyo, 170-3923",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Home Country Phone Number",
+                            text: $homelandPhoneNumber,
+                            placeholder: "06-1234-1234",
+                            isRequired: true
+                        )
+                        DropdownInfoField(
+                            title: "Enrollment Status",
+                            selectedValue: $schoolStatus,
+                            options: ["NonSchool", "Elementary", "Middle", "High"],
+                            placeholder: "High School",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "School Name",
+                            text: $schoolName,
+                            placeholder: "Fafa School",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "School Phone Number",
+                            text: $schoolPhoneNumber,
+                            placeholder: "06-1234-1234",
+                            isRequired: true
+                        )
+                        DropdownInfoField(
+                            title: "Type of School",
+                            selectedValue: $schoolType,
+                            options: ["Accredited", "NonAccredited", "Alternative"],
+                            placeholder: "Unaccredited by the Office of..",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Previous Employer Name",
+                            text: $originalWorkplaceName,
+                            placeholder: "Fafa Inc",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Previous Employer Business Registration Number",
+                            text: $originalWorkplaceRegistrationNumber,
+                            placeholder: "123456789",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Previous Employer Phone Number",
+                            text: $originalWorkplacePhoneNumber,
+                            placeholder: "02-1234-9876",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Prospective Employer Name",
+                            text: $futureWorkplaceName,
+                            placeholder: "Enter employer name",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Prospective Employer Phone Number",
+                            text: $futureWorkplacePhoneNumber,
+                            placeholder: "Enter phone number",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Annual Income",
+                            text: Binding(
+                                get: { String(incomeAmount) },
+                                set: { incomeAmount = Int($0) ?? 0 }
+                            ),
+                            placeholder: "5000 ten thousand won",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Occupation",
+                            text: $job,
+                            placeholder: "Enter your occupation",
+                            isRequired: true
+                        )
+                        SectionInfoView(
+                            title: "Refund Account Number",
+                            text: $refundAccountNumber,
+                            placeholder: "KOOKMIN, 123456-12-34566",
+                            isRequired: true
+                        )
 
                         VStack(alignment: .leading) {
                             Text("Enter Signature")
@@ -152,8 +312,7 @@ struct MyInfoView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue, lineWidth: 2))
 
                         Button("Done") {
-                            updateMyInfo()
-                        }
+                            handleDoneButton()                        }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
@@ -165,11 +324,51 @@ struct MyInfoView: View {
             }
             .sheet(isPresented: $showSignaturePad) {
                 SignatureMyInfoPadView(signatureImage: $signatureImage) { savedImage in
+                    print("📝 Signature captured")
                     self.signatureImage = savedImage
                     self.saveImageToAlbum(savedImage)
                 }
             }
-            .onAppear(perform: fetchData)
+            .onAppear {
+                 print("\n📱 MyInfoView appeared")
+                 logStorageState()
+
+                 // 저장된 데이터 로드 및 필드에 적용
+                 if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
+                     do {
+                         let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
+                         print("\n📦 Loading saved data into fields:")
+
+                         // InputARCField 값 설정
+                         koreaAddress = myInfoData["koreaAddress"] ?? ""
+                         telephoneNumber = myInfoData["telephoneNumber"] ?? ""
+                         phoneNumber = myInfoData["phoneNumber"] ?? ""
+                         homelandAddress = myInfoData["homelandAddress"] ?? ""
+                         homelandPhoneNumber = myInfoData["homelandPhoneNumber"] ?? ""
+                         schoolStatus = myInfoData["schoolStatus"] ?? ""
+                         schoolName = myInfoData["schoolName"] ?? ""
+                         schoolPhoneNumber = myInfoData["schoolPhoneNumber"] ?? ""
+                         schoolType = myInfoData["schoolType"] ?? ""
+                         originalWorkplaceName = myInfoData["originalWorkplaceName"] ?? ""
+                         originalWorkplaceRegistrationNumber = myInfoData["originalWorkplaceRegistrationNumber"] ?? ""
+                         originalWorkplacePhoneNumber = myInfoData["originalWorkplacePhoneNumber"] ?? ""
+                         futureWorkplaceName = myInfoData["futureWorkplaceName"] ?? ""
+                         futureWorkplacePhoneNumber = myInfoData["futureWorkplacePhoneNumber"] ?? ""
+                         incomeAmount = Int(myInfoData["incomeAmount"] ?? "0") ?? 0
+                         job = myInfoData["job"] ?? ""
+                         refundAccountNumber = myInfoData["refundAccountNumber"] ?? ""
+
+                         myInfoData.forEach { key, value in
+                             print("  \(key): \(value)")
+                         }
+                         print("✅ Fields populated with saved data")
+                     } catch {
+                         print("❌ Error loading saved data: \(error)")
+                     }
+                 }
+
+                 fetchData()
+             }
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
             }
@@ -178,169 +377,187 @@ struct MyInfoView: View {
             }
         }
     }
+    // MARK: - Data Operations
+    private func handleDoneButton() {
+        if validateFields() {
+            print("✅ Fields validation passed")
+            updateMyInfo()
+            saveData()
+            showContentView = true
+        } else {
+            print("❌ Fields validation failed")
+            errorMessage = "Please fill in all required fields."
+            showAlert = true
+            // 누락된 필드 로그 출력
+        }
+    }
+    
+    private func validateFields() -> Bool {
+        let isValid = !koreaAddress.isEmpty &&
+                      !telephoneNumber.isEmpty &&
+                      !phoneNumber.isEmpty &&
+                      !homelandAddress.isEmpty &&
+                      !homelandPhoneNumber.isEmpty &&
+                      !schoolStatus.isEmpty &&
+                      !schoolName.isEmpty &&
+                      !schoolPhoneNumber.isEmpty &&
+                      !schoolType.isEmpty &&
+                      !originalWorkplaceName.isEmpty &&
+                      !originalWorkplaceRegistrationNumber.isEmpty &&
+                      !originalWorkplacePhoneNumber.isEmpty &&
+                      !futureWorkplaceName.isEmpty &&
+                      !futureWorkplacePhoneNumber.isEmpty &&
+                      incomeAmount > 0 &&
+                      !job.isEmpty &&
+                      !refundAccountNumber.isEmpty
 
+        print("🔍 Field validation result: \(isValid)")
+        if !isValid {
+            print("Missing fields:")
+            if koreaAddress.isEmpty { print("- Korea Address") }
+            if telephoneNumber.isEmpty { print("- Telephone No.") }
+            if phoneNumber.isEmpty { print("- Cellphone No.") }
+            if homelandAddress.isEmpty { print("- Home Country Address") }
+            if homelandPhoneNumber.isEmpty { print("- Home Country Phone Number") }
+            if schoolStatus.isEmpty { print("- Enrollment Status") }
+            if schoolName.isEmpty { print("- School Name") }
+            if schoolPhoneNumber.isEmpty { print("- School Phone Number") }
+            if schoolType.isEmpty { print("- Type of School") }
+            if originalWorkplaceName.isEmpty { print("- Previous Employer Name") }
+            if originalWorkplaceRegistrationNumber.isEmpty { print("- Previous Employer Business Registration Number") }
+            if originalWorkplacePhoneNumber.isEmpty { print("- Previous Employer Phone Number") }
+            if futureWorkplaceName.isEmpty { print("- Prospective Employer Name") }
+            if futureWorkplacePhoneNumber.isEmpty { print("- Prospective Employer Phone Number") }
+            if incomeAmount <= 0 { print("- Annual Income") }
+            if job.isEmpty { print("- Occupation") }
+            if refundAccountNumber.isEmpty { print("- Refund Account Number") }
+        }
+
+        return isValid
+    }
+
+    // MARK: - Data Operations
     private func updateMyInfo() {
-        guard let url = URL(string: endpoint),
-              let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
-            alertMessage = "Invalid URL or missing access token"
+        guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ Access token not available")
+            alertMessage = "Access token not available"
             showAlert = true
             return
         }
         
-        let myInfoData = MyInfoData(
-            phoneNumber: phoneNumber,
-            annualIncome: incomeAmount,
-            workplaceName: originalWorkplaceName,
-            workplaceRegistrationNumber: originalWorkplaceRegistrationNumber,
-            workplacePhoneNumber: originalWorkplacePhoneNumber,
-            futureWorkplaceName: futureWorkplaceName,
-            futureWorkplaceRegistrationNumber: originalWorkplaceRegistrationNumber,
-            futureWorkplacePhoneNumber: futureWorkplacePhoneNumber,
-            profileImageUrl: profileImageUrl,
-            signatureUrl: signatureUrl,
-            koreaAddress: koreaAddress,
-            telephoneNumber: telephoneNumber,
-            homelandAddress: homelandAddress,
-            homelandPhoneNumber: homelandPhoneNumber,
-            schoolStatus: schoolStatus,
-            schoolName: schoolName,
-            schoolPhoneNumber: schoolPhoneNumber,
-            schoolType: schoolType,
-            originalWorkplaceName: originalWorkplaceName,
-            originalWorkplaceRegistrationNumber: originalWorkplaceRegistrationNumber,
-            originalWorkplacePhoneNumber: originalWorkplacePhoneNumber,
-            incomeAmount: String(incomeAmount),
-            job: job,
-            refundAccountNumber: refundAccountNumber
-        )
+        // Dictionary로 먼저 데이터 구성
+        let myInfoDict: [String: Any] = [
+            "phoneNumber": phoneNumber,
+            "annualIncome": incomeAmount,
+            "workplaceName": originalWorkplaceName,
+            "workplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "workplacePhoneNumber": originalWorkplacePhoneNumber,
+            "futureWorkplaceName": futureWorkplaceName,
+            "futureWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+            "profileImageUrl": profileImageUrl as Any,
+            "signatureUrl": signatureUrl as Any,
+            "koreaAddress": koreaAddress,
+            "telephoneNumber": telephoneNumber,
+            "homelandAddress": homelandAddress,
+            "homelandPhoneNumber": homelandPhoneNumber,
+            "schoolStatus": schoolStatus,
+            "schoolName": schoolName,
+            "schoolPhoneNumber": schoolPhoneNumber,
+            "schoolType": schoolType,
+            "originalWorkplaceName": originalWorkplaceName,
+            "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
+            "incomeAmount": String(incomeAmount),
+            "job": job,
+            "refundAccountNumber": refundAccountNumber
+        ]
 
-        var request = URLRequest(url: url)
+        print("\n📤 Updating MyInfo with data:")
+        myInfoDict.forEach { key, value in
+            print("  \(key): \(value)")
+        }
+
+        var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         do {
-            let jsonData = try JSONEncoder().encode(myInfoData)
+            let jsonData = try JSONSerialization.data(withJSONObject: myInfoDict)
             request.httpBody = jsonData
 
             URLSession.shared.dataTask(with: request) { data, response, error in
                 DispatchQueue.main.async {
                     if let error = error {
+                        print("❌ Error updating information: \(error.localizedDescription)")
                         alertMessage = "Error updating information: \(error.localizedDescription)"
                         showAlert = true
                         return
                     }
 
                     guard let httpResponse = response as? HTTPURLResponse else {
+                        print("❌ Invalid server response")
                         alertMessage = "Invalid server response"
                         showAlert = true
                         return
                     }
 
                     if (200...299).contains(httpResponse.statusCode) {
+                        print("✅ Information updated successfully")
                         alertMessage = "Information updated successfully"
                         myInfoDataSaved = true
                         saveData()
                         showContentView = true
                     } else {
+                        print("❌ Failed to update information. Status code: \(httpResponse.statusCode)")
                         alertMessage = "Failed to update information. Status code: \(httpResponse.statusCode)"
                     }
                     showAlert = true
                 }
             }.resume()
         } catch {
+            print("❌ Error encoding data: \(error.localizedDescription)")
             alertMessage = "Error encoding data: \(error.localizedDescription)"
             showAlert = true
         }
     }
 
-    private func uploadSignatureToS3(accessToken: String) {
-        guard let url = URL(string: "http://43.203.237.202:18080/api/v1/s3/sign"),
-              let image = signatureImage else {
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        request.setValue("image/png", forHTTPHeaderField: "Content-Type")
-
-        let imageData = image.pngData()
-        request.httpBody = imageData
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data,
-               let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-               let resultDict = json["data"] as? [String: String],
-               let signatureUrl = resultDict["resultUrl"] {
-                DispatchQueue.main.async {
-                    self.signatureUrl = signatureUrl
-                }
-            } else {
-                print("Error uploading signature to S3: \(error?.localizedDescription ?? "Unknown error")")
-            }
-        }.resume()
-    }
-
-    private func uploadProfileImageToS3(accessToken: String) {
-        guard let url = URL(string: "http://43.203.237.202:18080/api/v1/s3/profile"),
-              let image = signatureImage else {
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        request.setValue("image/png", forHTTPHeaderField: "Content-Type")
-
-        let imageData = image.pngData()
-        request.httpBody = imageData
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let data = data,
-               let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-               let resultDict = json["data"] as? [String: String],
-               let profileImageUrl = resultDict["resultUrl"] {
-                DispatchQueue.main.async {
-                    self.profileImageUrl = profileImageUrl
-                }
-            } else {
-                print("Error uploading profile image to S3: \(error?.localizedDescription ?? "Unknown error")")
-            }
-        }.resume()
-    }
-
     private func fetchData() {
-        guard let url = URL(string: "http://43.203.237.202:18080/api/v1/members/details"),
-              let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
-            print("Invalid URL or missing access token.")
+        guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ Access token not available")
             return
         }
-
+        
+        let url = URL(string: "http://43.203.237.202:18080/api/v1/members/details")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-
+        
+        print("📥 Fetching MyInfo data...")
         isLoading = true
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 isLoading = false
-            }
-
-            if let error = error {
-                print("Error fetching data: \(error.localizedDescription)")
-                return
-            }
-
-            guard let data = data else {
-                print("No data received.")
-                return
-            }
-
-            do {
-                let decodedData = try JSONDecoder().decode([String: String].self, from: data)
-                DispatchQueue.main.async {
+                
+                if let error = error {
+                    print("❌ Error fetching data: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let data = data else {
+                    print("❌ No data received")
+                    return
+                }
+                
+                do {
+                    let decodedData = try JSONDecoder().decode([String: String].self, from: data)
+                    print("✅ Data fetched successfully:")
+                    decodedData.forEach { key, value in
+                        print("  \(key): \(value)")
+                    }
+                    
                     self.koreaAddress = decodedData["koreaAddress"] ?? ""
                     self.telephoneNumber = decodedData["telephoneNumber"] ?? ""
                     self.phoneNumber = decodedData["phoneNumber"] ?? ""
@@ -358,14 +575,89 @@ struct MyInfoView: View {
                     self.incomeAmount = Int(decodedData["incomeAmount"] ?? "0") ?? 0
                     self.job = decodedData["job"] ?? ""
                     self.refundAccountNumber = decodedData["refundAccountNumber"] ?? ""
+                    
+                    print("✅ UI updated with fetched data")
+                } catch {
+                    print("❌ Failed to decode JSON: \(error.localizedDescription)")
                 }
-            } catch {
-                print("Failed to decode JSON: \(error.localizedDescription)")
             }
         }.resume()
     }
+    private func saveData() {
+        let myInfoData: [String: String] = [
+            "koreaAddress": koreaAddress,
+            "telephoneNumber": telephoneNumber,
+            "phoneNumber": phoneNumber,
+            "homelandAddress": homelandAddress,
+            "homelandPhoneNumber": homelandPhoneNumber,
+            "schoolStatus": schoolStatus,
+            "schoolName": schoolName,
+            "schoolPhoneNumber": schoolPhoneNumber,
+            "schoolType": schoolType,
+            "originalWorkplaceName": originalWorkplaceName,
+            "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
+            "futureWorkplaceName": futureWorkplaceName,
+            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+            "incomeAmount": String(incomeAmount),
+            "job": job,
+            "refundAccountNumber": refundAccountNumber,
+            "profileImageUrl": profileImageUrl ?? "",
+            "signatureUrl": signatureUrl ?? ""
+        ]
+
+        print("\n📝 Attempting to save MyInfo data:")
+        myInfoData.forEach { key, value in
+            print("  \(key): \(value)")
+        }
+
+        do {
+            let encodedData = try JSONEncoder().encode(myInfoData)
+            UserDefaults.standard.set(encodedData, forKey: "SavedmyInfoData")
+            myInfoDataSaved = true
+
+            // Verify saved data
+            if let verificationData = UserDefaults.standard.data(forKey: "SavedmyInfoData"),
+               let decodedData = try? JSONDecoder().decode([String: String].self, from: verificationData) {
+                print("\n✅ Data saved and verified in UserDefaults:")
+                decodedData.forEach { key, value in
+                    print("  \(key): \(value)")
+                }
+            }
+
+            alertMessage = "Your information has been saved successfully."
+            print("✅ Save operation completed successfully")
+        } catch {
+            alertMessage = "Failed to save your information: \(error.localizedDescription)"
+            print("❌ Save operation failed: \(error.localizedDescription)")
+        }
+        showAlert = true
+        print("--------------------------------")
+    }
+
+    private func loadMyInfoData() -> [String: String]? {
+        print("\n🔄 Starting loadMyInfoData process...")
+
+        guard let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") else {
+            print("❌ No MyInfo data found in UserDefaults")
+            return nil
+        }
+
+        do {
+            let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
+            print("\n📦 Successfully loaded MyInfo data:")
+            myInfoData.forEach { key, value in
+                print("  \(key): \(value)")
+            }
+            return myInfoData
+        } catch {
+            print("❌ Failed to decode MyInfo data: \(error.localizedDescription)")
+            return nil
+        }
+    }
 
     private func resetFields() {
+        print("\n🔄 Resetting all fields...")
         koreaAddress = ""
         telephoneNumber = ""
         phoneNumber = ""
@@ -384,53 +676,38 @@ struct MyInfoView: View {
         job = ""
         refundAccountNumber = ""
         signatureImage = nil
+        print("✅ All fields reset successfully")
     }
 
-    private func saveData() {
-    let myInfoData: [String: String] = [
-    "koreaAddress": koreaAddress,
-    "telephoneNumber": telephoneNumber,
-    "phoneNumber": phoneNumber,
-    "homelandAddress": homelandAddress,
-    "homelandPhoneNumber": homelandPhoneNumber,
-    "schoolStatus": schoolStatus,
-    "schoolName": schoolName,
-    "schoolPhoneNumber": schoolPhoneNumber,
-    "schoolType": schoolType,
-    "originalWorkplaceName": originalWorkplaceName,
-    "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
-    "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
-    "futureWorkplaceName": futureWorkplaceName,
-    "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
-    "incomeAmount": String(incomeAmount),
-    "job": job,
-    "refundAccountNumber": refundAccountNumber,
-    "profileImageUrl": profileImageUrl ?? "",
-    "signatureUrl": signatureUrl ?? ""
-    ]
-        do {
-            let encodedData = try JSONEncoder().encode(myInfoData)
-            UserDefaults.standard.set(encodedData, forKey: "SavedMyInfoData")
-            myInfoDataSaved = true
-            alertMessage = "Your information has been saved successfully."
-        } catch {
-            alertMessage = "Failed to save your information: \(error.localizedDescription)"
-        }
+    private func saveImageToAlbum(_ image: UIImage) {
+        print("\n📸 Saving signature image to album...")
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        alertMessage = "Signature saved to album."
         showAlert = true
+        print("✅ Signature image saved to album")
     }
 
-    private func handleUpdateComplete() {
-        showContentView = true
-       
+    private func logStorageState() {
+        // Check myInfoDataSaved flag
+        let savedFlag = UserDefaults.standard.bool(forKey: "myInfoDataSaved")
+        print("Current myInfoDataSaved flag: \(savedFlag)")
+
+        // Check saved MyInfo data
+        if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
+            do {
+                let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
+                print("\n📦 Saved MyInfo Data Contents:")
+                myInfoData.forEach { key, value in
+                    print("  \(key): \(value)")
+                }
+            } catch {
+                print("❌ Error decoding saved MyInfo data: \(error)")
+            }
+        } else {
+            print("❌ No saved MyInfo data found")
+        }
     }
-
-
-              private func saveImageToAlbum(_ image: UIImage) {
-                  UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                  alertMessage = "Signature saved to album."
-                  showAlert = true
-              }
-          }
+}
 
 struct SectionInfoView: View {
     var title: String
@@ -438,7 +715,8 @@ struct SectionInfoView: View {
     var showError: Bool = false
     var placeholder: String = ""
     var isRequired: Bool = false
-
+    @FocusState var isFocused: Bool
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -448,209 +726,211 @@ struct SectionInfoView: View {
                 if isRequired { Text("*").foregroundColor(.red) }
             }
             ZStack(alignment: .leading) {
-                if text.isEmpty {
-                    Text(placeholder)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 8)
-                }
-                TextField("", text: $text)
-                    .foregroundColor(.black)
+                TextField(placeholder, text: $text)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.white)
                     .cornerRadius(16)
+                    .focused($isFocused)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(showError && text.isEmpty ? Color.red : Color.gray, lineWidth: 1)
+                            .stroke(isFocused || !text.isEmpty ? Color.blue : Color.gray, lineWidth: 1)
                     )
+                    .foregroundColor(text.isEmpty ? Color.gray : Color.black)
             }
         }
     }
 }
 
+struct DropdownInfoField: View {
+    var title: String
+    @Binding var selectedValue: String
+    var options: [String]
+    var placeholder: String
+    var isRequired: Bool = false
 
-          struct DropdownInfoField: View {
-              var title: String
-              @Binding var selectedValue: String
-              var options: [String]
-              var placeholder: String
-              var isRequired: Bool = false
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                if isRequired { Text("*").foregroundColor(.red) }
+            }
+            Menu {
+                ForEach(options, id: \.self) { option in
+                    Button(action: {
+                        selectedValue = option
+                    }) {
+                        Text(option)
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(selectedValue.isEmpty ? placeholder : selectedValue)
+                        .foregroundColor(selectedValue.isEmpty ? .gray : .black)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .foregroundColor(.gray)
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
+            }
+        }
+    }
+}
 
-              var body: some View {
-                  VStack(alignment: .leading) {
-                      HStack {
-                          Text(title)
-                              .font(.headline)
-                              .foregroundColor(.gray)
-                          if isRequired { Text("*").foregroundColor(.red) }
-                      }
-                      Menu {
-                          ForEach(options, id: \.self) { option in
-                              Button(action: {
-                                  selectedValue = option
-                              }) {
-                                  Text(option)
-                              }
-                          }
-                      } label: {
-                          HStack {
-                              Text(selectedValue.isEmpty ? placeholder : selectedValue)
-                                  .foregroundColor(selectedValue.isEmpty ? .gray : .black)
-                              Spacer()
-                              Image(systemName: "chevron.down")
-                                  .foregroundColor(.gray)
-                          }
-                          .padding()
-                          .background(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
-                      }
-                  }
-              }
-          }
+                    // MARK: - Signature Related Views
+                    struct SignatureMyInfoPadView: View {
+                        @Binding var signatureImage: UIImage?
+                        var onSave: (UIImage) -> Void
+                        @State private var drawingPath = DrawingMyInfoPath()
+                        @Environment(\.presentationMode) var presentationMode
+                        
+                        var body: some View {
+                            VStack {
+                                Text("Enter Signature")
+                                    .font(.headline)
+                                    .padding()
+                                
+                                SignatureMyInfoDrawView(drawing: $drawingPath)
+                                    .frame(height: 200)
+                                    .background(Color(UIColor.systemGray5))
+                                    .cornerRadius(10)
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
+                                    .padding()
+                                
+                                HStack {
+                                    Button(action: {
+                                        print("🔄 Resetting signature pad")
+                                        drawingPath = DrawingMyInfoPath()
+                                    }) {
+                                        Text("Reset")
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background(Color.white)
+                                            .cornerRadius(10)
+                                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+                                    }
+                                    
+                                    Button(action: {
+                                        print("✅ Saving signature")
+                                        let image = drawingPath.toImage()
+                                        onSave(image)
+                                        presentationMode.wrappedValue.dismiss()
+                                    }) {
+                                        Text("Done")
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background(Color.blue)
+                                            .cornerRadius(10)
+                                    }
+                                }
+                                .padding()
+                            }
+                        }
+                    }
 
-          struct SignatureMyInfoPadView: View {
-              @Binding var signatureImage: UIImage?
-              var onSave: (UIImage) -> Void
-              @State private var drawingPath = DrawingMyInfoPath()
-              @Environment(\.presentationMode) var presentationMode
-              
-              var body: some View {
-                  VStack {
-                      Text("Enter Signature")
-                          .font(.headline)
-                          .padding()
-                      
-                      SignatureMyInfoDrawView(drawing: $drawingPath)
-                          .frame(height: 200)
-                          .background(Color(UIColor.systemGray5))
-                          .cornerRadius(10)
-                          .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
-                          .padding()
-                      
-                      HStack {
-                          Button(action: { drawingPath = DrawingMyInfoPath() }) {
-                              Text("Reset")
-                                  .frame(maxWidth: .infinity)
-                                  .padding()
-                                  .background(Color.white)
-                                  .cornerRadius(10)
-                                  .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
-                          }
-                          
-                          Button(action: {
-                              let image = drawingPath.toImage()
-                              onSave(image)
-                              presentationMode.wrappedValue.dismiss()
-                          }) {
-                              Text("Done")
-                                  .foregroundColor(.white)
-                                  .frame(maxWidth: .infinity)
-                                  .padding()
-                                  .background(Color.blue)
-                                  .cornerRadius(10)
-                          }
-                      }
-                      .padding()
-                  }
-              }
-          }
+                    struct SignatureMyInfoDrawView: View {
+                        @Binding var drawing: DrawingMyInfoPath
+                        
+                        var body: some View {
+                            ZStack {
+                                Color.white
+                                if drawing.isEmpty {
+                                    Text("Please enter the signature to be used for document creation.")
+                                        .foregroundColor(.gray)
+                                        .multilineTextAlignment(.center)
+                                } else {
+                                    DrawMyInfoShape(drawingPath: drawing)
+                                        .stroke(lineWidth: 2)
+                                        .foregroundColor(.black)
+                                }
+                            }
+                            .gesture(DragGesture()
+                                .onChanged { value in
+                                    drawing.addPoint(value.location)
+                                }
+                                .onEnded { _ in
+                                    drawing.addBreak()
+                                })
+                        }
+                    }
 
-          struct SignatureMyInfoDrawView: View {
-              @Binding var drawing: DrawingMyInfoPath
-              
-              var body: some View {
-                  ZStack {
-                      Color.white
-                      if drawing.isEmpty {
-                          Text("Please enter the signature to be used for document creation.")
-                              .foregroundColor(.gray)
-                              .multilineTextAlignment(.center)
-                      } else {
-                          DrawMyInfoShape(drawingPath: drawing)
-                              .stroke(lineWidth: 2)
-                              .foregroundColor(.black)
-                      }
-                  }
-                  .gesture(DragGesture()
-                      .onChanged { value in
-                          drawing.addPoint(value.location)
-                      }
-                      .onEnded { _ in
-                          drawing.addBreak()
-                      })
-              }
-          }
+                    struct DrawMyInfoShape: Shape {
+                        let drawingPath: DrawingMyInfoPath
+                        
+                        func path(in rect: CGRect) -> Path {
+                            drawingPath.path
+                        }
+                    }
 
-          struct DrawMyInfoShape: Shape {
-              let drawingPath: DrawingMyInfoPath
-              
-              func path(in rect: CGRect) -> Path {
-                  drawingPath.path
-              }
-          }
+                    struct DrawingMyInfoPath {
+                        private(set) var points = [CGPoint]()
+                        private var breaks = [Int]()
+                        
+                        var isEmpty: Bool {
+                            points.isEmpty
+                        }
+                        
+                        mutating func addPoint(_ point: CGPoint) {
+                            points.append(point)
+                        }
+                        
+                        mutating func addBreak() {
+                            breaks.append(points.count)
+                        }
+                        
+                        var path: Path {
+                            var path = Path()
+                            guard let firstPoint = points.first else { return path }
+                            path.move(to: firstPoint)
+                            for i in 1..<points.count {
+                                if breaks.contains(i) {
+                                    path.move(to: points[i])
+                                } else {
+                                    path.addLine(to: points[i])
+                                }
+                            }
+                            return path
+                        }
+                        
+                        func toImage() -> UIImage {
+                            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 200))
+                            return renderer.image { ctx in
+                                ctx.cgContext.setStrokeColor(UIColor.black.cgColor)
+                                ctx.cgContext.setLineWidth(2)
+                                ctx.cgContext.addPath(path.cgPath)
+                                ctx.cgContext.drawPath(using: .stroke)
+                            }
+                        }
+                    }
 
-          struct DrawingMyInfoPath {
-              private(set) var points = [CGPoint]()
-              private var breaks = [Int]()
-              
-              var isEmpty: Bool {
-                  points.isEmpty
-              }
-              
-              mutating func addPoint(_ point: CGPoint) {
-                  points.append(point)
-              }
-              
-              mutating func addBreak() {
-                  breaks.append(points.count)
-              }
-              
-              var path: Path {
-                  var path = Path()
-                  guard let firstPoint = points.first else { return path }
-                  path.move(to: firstPoint)
-                  for i in 1..<points.count {
-                      if breaks.contains(i) {
-                          path.move(to: points[i])
-                      } else {
-                          path.addLine(to: points[i])
-                      }
-                  }
-                  return path
-              }
-              
-              func toImage() -> UIImage {
-                  let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 200))
-                  return renderer.image { ctx in
-                      ctx.cgContext.setStrokeColor(UIColor.black.cgColor)
-                      ctx.cgContext.setLineWidth(2)
-                      ctx.cgContext.addPath(path.cgPath)
-                      ctx.cgContext.drawPath(using: .stroke)
-                  }
-              }
-          }
+                    extension Path {
+                        var cgPath: CGPath {
+                            let path = CGMutablePath()
+                            forEach { element in
+                                switch element {
+                                case .move(let p):
+                                    path.move(to: p)
+                                case .line(let p):
+                                    path.addLine(to: p)
+                                case .quadCurve(let p1, let p2):
+                                    path.addQuadCurve(to: p2, control: p1)
+                                case .curve(let p1, let p2, let p3):
+                                    path.addCurve(to: p3, control1: p1, control2: p2)
+                                case .closeSubpath:
+                                    path.closeSubpath()
+                                }
+                            }
+                            return path
+                        }
+                    }
 
-          extension Path {
-              var cgPath: CGPath {
-                  let path = CGMutablePath()
-                  forEach { element in
-                      switch element {
-                      case .move(let p):
-                          path.move(to: p)
-                      case .line(let p):
-                          path.addLine(to: p)
-                      case .quadCurve(let p1, let p2):
-                          path.addQuadCurve(to: p2, control: p1)
-                      case .curve(let p1, let p2, let p3):
-                          path.addCurve(to: p3, control1: p1, control2: p2)
-                      case .closeSubpath:
-                          path.closeSubpath()
-                      }
-                  }
-                  return path
-              }
-          }
-
-          struct MyInfoView_Previews: PreviewProvider {
-              static var previews: some View {
-                  MyInfoView()
-              }
-          }
+                    // MARK: - Preview
+                    struct MyInfoView_Previews: PreviewProvider {
+                        static var previews: some View {
+                            MyInfoView()
+                        }
+                    }

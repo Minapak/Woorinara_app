@@ -11,6 +11,9 @@ struct TranslationView: View {
      @State private var navigateToScanPrePassView = false
      @State private var navigateToMyInfoView = false
     @State private var navigateToTranslateView = false
+
+    @State private var navigateToPassportInfoView = false
+    @State private var navigateToARCInfoView = false
      @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
      @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
      @AppStorage("myInfoSaved") private var myInfoSaved: Bool = false
@@ -32,7 +35,6 @@ struct TranslationView: View {
                                .font(.system(size: 24).bold())
                                .foregroundColor(.black)
 
-                           Spacer()
 
                            Text("With just one click,")
                                .font(.system(size: 12))
@@ -66,8 +68,8 @@ struct TranslationView: View {
                            .cornerRadius(16)
 
                            Button("Auto-Fill") {
-                              // navigateToScanPreARCView = true
-                            handleAutoFillNavigation()
+                              navigateToARCInfoView = true
+                            //handleAutoFillNavigation()
                            }
                            .frame(width: 150, height: 50)
                            .font(.system(size: 16, weight: .bold))
@@ -94,6 +96,12 @@ struct TranslationView: View {
             .navigationDestination(isPresented: $navigateToScanARCView) {
                            ScanARCView()
                        }
+            .navigationDestination(isPresented: $navigateToARCInfoView) {
+                ARCInfoView()
+            }
+            .navigationDestination(isPresented: $navigateToPassportInfoView) {
+                PassportInfoView()
+            }
                        .navigationDestination(isPresented: $navigateToScanPreARCView) {
                            ScanPreARCView()
                        }

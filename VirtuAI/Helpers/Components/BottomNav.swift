@@ -102,9 +102,9 @@ struct CustomTabView: View {
                     }
                 }
             }
-            .frame(height: 49) // 탭바 높이 고정
-            .padding(.top, 6) // 상단 패딩 축소
-            .padding(.bottom, getSafeAreaBottom()) // 하단 Safe Area 고려
+            .frame(height: 35) // 탭바 높이 고정
+            .padding(.top, 3) // 상단 패딩 축소
+            .padding(.bottom, 3) // 하단 Safe Area 고려
             .background(Color.white)
         }
     }
@@ -130,7 +130,7 @@ struct TabBottomView: View {
     
     var body: some View {
         HStack {
-            Spacer()
+           // Spacer()
             
             ForEach(tabbarItems) { item in
                 Button {
@@ -139,10 +139,10 @@ struct TabBottomView: View {
                     let isSelected = selectedIndex == item.id
                     TabItemView(data: item, isSelected: isSelected)
                 }
-                Spacer()
+             //   Spacer()
             }
         }
-        .padding(.top, 7)
+//        .padding(.top, 7)
     }
 }
 // TabItemView 업데이트

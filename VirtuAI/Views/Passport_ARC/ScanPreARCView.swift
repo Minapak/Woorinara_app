@@ -40,23 +40,73 @@ struct CameraCaptureARCView: UIViewControllerRepresentable {
     }
 }
 
-// OCR Result Model
-struct OCRResult: Codable {
+struct OCRARCResult: Codable {
     var status: Int
     var message: String
-    var data: OCRData?
+    var data: OCRARCData?
 }
 
-struct OCRData: Codable {
-    var inferResult: String?
-    var gender: String?
-    var nationality: String?
+struct OCRARCData: Codable {
+    var foreignRegistrationNumber: String?
     var dateOfBirth: String?
-    var visa: String?
+    var gender: String?
     var name: String?
-    var message: String?
-    var alienRegNum: String?
-    var userId: String?
+    var nationality: String?
+    var issueCountry: String?
+    var visaType: String?
+    var permitDate: String?
+    var expirationDate: String?
+    var residence: String?
+    
+    init() {
+        self.foreignRegistrationNumber = nil
+        self.dateOfBirth = nil
+        self.gender = nil
+        self.name = nil
+        self.nationality = nil
+        self.issueCountry = nil
+        self.visaType = nil
+        self.permitDate = nil
+        self.expirationDate = nil
+        self.residence = nil
+    }
+    
+    init(
+        foreignRegistrationNumber: String? = nil,
+        dateOfBirth: String? = nil,
+        gender: String? = nil,
+        name: String? = nil,
+        nationality: String? = nil,
+        issueCountry: String? = nil,
+        visaType: String? = nil,
+        permitDate: String? = nil,
+        expirationDate: String? = nil,
+        residence: String? = nil
+    ) {
+        self.foreignRegistrationNumber = foreignRegistrationNumber
+        self.dateOfBirth = dateOfBirth
+        self.gender = gender
+        self.name = name
+        self.nationality = nationality
+        self.issueCountry = issueCountry
+        self.visaType = visaType
+        self.permitDate = permitDate
+        self.expirationDate = expirationDate
+        self.residence = residence
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case foreignRegistrationNumber = "alienRegNum"
+        case dateOfBirth
+        case gender
+        case name
+        case nationality
+        case issueCountry
+        case visaType = "visa"
+        case permitDate
+        case expirationDate
+        case residence
+    }
 }
 
 // Main View for ARC Scanning
@@ -66,11 +116,13 @@ struct ScanPreARCView: View {
     @State private var navigateToContentView = false // For navigating back to ContentView
     @State private var capturedImage: UIImage?
     @State private var isCameraPresented = false
-    @State private var ocrResult: OCRResult?
+    @State private var ocrARCResult: OCRARCResult?
     @State private var isLoading = false
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
+    @State private var showScanAlert = false // 추가
+    @State private var scanAlertMessage = "" // 추가
     @State private var isManualInput = false
     @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
     var body: some View {
@@ -103,8 +155,17 @@ struct ScanPreARCView: View {
                     
                     HStack(spacing:30) {
                         Button(action: {
-                            arcDataSaved = true // Simulate saving ARC data
-                            navigateToResultView = true
+                            if let image = capturedImage {
+                                showScanAlert = true
+                                scanAlertMessage = "ARC scan completed successfully!"
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    arcDataSaved = true
+                                    navigateToResultView = true
+                                }
+                            } else {
+                                showScanAlert = true
+                                scanAlertMessage = "Please capture an image first"
+                            }
                         }) {
                             Text("Scan")
                                 .font(.system(size: 18, weight: .bold))
@@ -112,7 +173,6 @@ struct ScanPreARCView: View {
                                 .frame(width: 100, height: 44)
                                 .background(Capsule().fill(Color.blue))
                         }
-
                         Button(action: {
                             capturedImage = nil
                             isCameraPresented = true
@@ -171,20 +231,46 @@ struct ScanPreARCView: View {
             .alert(isPresented: $showErrorAlert) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
+            .alert(isPresented: $showScanAlert) {
+                Alert(
+                    title: Text("Scan Status"),
+                    message: Text(scanAlertMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
+            // OCR 결과가 있는 경우의 NavigationLink
+              NavigationLink(
+                  destination: ScanARCView(result: OCRARCResult(
+                      status: ocrARCResult?.status ?? 0,
+                      message: ocrARCResult?.message ?? "",
+                      data: OCRARCData(
+                          foreignRegistrationNumber: ocrARCResult?.data?.foreignRegistrationNumber,
+                          dateOfBirth: ocrARCResult?.data?.dateOfBirth,
+                          gender: ocrARCResult?.data?.gender,
+                          name: ocrARCResult?.data?.name,
+                          nationality: ocrARCResult?.data?.nationality,
+                          issueCountry: ocrARCResult?.data?.issueCountry,
+                          visaType: ocrARCResult?.data?.visaType,
+                          permitDate: ocrARCResult?.data?.permitDate,
+                          expirationDate: ocrARCResult?.data?.expirationDate,
+                          residence: ocrARCResult?.data?.residence
+                      )
+                  )),
+                  isActive: $navigateToResultView
+              ) {
+                  EmptyView()
+              }
             
             NavigationLink(
-                destination: ScanARCView(result: ocrResult ?? OCRResult(status: 0, message: "", data: OCRData())),
-                isActive: $navigateToResultView
-            ) {
-                EmptyView()
-            }
-            
-            NavigationLink(
-                destination: ScanARCView(result: OCRResult(status: 0, message: "", data: OCRData())),
-                isActive: $isManualInput
-            ) {
-                EmptyView()
-            }
+                     destination: ScanARCView(result: OCRARCResult(
+                         status: 0,
+                         message: "",
+                         data: OCRARCData()
+                     )),
+                     isActive: $isManualInput
+                 ) {
+                     EmptyView()
+                 }
 
             NavigationLink(
                 destination: ContentView(),
@@ -197,7 +283,9 @@ struct ScanPreARCView: View {
 
     private func captureAndSendImage(_ image: UIImage) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
-
+        
+        print("🔄 Starting image capture and OCR process...")
+        
         let url = URL(string: "http://43.203.237.202:18080/api/v1/naver-ocr")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -205,7 +293,7 @@ struct ScanPreARCView: View {
         
         let boundary = UUID().uuidString
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
+        
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
@@ -216,44 +304,63 @@ struct ScanPreARCView: View {
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"ext\"\r\n\r\npng\r\n".data(using: .utf8)!)
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
+        
         request.httpBody = body
-
+        
+        print("📤 Sending OCR request...")
         isLoading = true
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 self.isLoading = false
             }
-
+            
             if let error = error {
+                print("❌ Network error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     self.errorMessage = "Network error: \(error.localizedDescription)"
                     self.showErrorAlert = true
                 }
                 return
             }
-
+            
             guard let data = data else {
+                print("❌ No data received from server")
                 DispatchQueue.main.async {
                     self.errorMessage = "No data received from server."
                     self.showErrorAlert = true
                 }
                 return
             }
-
+            
             do {
-                let result = try JSONDecoder().decode(OCRResult.self, from: data)
+                let result = try JSONDecoder().decode(OCRARCResult.self, from: data)
+                print("✅ OCR Response received:")
+                print("Status: \(result.status)")
+                print("Message: \(result.message)")
+                if let ocrData = result.data {
+                    print("Data received:")
+                    print("  Name: \(ocrData.name ?? "nil")")
+                    print("  Registration Number: \(ocrData.foreignRegistrationNumber ?? "nil")")
+                    print("  Date of Birth: \(ocrData.dateOfBirth ?? "nil")")
+                    print("  Gender: \(ocrData.gender ?? "nil")")
+                    print("  Nationality: \(ocrData.nationality ?? "nil")")
+                    print("  Visa Type: \(ocrData.visaType ?? "nil")")
+                }
+                
                 DispatchQueue.main.async {
                     if result.status == 200, result.data != nil {
-                        self.ocrResult = result
+                        print("✅ Valid OCR data received, navigating to result view")
+                        self.ocrARCResult = result
                         self.navigateToResultView = true
                     } else {
+                        print("❌ Invalid OCR data received")
                         self.errorMessage = "No valid OCR data received."
                         self.showErrorAlert = true
                     }
                 }
             } catch {
+                print("❌ Decoding error: \(error)")
                 DispatchQueue.main.async {
                     self.errorMessage = "Failed to decode response: \(error)"
                     self.showErrorAlert = true

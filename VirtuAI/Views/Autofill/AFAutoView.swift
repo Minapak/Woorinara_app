@@ -10,9 +10,9 @@ struct AFAutoView: View {
     @State private var selectedImage: Image? = nil // 선택한 이미지를 저장할 변수
     @State private var isLoading = false
     // AppStorage for Data
-    @AppStorage("arcDataSaved") private var savedARCData: Data?
-     @AppStorage("passportDataSaved") private var savedPassportData: Data?
-     @AppStorage("myInfoDataSaved") private var savedMyInfoData: Data?
+    @AppStorage("SavedarcData") private var savedARCData: Data?
+     @AppStorage("SavedpassportData") private var savedPassportData: Data?
+     @AppStorage("SavedmyInfoData") private var savedMyInfoData: Data?
    // @AppStorage("myInfoSignatureImage") private var signatureImageData: Data? = nil
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
@@ -239,27 +239,11 @@ struct AFAutoView: View {
               }
           })
       }
-    // Load saved data
     private func loadSavedData() {
-        if let arcData = savedARCData, let arcDict = try? JSONDecoder().decode([String: String].self, from: arcData) {
-            if let foreignRegistrationNumber = arcDict["foreignRegistrationNumber"] {
-                for (index, char) in foreignRegistrationNumber.enumerated() {
-                    let boxKey = "외국인 등록 번호 \(index + 1)"
-                    boxes.updateText(for: boxKey, with: String(char))
-                }
-            }
-        }
-
-        if let passportData = savedPassportData, let passportDict = try? JSONDecoder().decode([String: String].self, from: passportData) {
-            boxes.updateText(for: "성 Surname", with: passportDict["surName"] ?? "")
-            boxes.updateText(for: "명 Given names", with: passportDict["givenName"] ?? "")
-            boxes.updateText(for: "국적 Nationality", with: passportDict["nationality"] ?? "")
-            boxes.updateText(for: "여권 번호 Passport No.", with: passportDict["documentNumber"] ?? "")
-            boxes.updateText(for: "여권 발급 일자 Passport Issue Date", with: passportDict["dateOfIssue"] ?? "")
-            boxes.updateText(for: "여권 유효 기간 Passport Expiry Date", with: passportDict["dateOfExpiry"] ?? "")
-        }
-
-        if let myInfoData = savedMyInfoData, let myInfoDict = try? JSONDecoder().decode([String: String].self, from: myInfoData) {
+        if let savedData = savedMyInfoData,
+           let myInfoDict = try? JSONDecoder().decode([String: String].self, from: savedData) {
+            
+            // MyInfo 데이터 매핑
             boxes.updateText(for: "대한민국 내 주소", with: myInfoDict["koreaAddress"] ?? "")
             boxes.updateText(for: "전화번호", with: myInfoDict["telephoneNumber"] ?? "")
             boxes.updateText(for: "휴대전화", with: myInfoDict["phoneNumber"] ?? "")
@@ -278,10 +262,72 @@ struct AFAutoView: View {
             boxes.updateText(for: "반환용계좌번호", with: myInfoDict["refundAccountNumber"] ?? "")
         }
 
+        // Passport 데이터 매핑
+        if let passportData = savedPassportData,
+           let passportDict = try? JSONDecoder().decode([String: String].self, from: passportData) {
+            
+            boxes.updateText(for: "성 Surname", with: passportDict["surName"] ?? "")
+            boxes.updateText(for: "명 Given names", with: passportDict["givenName"] ?? "")
+            boxes.updateText(for: "국적 Nationality", with: passportDict["nationality"] ?? "")
+            boxes.updateText(for: "여권 번호 Passport No.", with: passportDict["documentNumber"] ?? "")
+            boxes.updateText(for: "여권 발급 일자 Passport Issue Date", with: passportDict["dateOfIssue"] ?? "")
+            boxes.updateText(for: "여권 유효 기간 Passport Expiry Date", with: passportDict["dateOfExpiry"] ?? "")
+        }
+
+        // ARC 데이터 매핑
+        if let arcData = savedARCData,
+           let arcDict = try? JSONDecoder().decode([String: String].self, from: arcData) {
+            
+            if let foreignRegistrationNumber = arcDict["foreignRegistrationNumber"] {
+                for (index, char) in foreignRegistrationNumber.enumerated() {
+                    let boxKey = "외국인 등록 번호 \(index + 1)"
+                    boxes.updateText(for: boxKey, with: String(char))
+                }
+            }
+        }
+
+        // 현재 날짜로 신청일 설정
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         boxes.updateText(for: "신청일", with: formatter.string(from: Date()))
     }
+
+
+    private func initializeWithDefaults() {
+        // Initialize ARC fields with default values
+        for i in boxes.indices {
+            if boxes[i].title.contains("외국인 등록 번호") {
+                boxes[i].text = ""
+            }
+        }
+
+        // Initialize Passport fields with default values
+        boxes.updateText(for: "성 Surname", with: "")
+        boxes.updateText(for: "명 Given names", with: "")
+        boxes.updateText(for: "국적 Nationality", with: "")
+        boxes.updateText(for: "여권 번호 Passport No.", with: "")
+        boxes.updateText(for: "여권 발급 일자 Passport Issue Date", with: "")
+        boxes.updateText(for: "여권 유효 기간 Passport Expiry Date", with: "")
+
+        // Initialize MyInfo fields with default values
+        boxes.updateText(for: "대한민국 내 주소", with: "")
+        boxes.updateText(for: "전화번호", with: "")
+        boxes.updateText(for: "휴대전화", with: "")
+        boxes.updateText(for: "본국 주소", with: "")
+        boxes.updateText(for: "전화번호1", with: "")
+        boxes.updateText(for: "학교이름", with: "")
+        boxes.updateText(for: "전화번호2", with: "")
+        boxes.updateText(for: "원 근무처", with: "")
+        boxes.updateText(for: "사업자 등록 번호1", with: "")
+        boxes.updateText(for: "전화 번호3", with: "")
+        boxes.updateText(for: "예정 근무처", with: "")
+        boxes.updateText(for: "전화 번호4", with: "")
+        boxes.updateText(for: "연소득금액", with: "")
+        boxes.updateText(for: "직업", with: "")
+        boxes.updateText(for: "email", with: "")
+        boxes.updateText(for: "반환용계좌번호", with: "")
+    }
+    
     // Handle selection logic
     private func handleBoxSelection(at index: Int) {
         // Clear all top category selections first

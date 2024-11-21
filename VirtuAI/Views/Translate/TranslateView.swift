@@ -115,6 +115,7 @@ struct TranslateView: View {
                         Button(buttonLabel) {
                             if translationCompleted {
                                 navigateToAFInfoView = true
+                                buttonLabel = "Auto-fill"
                             } else {
                                 translationCompleted = true
                                 buttonLabel = "Auto-fill"

@@ -2,11 +2,16 @@ import SwiftUI
 import SwiftKeychainWrapper
 import AVFoundation
 
-// OCR API Response Model
 struct OCRPassResult: Codable {
     var status: Int
     var message: String
     var data: OCRPassData?
+    
+    init(status: Int, message: String, data: OCRPassData?) {
+        self.status = status
+        self.message = message
+        self.data = data
+    }
 }
 
 struct OCRPassData: Codable {
@@ -22,6 +27,79 @@ struct OCRPassData: Codable {
     var dateOfBirth: String?
     var message: String?
     var userId: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case dateOfExpiry = "dateOfExpiry"
+        case inferResult = "inferResult"
+        case surName = "surName"
+        case nationality = "nationality"
+        case gender = "gender"
+        case documentNumber = "documentNum" // API 응답의 실제 키 이름으로 수정
+        case givenName = "givenName"
+        case issueCountry = "issueCountry"
+        case middleName = "middleName"
+        case dateOfBirth = "dateOfBirth"
+        case message = "message"
+        case userId = "userId"
+    }
+    
+    init() {
+        self.dateOfExpiry = nil
+        self.inferResult = nil
+        self.surName = nil
+        self.nationality = nil
+        self.gender = nil
+        self.documentNumber = nil
+        self.givenName = nil
+        self.issueCountry = nil
+        self.middleName = nil
+        self.dateOfBirth = nil
+        self.message = nil
+        self.userId = nil
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        dateOfExpiry = try container.decodeIfPresent(String.self, forKey: .dateOfExpiry)
+        inferResult = try container.decodeIfPresent(String.self, forKey: .inferResult)
+        surName = try container.decodeIfPresent(String.self, forKey: .surName)
+        nationality = try container.decodeIfPresent(String.self, forKey: .nationality)
+        gender = try container.decodeIfPresent(String.self, forKey: .gender)
+        documentNumber = try container.decodeIfPresent(String.self, forKey: .documentNumber)
+        givenName = try container.decodeIfPresent(String.self, forKey: .givenName)
+        issueCountry = try container.decodeIfPresent(String.self, forKey: .issueCountry)
+        middleName = try container.decodeIfPresent(String.self, forKey: .middleName)
+        dateOfBirth = try container.decodeIfPresent(String.self, forKey: .dateOfBirth)
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+        userId = try container.decodeIfPresent(String.self, forKey: .userId)
+    }
+    
+    init(dateOfExpiry: String? = nil,
+         inferResult: String? = nil,
+         surName: String? = nil,
+         nationality: String? = nil,
+         gender: String? = nil,
+         documentNumber: String? = nil,
+         givenName: String? = nil,
+         issueCountry: String? = nil,
+         middleName: String? = nil,
+         dateOfBirth: String? = nil,
+         message: String? = nil,
+         userId: String? = nil) {
+        self.dateOfExpiry = dateOfExpiry
+        self.inferResult = inferResult
+        self.surName = surName
+        self.nationality = nationality
+        self.gender = gender
+        self.documentNumber = documentNumber
+        self.givenName = givenName
+        self.issueCountry = issueCountry
+        self.middleName = middleName
+        self.dateOfBirth = dateOfBirth
+        self.message = message
+        self.userId = userId
+    }
 }
 
 // Camera Preview and Image Capture
@@ -74,6 +152,8 @@ struct ScanPrePassView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage = ""
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
+    @State private var showScanAlert = false // 추가
+    @State private var scanAlertMessage = "" // 추가
     @State private var isManualInput = false
     @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
     var body: some View {
@@ -108,8 +188,17 @@ struct ScanPrePassView: View {
 
                     HStack(spacing:30) {
                         Button(action: {
-                            passportDataSaved = true // Simulate saving passport data
-                            navigateToResultPassView = true
+                            if let image = capturedImage {
+                                showScanAlert = true
+                                scanAlertMessage = "Passport scan completed successfully!"
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    passportDataSaved = true
+                                    navigateToResultPassView = true
+                                }
+                            } else {
+                                showScanAlert = true
+                                scanAlertMessage = "Please capture an image first"
+                            }
                         }) {
                             Text("Scan")
                                 .font(.system(size: 18, weight: .bold))
@@ -177,7 +266,13 @@ struct ScanPrePassView: View {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
             
-         
+            .alert(isPresented: $showScanAlert) {
+                Alert(
+                    title: Text("Scan Status"),
+                    message: Text(scanAlertMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
             
             NavigationLink(
                 destination: ScanPassView(result: ocrPassResult ?? OCRPassResult(status: 0, message: "", data: OCRPassData())),
