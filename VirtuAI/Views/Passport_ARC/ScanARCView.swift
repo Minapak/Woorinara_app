@@ -23,6 +23,74 @@ struct ARCIdentityData: Codable {
     var issueCity: String
     var reportDate: String
     var residence: String
+
+    // CodingKeys 추가
+    enum CodingKeys: String, CodingKey {
+        case foreignRegistrationNumber
+        case birthDate
+        case gender
+        case name
+        case nationality
+        case region
+        case residenceStatus
+        case visaType
+        case permitDate
+        case expirationDate
+        case issueCity
+        case reportDate
+        case residence
+    }
+
+    // 디코딩 이니셜라이저 추가
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // 각 필드를 디코딩하되, 값이 없으면 기본값 사용
+        foreignRegistrationNumber = try container.decodeIfPresent(String.self, forKey: .foreignRegistrationNumber) ?? ""
+        birthDate = try container.decodeIfPresent(String.self, forKey: .birthDate) ?? ""
+        gender = try container.decodeIfPresent(String.self, forKey: .gender) ?? ""
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        nationality = try container.decodeIfPresent(String.self, forKey: .nationality) ?? ""
+        region = try container.decodeIfPresent(String.self, forKey: .region) ?? ""
+        residenceStatus = try container.decodeIfPresent(String.self, forKey: .residenceStatus) ?? ""
+        visaType = try container.decodeIfPresent(String.self, forKey: .visaType) ?? ""
+        permitDate = try container.decodeIfPresent(String.self, forKey: .permitDate) ?? ""
+        expirationDate = try container.decodeIfPresent(String.self, forKey: .expirationDate) ?? ""
+        issueCity = try container.decodeIfPresent(String.self, forKey: .issueCity) ?? ""
+        reportDate = try container.decodeIfPresent(String.self, forKey: .reportDate) ?? ""
+        residence = try container.decodeIfPresent(String.self, forKey: .residence) ?? ""
+    }
+
+    // 일반 이니셜라이저 추가
+    init(
+        foreignRegistrationNumber: String,
+        birthDate: String,
+        gender: String,
+        name: String,
+        nationality: String,
+        region: String,
+        residenceStatus: String,
+        visaType: String,
+        permitDate: String,
+        expirationDate: String,
+        issueCity: String,
+        reportDate: String,
+        residence: String
+    ) {
+        self.foreignRegistrationNumber = foreignRegistrationNumber
+        self.birthDate = birthDate
+        self.gender = gender
+        self.name = name
+        self.nationality = nationality
+        self.region = region
+        self.residenceStatus = residenceStatus
+        self.visaType = visaType
+        self.permitDate = permitDate
+        self.expirationDate = expirationDate
+        self.issueCity = issueCity
+        self.reportDate = reportDate
+        self.residence = residence
+    }
 }
 
 struct ScanARCView: View {
@@ -65,9 +133,10 @@ struct ScanARCView: View {
             print("arcDataSaved changed to: \(arcDataSaved)")
         }
     }
-    
+    @AppStorage("SavedarcData") private var savedARCData: Data?
     // Constants
     let accessToken = KeychainWrapper.standard.string(forKey: "accessToken")
+    let userId = KeychainWrapper.standard.string(forKey: "username")
     let countries = [
         "South Korea", "Japan", "China", "India", "Thailand", "United States", "Canada", "Germany", "France", "United Kingdom",
         "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -83,145 +152,53 @@ struct ScanARCView: View {
     let residenceCategories1 = (65...90).map { String(UnicodeScalar($0)!) }
     let residenceCategories2 = (1...9).map { String($0) }
     
-    init(result: OCRARCResult? = nil) {
+    init(result: ARCResult? = nil) {
         print("\n🔄 Starting ScanARCView initialization...")
         
-        if let result = result {
+        if let result = result, let data = result.data {
             print("\n📝 Initializing with OCR result:")
-            // OCR 결과로 초기화하는 기존 코드 유지
-            self._foreignRegistrationNumber = State(initialValue: result.data?.foreignRegistrationNumber ?? "")
-            self._dateOfBirth = State(initialValue: result.data?.dateOfBirth ?? "")
-            self._gender = State(initialValue: result.data?.gender)
-            self._name = State(initialValue: result.data?.name ?? "")
-            self._country = State(initialValue: result.data?.nationality ?? "")
+            // OCR 결과로 텍스트 필드 초기화
+            self._foreignRegistrationNumber = State(initialValue: data.foreignRegistrationNumber ?? "")
+            self._dateOfBirth = State(initialValue: data.dateOfBirth ?? "")
+            self._gender = State(initialValue: data.gender)
+            self._name = State(initialValue: data.name ?? "")
+            self._country = State(initialValue: data.nationality ?? "")
             
-            // Visa type parsing
-            if let visaType = result.data?.visaType, visaType.count >= 3 {
-                let firstPart = String(visaType.prefix(1))
-                let secondPart = String(visaType.suffix(1))
-                self._residenceCategory1 = State(initialValue: firstPart)
-                self._residenceCategory2 = State(initialValue: secondPart)
+            // Visa 타입 파싱 및 설정
+            if let visaType = data.visaType, visaType.count >= 3 {
+                self._residenceCategory1 = State(initialValue: String(visaType.prefix(1)))
+                self._residenceCategory2 = State(initialValue: String(visaType.suffix(1)))
                 self._visaType = State(initialValue: visaType)
+            } else {
+                // 기본값 설정
+                self._residenceCategory1 = State(initialValue: "A")
+                self._residenceCategory2 = State(initialValue: "1")
+                self._visaType = State(initialValue: "A-1")
             }
             
             print("✅ OCR data initialization completed")
+        } else {
+            print("\n📦 Checking saved ARC data...")
+            // Try to load saved data from UserDefaults
+            if let savedData = savedARCData,
+               let decodedResult = try? JSONDecoder().decode(ARCResult.self, from: savedData),
+               let data = decodedResult.data {
+                self._foreignRegistrationNumber = State(initialValue: data.foreignRegistrationNumber ?? "")
+                self._dateOfBirth = State(initialValue: data.dateOfBirth ?? "")
+                self._gender = State(initialValue: data.gender)
+                self._name = State(initialValue: data.name ?? "")
+                self._country = State(initialValue: data.nationality ?? "")
+                
+                if let visaType = data.visaType, visaType.count >= 3 {
+                    self._residenceCategory1 = State(initialValue: String(visaType.prefix(1)))
+                    self._residenceCategory2 = State(initialValue: String(visaType.suffix(1)))
+                    self._visaType = State(initialValue: visaType)
+                }
+            }
             
-        } else {
-            print("\n📦 No OCR result, checking saved ARC data...")
-            if let savedData = UserDefaults.standard.data(forKey: "SavedARCData") {
-                do {
-                    let arcData = try JSONDecoder().decode([String: String].self, from: savedData)
-                    print("📦 Loading saved ARC Data:")
-                    arcData.forEach { key, value in
-                        print("  \(key): \(value)")
-                    }
-                    
-                    // InputARCField 데이터 매핑
-                    self._foreignRegistrationNumber = State(initialValue: arcData["foreignRegistrationNumber"] ?? "")
-                    self._dateOfBirth = State(initialValue: arcData["birthDate"] ?? "")
-                    self._name = State(initialValue: arcData["name"] ?? "")
-                    
-                    // RadioARCButton 데이터 매핑 (성별)
-                    if let savedGender = arcData["gender"] {
-                        self._gender = State(initialValue: savedGender)
-                        print("  Setting gender to: \(savedGender)")
-                    } else {
-                        self._gender = State(initialValue: nil)
-                        print("  No saved gender found")
-                    }
-                    
-                    // DropdownARCField 데이터 매핑
-                    self._country = State(initialValue: arcData["nationality"] ?? "")
-                    self._region = State(initialValue: arcData["region"] ?? "California")
-                    self._residenceStatus = State(initialValue: arcData["residenceStatus"] ?? "Permanent Resident")
-                    
-                    // Visa 관련 필드 매핑
-                    if let visaType = arcData["visaType"] {
-                        self._visaType = State(initialValue: visaType)
-                        
-                        // Visa 카테고리 파싱
-                        if visaType.count >= 3 {
-                            self._residenceCategory1 = State(initialValue: String(visaType.prefix(1)))
-                            self._residenceCategory2 = State(initialValue: String(visaType.suffix(1)))
-                            print("  Setting visa categories: \(String(visaType.prefix(1)))-\(String(visaType.suffix(1)))")
-                        } else {
-                            self._residenceCategory1 = State(initialValue: "A")
-                            self._residenceCategory2 = State(initialValue: "1")
-                            print("  Using default visa categories: A-1")
-                        }
-                    }
-                    
-                    // 나머지 필드 매핑
-                    self._permitDate = State(initialValue: arcData["permitDate"] ?? "20220115")
-                    self._expirationDate = State(initialValue: arcData["expirationDate"] ?? "20320115")
-                    self._issueCity = State(initialValue: arcData["issueCity"] ?? "Los Angeles")
-                    self._reportDate = State(initialValue: arcData["reportDate"] ?? "20231012")
-                    self._residence = State(initialValue: arcData["residence"] ?? "1234 Elm St, Los Angeles, CA")
-                    
-                    print("✅ Successfully loaded and mapped saved ARC data to UI fields")
-                    
-                } catch {
-                    print("❌ Error loading saved ARC data: \(error)")
-                    initializeWithDefaults()
-                }
-            } else {
-                print("ℹ️ No saved data found, initializing with defaults")
-                initializeWithDefaults()
-            }
         }
     }
-    
-    private mutating func initializeWithDefaults() {
-        print("\n🔄 Initializing UI fields with default values")
-        // InputARCField 기본값
-        self._foreignRegistrationNumber = State(initialValue: "")
-        self._dateOfBirth = State(initialValue: "")
-        self._name = State(initialValue: "")
-        
-        // RadioARCButton 기본값
-        self._gender = State(initialValue: nil)
-        
-        // DropdownARCField 기본값
-        self._country = State(initialValue: "")
-        self._region = State(initialValue: "California")
-        self._residenceStatus = State(initialValue: "Permanent Resident")
-        
-        // Visa 관련 기본값
-        self._visaType = State(initialValue: "D-8")
-        self._residenceCategory1 = State(initialValue: "A")
-        self._residenceCategory2 = State(initialValue: "1")
-        
-        // 나머지 필드 기본값
-        self._permitDate = State(initialValue: "20220115")
-        self._expirationDate = State(initialValue: "20320115")
-        self._issueCity = State(initialValue: "Los Angeles")
-        self._reportDate = State(initialValue: "20231012")
-        self._residence = State(initialValue: "1234 Elm St, Los Angeles, CA")
-        
-        print("✅ Default initialization of UI fields completed")
-    }
-    
-    // Logger function
-    private func logStorageState() {
-        // Check arcDataSaved flag
-        let savedFlag = UserDefaults.standard.bool(forKey: "arcDataSaved")
-        print("Current arcDataSaved flag: \(savedFlag)")
-        
-        // Check saved ARC data
-        if let savedData = UserDefaults.standard.data(forKey: "SavedARCData") {
-            do {
-                let arcData = try JSONDecoder().decode([String: String].self, from: savedData)
-                print("📦 Saved ARC Data Contents:")
-                arcData.forEach { key, value in
-                    print("  \(key): \(value)")
-                }
-            } catch {
-                print("❌ Error decoding saved ARC data: \(error)")
-            }
-        } else {
-            print("❌ No saved ARC data found")
-        }
-    }
+  
     
     var body: some View {
         NavigationStack {
@@ -377,53 +354,44 @@ struct ScanARCView: View {
             .navigationBarBackButtonHidden(false)
             .onAppear {
                 print("📱 ScanARCView appeared")
-                logStorageState()
-                
-                // 저장된 데이터 로드 및 필드에 적용
-                if let savedData = UserDefaults.standard.data(forKey: "SavedARCData") {
-                    do {
-                        let arcData = try JSONDecoder().decode([String: String].self, from: savedData)
-                        print("📦 Loading saved data into fields:")
-                        
-                        // InputARCField 값 설정
-                        foreignRegistrationNumber = arcData["foreignRegistrationNumber"] ?? ""
-                        dateOfBirth = arcData["birthDate"] ?? ""
-                        name = arcData["name"] ?? ""
-                        
-                        // RadioARCButton 값 설정
-                        gender = arcData["gender"]
-                        
-                        // DropdownARCField 값 설정
-                        country = arcData["nationality"] ?? ""
-                        region = arcData["region"] ?? "California"
-                        residenceStatus = arcData["residenceStatus"] ?? "Permanent Resident"
-                        
-                        // Visa 관련 값 설정
-                        if let visaType = arcData["visaType"] {
-                            if visaType.count >= 3 {
-                                residenceCategory1 = String(visaType.prefix(1))
-                                residenceCategory2 = String(visaType.suffix(1))
-                            }
-                        }
-                        
-                        // 기타 필드 값 설정
-                        permitDate = arcData["permitDate"] ?? "20220115"
-                        expirationDate = arcData["expirationDate"] ?? "20320115"
-                        issueCity = arcData["issueCity"] ?? "Los Angeles"
-                        reportDate = arcData["reportDate"] ?? "20231012"
-                        residence = arcData["residence"] ?? "1234 Elm St, Los Angeles, CA"
-                        
-                        arcData.forEach { key, value in
-                            print("  \(key): \(value)")
-                        }
-                        print("✅ Fields populated with saved data")
-                    } catch {
-                        print("❌ Error loading saved data: \(error)")
-                    }
-                }
-                
-                fetchData()
+                loadSavedData()
             }
+            .overlay(Group {
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .background(Color.black.opacity(0.2))
+                }
+            })
+        }
+    }
+    private func loadSavedData() {
+        // 현재 로그인한 사용자의 토큰 확인
+        guard let currentUserToken = KeychainWrapper.standard.string(forKey: "accessToken"),
+              currentUserToken == accessToken else {
+            print("❌ User token mismatch or not available")
+            return
+        }
+
+        if let savedData = savedARCData,
+           let decodedResult = try? JSONDecoder().decode(ARCResult.self, from: savedData),
+           let data = decodedResult.data {
+            // 데이터 로드
+            foreignRegistrationNumber = data.foreignRegistrationNumber ?? ""
+            dateOfBirth = data.dateOfBirth ?? ""
+            gender = data.gender
+            name = data.name ?? ""
+            country = data.nationality ?? ""
+            
+            if let visaType = data.visaType, visaType.count >= 3 {
+                residenceCategory1 = String(visaType.prefix(1))
+                residenceCategory2 = String(visaType.suffix(1))
+                self.visaType = visaType
+            }
+            print("✅ Successfully loaded saved data")
+        } else {
+            print("❌ No saved data found or decoding failed")
+            setDefaultPlaceholders()
         }
     }
     
@@ -470,7 +438,7 @@ struct ScanARCView: View {
         performAPIRequest(endpoint: APIEndpoint.base, method: "POST", data: identityData) { success in
             print(success ? "✅ ARC identity created successfully" : "❌ Failed to create ARC identity")
             if success {
-                fetchData()
+                print( "✅ ARC identity 생성 API 완료")
             }
         }
     }
@@ -505,12 +473,10 @@ struct ScanARCView: View {
         performAPIRequest(endpoint: APIEndpoint.update, method: "POST", data: identityData) { success in
             print(success ? "✅ ARC identity updated successfully" : "❌ Failed to update ARC identity")
             if success {
-                fetchData()
+                print( "✅ ARC identity 업데이트 API 완료")
             }
         }
     }
-    
-    // fetchData 함수 수정
     private func fetchData() {
         guard let url = URL(string: APIEndpoint.base),
               let token = accessToken else {
@@ -530,17 +496,20 @@ struct ScanARCView: View {
                 
                 if let error = error {
                     print("❌ Error: \(error.localizedDescription)")
+                    self.setDefaultPlaceholders() // 에러 시 기본값 설정
                     return
                 }
                 
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
                     print("❌ Invalid response")
+                    self.setDefaultPlaceholders() // 잘못된 응답 시 기본값 설정
                     return
                 }
                 
                 guard let data = data else {
                     print("❌ No data received")
+                    self.setDefaultPlaceholders() // 데이터 없을 시 기본값 설정
                     return
                 }
                 
@@ -549,27 +518,33 @@ struct ScanARCView: View {
                     print("✅ Data fetched successfully:")
                     print(decodedData)
                     
-                    // UI 업데이트
-                    self.foreignRegistrationNumber = decodedData.foreignRegistrationNumber
-                    self.dateOfBirth = decodedData.birthDate
-                    self.gender = decodedData.gender
-                    self.name = decodedData.name
-                    self.country = decodedData.nationality
-                    self.region = decodedData.region
-                    self.residenceStatus = decodedData.residenceStatus
+                    // 서버에서 받은 데이터로 UI 업데이트
+                    // nil 또는 빈 문자열인 경우 빈 값으로 설정
+                    self.foreignRegistrationNumber = decodedData.foreignRegistrationNumber.isEmpty ? "" : decodedData.foreignRegistrationNumber
+                    self.dateOfBirth = decodedData.birthDate.isEmpty ? "" : decodedData.birthDate
+                    self.gender = decodedData.gender.isEmpty ? nil : decodedData.gender
+                    self.name = decodedData.name.isEmpty ? "" : decodedData.name
+                    self.country = decodedData.nationality.isEmpty ? "" : decodedData.nationality
+                    self.region = decodedData.region.isEmpty ? "" : decodedData.region
+                    self.residenceStatus = decodedData.residenceStatus.isEmpty ? "" : decodedData.residenceStatus
                     
                     // Visa 타입 파싱 및 설정
                     if decodedData.visaType.count >= 3 {
                         self.residenceCategory1 = String(decodedData.visaType.prefix(1))
                         self.residenceCategory2 = String(decodedData.visaType.suffix(1))
+                    } else {
+                        // 기본값 설정
+                        self.residenceCategory1 = "D"
+                        self.residenceCategory2 = "8"
                     }
-                    self.visaType = decodedData.visaType
+                    self.visaType = decodedData.visaType.isEmpty ? "D-8" : decodedData.visaType
                     
-                    self.permitDate = decodedData.permitDate
-                    self.expirationDate = decodedData.expirationDate
-                    self.issueCity = decodedData.issueCity
-                    self.reportDate = decodedData.reportDate
-                    self.residence = decodedData.residence
+                    // 나머지 필드 설정
+                    self.permitDate = decodedData.permitDate.isEmpty ? "20220115" : decodedData.permitDate
+                    self.expirationDate = decodedData.expirationDate.isEmpty ? "20320115" : decodedData.expirationDate
+                    self.issueCity = decodedData.issueCity.isEmpty ? "Los Angeles" : decodedData.issueCity
+                    self.reportDate = decodedData.reportDate.isEmpty ? "20231012" : decodedData.reportDate
+                    self.residence = decodedData.residence.isEmpty ? "1234 Elm St, Los Angeles, CA" : decodedData.residence
                     
                     // 데이터 저장
                     self.saveARCData()
@@ -577,9 +552,33 @@ struct ScanARCView: View {
                     print("✅ View updated with fetched data")
                 } catch {
                     print("❌ Decoding error: \(error)")
+                    self.setDefaultPlaceholders() // 디코딩 에러 시 기본값 설정
                 }
             }
         }.resume()
+    }
+
+    // 기본값 설정을 위한 헬퍼 함수
+    private func setDefaultPlaceholders() {
+        print("📝 Setting default placeholders")
+        // 필수 필드는 빈 값으로 설정 (사용자가 입력하도록)
+        foreignRegistrationNumber = ""  // placeholder: "Z123456789"
+        dateOfBirth = ""              // placeholder: "19870201"
+        gender = nil                   // placeholder: 선택 없음
+        name = ""                      // placeholder: "TANAKA"
+        country = ""                   // placeholder: 국가 선택
+        
+        // 나머지 필드는 기본값 설정
+        region = "California"
+        residenceStatus = "Permanent Resident"
+        residenceCategory1 = "D"
+        residenceCategory2 = "8"
+        visaType = "D-8"
+        permitDate = "20220115"
+        expirationDate = "20320115"
+        issueCity = "Los Angeles"
+        reportDate = "20231012"
+        residence = "1234 Elm St, Los Angeles, CA"
     }
     private func performAPIRequest<T: Encodable>(endpoint: String, method: String, data: T, completion: @escaping (Bool) -> Void) {
             guard let url = URL(string: endpoint),
@@ -630,46 +629,63 @@ struct ScanARCView: View {
         }
         
     private func handleNextButton() {
-        print("\n🔄 Handle Next Button pressed")
-        print("Current arcDataSaved state: \(arcDataSaved)")
-        
         if validateFields() {
-            print("✅ Fields validation passed")
             
-            if UserDefaults.standard.data(forKey: "SavedARCData") != nil {
-                print("📤 Updating existing ARC data...")
+            if UserDefaults.standard.data(forKey: "SavedPassportData") != nil {
+                print("📤 Updating existing ARCIdentity data...")
                 updateARCIdentity()
             } else {
-                print("📥 Creating new ARC data...")
+                print("📥 Creating new ARCIdentity data...")
                 createARCIdentity()
             }
             
-            print("📝 Saving ARC data and navigating to PassportView...")
-            saveARCData()
+            
+            
+            let identityData = ARCIdentityData(
+                foreignRegistrationNumber: foreignRegistrationNumber,
+                birthDate: dateOfBirth,
+                gender: gender ?? "",
+                name: name,
+                nationality: country,
+                region: region,
+                residenceStatus: residenceStatus,
+                visaType: visaType,
+                permitDate: permitDate,
+                expirationDate: expirationDate,
+                issueCity: issueCity,
+                reportDate: reportDate,
+                residence: residence
+            )
+            
+            // Save to UserDefaults
+            let result = ARCResult(
+                status: 200,
+                message: "Success",
+                data: ARCData(
+                    foreignRegistrationNumber: foreignRegistrationNumber,
+                    dateOfBirth: dateOfBirth,
+                    gender: gender,
+                    name: name,
+                    nationality: country,
+                    issueCountry: nil,
+                    visaType: visaType,
+                    permitDate: permitDate,
+                    expirationDate: expirationDate,
+                    residence: residence
+                )
+            )
+            
+            if let encoded = try? JSONEncoder().encode(result) {
+                savedARCData = encoded
+                arcDataSaved = true
+            }
+            
             navigateToPassportView = true
         } else {
-            print("❌ Fields validation failed")
-            errorMessage = "Please fill in all required fields."
             showError = true
-            
-            // Log which fields are missing
-            print("\nMissing required fields:")
-            if foreignRegistrationNumber.isEmpty { print("- Foreign Registration Number") }
-            if dateOfBirth.isEmpty { print("- Date of Birth") }
-            if gender == nil { print("- Gender") }
-            if name.isEmpty { print("- Name") }
-            if country.isEmpty { print("- Country") }
-            
-            // Log current field values
-            print("\nCurrent field values:")
-            print("- Foreign Registration Number: \(foreignRegistrationNumber.isEmpty ? "Empty" : foreignRegistrationNumber)")
-            print("- Date of Birth: \(dateOfBirth.isEmpty ? "Empty" : dateOfBirth)")
-            print("- Gender: \(gender ?? "Not selected")")
-            print("- Name: \(name.isEmpty ? "Empty" : name)")
-            print("- Country: \(country.isEmpty ? "Empty" : country)")
+            errorMessage = "Please fill in all required fields."
         }
     }
-        
         private func validateFields() -> Bool {
             let isValid = !foreignRegistrationNumber.isEmpty &&
             !dateOfBirth.isEmpty &&
@@ -718,7 +734,6 @@ struct ScanARCView: View {
                 UserDefaults.standard.set(encodedData, forKey: "SavedARCData")
                 arcDataSaved = true
                 print("✅ ARC data saved successfully")
-                logStorageState() // Log the state after saving
             } catch {
                 print("❌ Failed to encode ARC data: \(error.localizedDescription)")
             }

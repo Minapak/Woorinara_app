@@ -2,101 +2,137 @@ import SwiftUI
 import AVFoundation
 import SwiftKeychainWrapper
 
-// Camera Capture Component
+// MARK: - 카메라 캡처 컴포넌트
+/// SwiftUI에서 카메라 기능을 사용하기 위한 UIImagePickerController 래퍼
 struct CameraCaptureARCView: UIViewControllerRepresentable {
-    @Binding var capturedImage: UIImage?
-    @Binding var isPresented: Bool
-
+    @Binding var capturedImage: UIImage?  // 촬영된 이미지를 저장
+    @Binding var isPresented: Bool        // 카메라 뷰 표시 여부 제어
+    
+    // UIImagePickerController 생성 및 설정
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = .camera
+        picker.sourceType = .camera  // 카메라 모드로 설정
         picker.delegate = context.coordinator
         return picker
     }
-
+    
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
+    
+    // 카메라 작업을 처리하는 코디네이터 클래스
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
         let parent: CameraCaptureARCView
-
+        
         init(_ parent: CameraCaptureARCView) {
             self.parent = parent
         }
-
+        
+        // 이미지 촬영 완료 시 처리
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             if let image = info[.originalImage] as? UIImage {
                 parent.capturedImage = image
             }
             parent.isPresented = false
         }
-
+        
+        // 촬영 취소 시 처리
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.isPresented = false
         }
     }
 }
 
-struct OCRARCResult: Codable {
-    var status: Int
-    var message: String
-    var data: OCRARCData?
+// MARK: - 데이터 모델
+
+/// 네이버 OCR API 응답 모델
+struct OCRNaverResponse: Codable {
+    let status: Int          // 응답 상태 코드
+    let message: String      // 응답 메시지
+    let data: OCRNaverData?  // OCR 결과 데이터
 }
 
-struct OCRARCData: Codable {
-    var foreignRegistrationNumber: String?
-    var dateOfBirth: String?
-    var gender: String?
-    var name: String?
-    var nationality: String?
-    var issueCountry: String?
-    var visaType: String?
-    var permitDate: String?
-    var expirationDate: String?
-    var residence: String?
+/// OCR로 추출된 외국인등록증 데이터 모델
+struct OCRNaverData: Codable {
+    let inferResult: String?   // OCR 추론 결과
+    let gender: String?        // 성별
+    let nationality: String?   // 국적
+    let dateOfBirth: String?   // 생년월일
+    let visa: String?          // 비자 종류
+    let name: String?          // 이름
+    let message: String?       // 추가 메시지
+    let alienRegNum: String?   // 외국인등록번호
+    let foreignRegistrationNumber: String? // 추가 필드
+    let userId: String? = KeychainWrapper.standard.string(forKey: "username") ?? ""        // 사용자 ID
     
-    init() {
-        self.foreignRegistrationNumber = nil
-        self.dateOfBirth = nil
-        self.gender = nil
-        self.name = nil
-        self.nationality = nil
-        self.issueCountry = nil
-        self.visaType = nil
-        self.permitDate = nil
-        self.expirationDate = nil
-        self.residence = nil
-    }
-    
-    init(
-        foreignRegistrationNumber: String? = nil,
-        dateOfBirth: String? = nil,
-        gender: String? = nil,
-        name: String? = nil,
-        nationality: String? = nil,
-        issueCountry: String? = nil,
-        visaType: String? = nil,
-        permitDate: String? = nil,
-        expirationDate: String? = nil,
-        residence: String? = nil
-    ) {
-        self.foreignRegistrationNumber = foreignRegistrationNumber
-        self.dateOfBirth = dateOfBirth
-        self.gender = gender
-        self.name = name
-        self.nationality = nationality
-        self.issueCountry = issueCountry
-        self.visaType = visaType
-        self.permitDate = permitDate
-        self.expirationDate = expirationDate
-        self.residence = residence
-    }
-    
+    // JSON 매핑을 위한 코딩키
     enum CodingKeys: String, CodingKey {
-        case foreignRegistrationNumber = "alienRegNum"
+        case inferResult
+        case gender
+        case nationality
+        case dateOfBirth = "date_of_birth"
+        case visa
+        case name
+        case message
+        case alienRegNum
+        case foreignRegistrationNumber
+        case userId
+    }
+}
+
+// MARK: - 모델 확장
+
+/// OCRNaverResponse를 ARCResult로 변환하는 확장
+extension OCRNaverResponse {
+    func toARCResult() -> ARCResult {
+        return ARCResult(
+            status: self.status,
+            message: self.message,
+            data: ARCData(
+                foreignRegistrationNumber: self.data?.foreignRegistrationNumber,
+                dateOfBirth: self.data?.dateOfBirth,
+                gender: self.data?.gender,
+                name: self.data?.name,
+                nationality: self.data?.nationality,
+                issueCountry: nil,
+                visaType: self.data?.visa,
+                permitDate: nil,
+                expirationDate: nil,
+                residence: nil
+            )
+        )
+    }
+}
+
+/// 외국인등록증 데이터 표준 결과 구조체
+struct ARCResult: Codable {
+    var status: Int
+    var message: String
+    var data: ARCData?
+}
+
+/// 외국인등록증 정보 데이터 모델
+struct ARCData: Codable {
+    // 필수 정보
+    var foreignRegistrationNumber: String? // 외국인등록번호
+    var dateOfBirth: String?              // 생년월일
+    var gender: String?                   // 성별
+    var name: String?                     // 이름
+    var nationality: String?              // 국적
+    
+    // 추가 정보
+    var issueCountry: String?             // 발급 국가
+    var visaType: String?                 // 비자 종류
+    var permitDate: String?               // 허가일자
+    var expirationDate: String?           // 만료일자
+    var residence: String?                // 거주지
+    
+    
+    // JSON 매핑을 위한 코딩키
+    enum CodingKeys: String, CodingKey {
+        case foreignRegistrationNumber
         case dateOfBirth
         case gender
         case name
@@ -109,35 +145,43 @@ struct OCRARCData: Codable {
     }
 }
 
-// Main View for ARC Scanning
+// MARK: - 메인 뷰
+/// 외국인등록증 스캐닝 메인 뷰
 struct ScanPreARCView: View {
+    // MARK: 환경 및 상태 변수
     @Environment(\.presentationMode) var presentationMode
-    @State private var navigateToResultView = false
-    @State private var navigateToContentView = false // For navigating back to ContentView
-    @State private var capturedImage: UIImage?
-    @State private var isCameraPresented = false
-    @State private var ocrARCResult: OCRARCResult?
-    @State private var isLoading = false
-    @State private var showErrorAlert = false
-    @State private var errorMessage = ""
+    @State private var navigateToResultView = false  // 결과 뷰로 이동 제어
+    @State private var navigateToContentView = false // 콘텐츠 뷰로 이동 제어
+    @State private var capturedImage: UIImage?      // 촬영된 이미지
+    @State private var isCameraPresented = false    // 카메라 표시 여부
+    @State private var arcResult: ARCResult?        // OCR 결과
+    @State private var isLoading = false            // 로딩 표시
+    @State private var showErrorAlert = false       // 에러 알림 표시
+    @State private var errorMessage = ""            // 에러 메시지
     @State private var authToken: String = KeychainWrapper.standard.string(forKey: "accessToken") ?? "DefaultAccessToken"
-    @State private var showScanAlert = false // 추가
-    @State private var scanAlertMessage = "" // 추가
-    @State private var isManualInput = false
-    @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
+    @State private var userId: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
+    @State private var showScanAlert = false        // 스캔 상태 알림
+    @State private var scanAlertMessage = ""        // 스캔 상태 메시지
+    @State private var isManualInput = false        // 수동 입력 모드
+    @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false // ARC 데이터 저장 상태
+    @AppStorage("SavedarcData") private var savedARCData: Data?
     var body: some View {
         NavigationStack {
             ZStack {
+                // 배경
                 Color.black.opacity(0.6).ignoresSafeArea()
-
+                
+                // 메인 컨텐츠
                 VStack(spacing: 10) {
+                    // 안내 메시지
                     Spacer().frame(height: 10)
                     Text("Place your ARC within\nthe frame and tap the capture\nbutton to scan.")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
-
+                    
+                    // 이미지 프리뷰
                     ZStack {
                         if let image = capturedImage {
                             Image(uiImage: image)
@@ -145,7 +189,6 @@ struct ScanPreARCView: View {
                                 .scaledToFit()
                                 .frame(width: 580, height: 380)
                                 .cornerRadius(10)
-                             
                         } else {
                             Color.gray.opacity(0.1)
                                 .frame(width: 580, height: 380)
@@ -153,15 +196,15 @@ struct ScanPreARCView: View {
                         }
                     }
                     
-                    HStack(spacing:30) {
+                    // 액션 버튼
+                    HStack(spacing: 30) {
+                        // 스캔 버튼
                         Button(action: {
                             if let image = capturedImage {
-                                showScanAlert = true
-                                scanAlertMessage = "ARC scan completed successfully!"
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                     arcDataSaved = true
+                                    captureAndSendImage(image)
                                     navigateToResultView = true
-                                }
+                                
                             } else {
                                 showScanAlert = true
                                 scanAlertMessage = "Please capture an image first"
@@ -173,6 +216,8 @@ struct ScanPreARCView: View {
                                 .frame(width: 100, height: 44)
                                 .background(Capsule().fill(Color.blue))
                         }
+                        
+                        // 재촬영 버튼
                         Button(action: {
                             capturedImage = nil
                             isCameraPresented = true
@@ -185,10 +230,11 @@ struct ScanPreARCView: View {
                         }
                     }.padding(.bottom, 10)
                     
+                    // 수동 입력 버튼
                     Button(action: {
                         isManualInput = true
                     }) {
-                        VStack(spacing: 4) { // Adjust spacing if needed
+                        VStack(spacing: 4) {
                             Text("Manual input")
                                 .font(.system(size: 16, weight: .regular))
                                 .foregroundColor(.white)
@@ -196,24 +242,23 @@ struct ScanPreARCView: View {
                                 .background(
                                     GeometryReader { geometry in
                                         Rectangle()
-                                            .frame(width: geometry.size.width, height: 1) // Match width of the text
+                                            .frame(width: geometry.size.width, height: 1)
                                             .foregroundColor(.white)
-                                            .offset(y: 24) // Position the line just below the text
+                                            .offset(y: 24)
                                     }
                                 )
                         }
-                        .fixedSize(horizontal: true, vertical: false) // Prevents VStack from expanding
+                        .fixedSize(horizontal: true, vertical: false)
                     }
-
-                    
-            
                 }
                 
+                // 로딩 인디케이터
                 if isLoading {
                     Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
                     ProgressView().scaleEffect(2)
                 }
             }
+            // 뷰 설정
             .onAppear {
                 isCameraPresented = true
             }
@@ -225,9 +270,11 @@ struct ScanPreARCView: View {
                     .foregroundColor(.white)
                     .imageScale(.large)
             })
+            // 카메라 시트
             .sheet(isPresented: $isCameraPresented) {
                 CameraCaptureARCView(capturedImage: $capturedImage, isPresented: $isCameraPresented)
             }
+            // 알림 설정
             .alert(isPresented: $showErrorAlert) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
@@ -238,40 +285,31 @@ struct ScanPreARCView: View {
                     dismissButton: .default(Text("OK"))
                 )
             }
-            // OCR 결과가 있는 경우의 NavigationLink
-              NavigationLink(
-                  destination: ScanARCView(result: OCRARCResult(
-                      status: ocrARCResult?.status ?? 0,
-                      message: ocrARCResult?.message ?? "",
-                      data: OCRARCData(
-                          foreignRegistrationNumber: ocrARCResult?.data?.foreignRegistrationNumber,
-                          dateOfBirth: ocrARCResult?.data?.dateOfBirth,
-                          gender: ocrARCResult?.data?.gender,
-                          name: ocrARCResult?.data?.name,
-                          nationality: ocrARCResult?.data?.nationality,
-                          issueCountry: ocrARCResult?.data?.issueCountry,
-                          visaType: ocrARCResult?.data?.visaType,
-                          permitDate: ocrARCResult?.data?.permitDate,
-                          expirationDate: ocrARCResult?.data?.expirationDate,
-                          residence: ocrARCResult?.data?.residence
-                      )
-                  )),
-                  isActive: $navigateToResultView
-              ) {
-                  EmptyView()
-              }
+            
+           
+            // 네비게이션 링크
+            NavigationLink(
+                destination: ScanARCView(result: arcResult ?? ARCResult(
+                    status: 0,
+                    message: "",
+                    data: ARCData()
+                )),
+                isActive: $navigateToResultView
+            ) {
+                EmptyView()
+            }
             
             NavigationLink(
-                     destination: ScanARCView(result: OCRARCResult(
-                         status: 0,
-                         message: "",
-                         data: OCRARCData()
-                     )),
-                     isActive: $isManualInput
-                 ) {
-                     EmptyView()
-                 }
-
+                destination: ScanARCView(result: ARCResult(
+                    status: 0,
+                    message: "",
+                    data: ARCData()
+                )),
+                isActive: $isManualInput
+            ) {
+                EmptyView()
+            }
+            
             NavigationLink(
                 destination: ContentView(),
                 isActive: $navigateToContentView
@@ -280,20 +318,24 @@ struct ScanPreARCView: View {
             }
         }
     }
-
+    
+    // MARK: - 네트워크 함수
+    /// 이미지 캡처 및 OCR API 요청 처리
     private func captureAndSendImage(_ image: UIImage) {
+        // 이미지 데이터 변환
         guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
         
-        print("🔄 Starting image capture and OCR process...")
-        
+        // API 요청 설정
         let url = URL(string: "http://43.203.237.202:18080/api/v1/naver-ocr")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         
+        // multipart/form-data 바디 생성
         let boundary = UUID().uuidString
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
+        // 요청 바디 구성
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
@@ -307,64 +349,65 @@ struct ScanPreARCView: View {
         
         request.httpBody = body
         
-        print("📤 Sending OCR request...")
+        print("📤 OCR 요청 전송 중...")
         isLoading = true
         
+        // API 요청 실행
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 self.isLoading = false
             }
             
+            // 에러 처리
             if let error = error {
-                print("❌ Network error: \(error.localizedDescription)")
+                print("❌ 네트워크 에러: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self.errorMessage = "Network error: \(error.localizedDescription)"
+                    self.errorMessage = "네트워크 에러: \(error.localizedDescription)"
                     self.showErrorAlert = true
                 }
                 return
             }
             
+            // 데이터 확인
             guard let data = data else {
-                print("❌ No data received from server")
+                print("❌ 서버로부터 데이터를 받지 못함")
                 DispatchQueue.main.async {
-                    self.errorMessage = "No data received from server."
+                    self.errorMessage = "서버로부터 데이터를 받지 못했습니다."
                     self.showErrorAlert = true
                 }
                 return
             }
             
             do {
-                let result = try JSONDecoder().decode(OCRARCResult.self, from: data)
-                print("✅ OCR Response received:")
-                print("Status: \(result.status)")
-                print("Message: \(result.message)")
-                if let ocrData = result.data {
-                    print("Data received:")
-                    print("  Name: \(ocrData.name ?? "nil")")
-                    print("  Registration Number: \(ocrData.foreignRegistrationNumber ?? "nil")")
-                    print("  Date of Birth: \(ocrData.dateOfBirth ?? "nil")")
-                    print("  Gender: \(ocrData.gender ?? "nil")")
-                    print("  Nationality: \(ocrData.nationality ?? "nil")")
-                    print("  Visa Type: \(ocrData.visaType ?? "nil")")
-                }
+                // OCR 응답 디코딩 및 변환
+                let ocrResponse = try JSONDecoder().decode(OCRNaverResponse.self, from: data)
+                let result = ocrResponse.toARCResult()
                 
-                DispatchQueue.main.async {
-                    if result.status == 200, result.data != nil {
-                        print("✅ Valid OCR data received, navigating to result view")
-                        self.ocrARCResult = result
+                print("✅ OCR 응답 수신:")
+                print("상태: \(result.status)")
+                print("메시지: \(result.message)")
+                
+                // 결과 처리
+         
+                    if result.status == 200 {
+                        print("✅ 유효한 OCR 데이터 수신, 결과 뷰로 이동")
+                        if let encoded = try? JSONEncoder().encode(result) {
+                                                   savedARCData = encoded
+                                               }
+                        self.arcResult = result
+                        self.arcDataSaved = true
                         self.navigateToResultView = true
                     } else {
-                        print("❌ Invalid OCR data received")
-                        self.errorMessage = "No valid OCR data received."
+                        print("❌ 유효하지 않은 OCR 데이터")
+                        self.errorMessage = "유효한 OCR 데이터를 받지 못했습니다."
                         self.showErrorAlert = true
                     }
-                }
+                
             } catch {
-                print("❌ Decoding error: \(error)")
-                DispatchQueue.main.async {
-                    self.errorMessage = "Failed to decode response: \(error)"
+                print("❌ 디코딩 에러: \(error)")
+                    self.errorMessage = "응답 디코딩 실패: \(error)"
                     self.showErrorAlert = true
-                }
+                
             }
         }.resume()
     }

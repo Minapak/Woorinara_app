@@ -36,7 +36,7 @@ enum TabType: Int, CaseIterable {
             return TabItemData(
                 id: 1,
                 image: "globe",
-                selectedImage: "globe.fill",
+                selectedImage: "globe",
                 title: "Translation",
                 isSystemImage: true
             )
@@ -72,7 +72,6 @@ struct CustomTabView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Divider()
             HStack(spacing: 0) {
                 ForEach(tabs) { tab in
                     Button(action: {
@@ -145,7 +144,6 @@ struct TabBottomView: View {
 //        .padding(.top, 7)
     }
 }
-// TabItemView 업데이트
 struct TabItemView: View {
     let data: TabItemData
     let isSelected: Bool
@@ -156,14 +154,12 @@ struct TabItemView: View {
     var body: some View {
         VStack(spacing: 3) {
             if data.isSystemImage {
-                // SF Symbol 이미지
                 Image(systemName: isSelected ? data.selectedImage : data.image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 24, height: 24)
                     .foregroundColor(isSelected ? Color.blue : Color.gray)
             } else {
-                // 일반 이미지
                 Image(isSelected ? data.selectedImage : data.image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)

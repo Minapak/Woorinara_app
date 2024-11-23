@@ -102,49 +102,49 @@ struct MyPageView: View {
                         
                             Divider()
                             // My Document Folder Section
-                            VStack(alignment: .leading, spacing: 20) {
-                                Text("Test")
-                                    .font(.headline)
+//                            VStack(alignment: .leading, spacing: 20) {
+//                                Text("Test")
+//                                    .font(.headline)
+//                                
+//                            
+//                                NavigationLink(destination: ARCInfoView()) {
+//                                    HStack {
+//                                        Text("ARC(최초로그인)")
+//                                            .foregroundColor(.black.opacity(0.5))
+//                                        Spacer()
+//                                        Image(systemName: "chevron.right")
+//                                            .foregroundColor(.gray)
+//                                    }
+//                                }
+//                                NavigationLink(destination: PassportInfoView()) {
+//                                    HStack {
+//                                        Text("Passport")
+//                                            .foregroundColor(.black.opacity(0.5))
+//                                        Spacer()
+//                                        Image(systemName: "chevron.right")
+//                                            .foregroundColor(.gray)
+//                                    }
+//                                }
+//                                NavigationLink(destination: MyInfoView()) {
+//                                    HStack {
+//                                        Text("MyInfo")
+//                                            .foregroundColor(.black.opacity(0.5))
+//                                        Spacer()
+//                                        Image(systemName: "chevron.right")
+//                                            .foregroundColor(.gray)
+//                                    }
+//                                }
+//                                NavigationLink(destination: AFAutoView()) {
+//                                    HStack {
+//                                        Text("통합 신청서 완성")
+//                                            .foregroundColor(.black.opacity(0.5))
+//                                        Spacer()
+//                                        Image(systemName: "chevron.right")
+//                                            .foregroundColor(.gray)
+//                                    }
+//                                }
                                 
-                            
-                                NavigationLink(destination: ARCInfoView()) {
-                                    HStack {
-                                        Text("ARC(최초로그인)")
-                                            .foregroundColor(.black.opacity(0.5))
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                NavigationLink(destination: PassportInfoView()) {
-                                    HStack {
-                                        Text("Passport")
-                                            .foregroundColor(.black.opacity(0.5))
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                NavigationLink(destination: MyInfoView()) {
-                                    HStack {
-                                        Text("MyInfo")
-                                            .foregroundColor(.black.opacity(0.5))
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                NavigationLink(destination: AFAutoView()) {
-                                    HStack {
-                                        Text("통합 신청서 완성")
-                                            .foregroundColor(.black.opacity(0.5))
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                                
-                            }
+ //                           }
                             .padding(.horizontal)
                         }
                         .padding(.top, 10)

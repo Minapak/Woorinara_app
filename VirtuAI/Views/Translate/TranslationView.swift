@@ -44,7 +44,7 @@ struct TranslationView: View {
                                .foregroundColor(.gray)
                        }
 
-                       Spacer()
+                      // Spacer()
 
                        Image("af")
                            .resizable()
@@ -90,7 +90,7 @@ struct TranslationView: View {
                    }
                }
                .navigationDestination(isPresented: $navigateToTranslateView) {
-                            TranslateView()
+                   ScanARCView()
                         }
                   
             .navigationDestination(isPresented: $navigateToScanARCView) {

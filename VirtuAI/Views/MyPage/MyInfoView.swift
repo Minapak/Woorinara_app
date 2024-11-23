@@ -155,7 +155,7 @@ struct MyInfoView: View {
     @State private var errorMessage: String = ""
     // Update API endpoint
     let endpoint = "http://43.203.237.202:18080/api/v1/members/details/update"
-
+    
     // MARK: - Body
     var body: some View {
         NavigationStack {
@@ -164,11 +164,11 @@ struct MyInfoView: View {
                     Text("My Information")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
-
+                    
                     Text("Please provide any information that cannot be determined from the ID.")
                         .font(.system(size: 18))
                         .foregroundColor(.gray)
-
+                    
                     VStack(alignment: .leading) {
                         SectionInfoView(
                             title: "Address in Korea",
@@ -277,7 +277,7 @@ struct MyInfoView: View {
                             placeholder: "KOOKMIN, 123456-12-34566",
                             isRequired: true
                         )
-
+                        
                         VStack(alignment: .leading) {
                             Text("Enter Signature")
                                 .font(.headline)
@@ -300,9 +300,9 @@ struct MyInfoView: View {
                             }
                         }
                     }
-
+                    
                     Spacer()
-
+                    
                     HStack {
                         Button("Retry") {
                             resetFields()
@@ -310,7 +310,7 @@ struct MyInfoView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue, lineWidth: 2))
-
+                        
                         Button("Done") {
                             handleDoneButton()                        }
                         .frame(maxWidth: .infinity)
@@ -330,45 +330,9 @@ struct MyInfoView: View {
                 }
             }
             .onAppear {
-                 print("\n📱 MyInfoView appeared")
-                 logStorageState()
-
-                 // 저장된 데이터 로드 및 필드에 적용
-                 if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
-                     do {
-                         let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
-                         print("\n📦 Loading saved data into fields:")
-
-                         // InputARCField 값 설정
-                         koreaAddress = myInfoData["koreaAddress"] ?? ""
-                         telephoneNumber = myInfoData["telephoneNumber"] ?? ""
-                         phoneNumber = myInfoData["phoneNumber"] ?? ""
-                         homelandAddress = myInfoData["homelandAddress"] ?? ""
-                         homelandPhoneNumber = myInfoData["homelandPhoneNumber"] ?? ""
-                         schoolStatus = myInfoData["schoolStatus"] ?? ""
-                         schoolName = myInfoData["schoolName"] ?? ""
-                         schoolPhoneNumber = myInfoData["schoolPhoneNumber"] ?? ""
-                         schoolType = myInfoData["schoolType"] ?? ""
-                         originalWorkplaceName = myInfoData["originalWorkplaceName"] ?? ""
-                         originalWorkplaceRegistrationNumber = myInfoData["originalWorkplaceRegistrationNumber"] ?? ""
-                         originalWorkplacePhoneNumber = myInfoData["originalWorkplacePhoneNumber"] ?? ""
-                         futureWorkplaceName = myInfoData["futureWorkplaceName"] ?? ""
-                         futureWorkplacePhoneNumber = myInfoData["futureWorkplacePhoneNumber"] ?? ""
-                         incomeAmount = Int(myInfoData["incomeAmount"] ?? "0") ?? 0
-                         job = myInfoData["job"] ?? ""
-                         refundAccountNumber = myInfoData["refundAccountNumber"] ?? ""
-
-                         myInfoData.forEach { key, value in
-                             print("  \(key): \(value)")
-                         }
-                         print("✅ Fields populated with saved data")
-                     } catch {
-                         print("❌ Error loading saved data: \(error)")
-                     }
-                 }
-
-                 fetchData()
-             }
+                print("\n📱 MyInfoView appeared")
+                verifyUserAndLoadData()
+            }
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
             }
@@ -377,40 +341,216 @@ struct MyInfoView: View {
             }
         }
     }
-    // MARK: - Data Operations
     private func handleDoneButton() {
         if validateFields() {
             print("✅ Fields validation passed")
-            updateMyInfo()
+            
             saveData()
+            if UserDefaults.standard.data(forKey: "SavedmyInfoData") != nil {
+                print("📤 Updating existing MyInfo data...")
+                updateMyInfo()
+            } else {
+                print("📥 Creating new MyInfo data...")
+                createMyInfo()
+            }
+            
+            let myInfoData = MyInfoData(dictionary: [
+                "phoneNumber": phoneNumber,
+                "annualIncome": incomeAmount,
+                "workplaceName": originalWorkplaceName,
+                "workplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+                "workplacePhoneNumber": originalWorkplacePhoneNumber,
+                "futureWorkplaceName": futureWorkplaceName,
+                "futureWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+                "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+                "profileImageUrl": profileImageUrl as Any,
+                "signatureUrl": signatureUrl as Any,
+                "koreaAddress": koreaAddress,
+                "telephoneNumber": telephoneNumber,
+                "homelandAddress": homelandAddress,
+                "homelandPhoneNumber": homelandPhoneNumber,
+                "schoolStatus": schoolStatus,
+                "schoolName": schoolName,
+                "schoolPhoneNumber": schoolPhoneNumber,
+                "schoolType": schoolType,
+                "originalWorkplaceName": originalWorkplaceName,
+                "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+                "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
+                "incomeAmount": String(incomeAmount),
+                "job": job,
+                "refundAccountNumber": refundAccountNumber
+            ])
+            
+            // Save to UserDefaults
+            if let encoded = try? JSONEncoder().encode(myInfoData) {
+                UserDefaults.standard.set(encoded, forKey: "SavedmyInfoData")
+                myInfoDataSaved = true
+                print("✅ MyInfo data saved successfully")
+            }
+            
             showContentView = true
         } else {
             print("❌ Fields validation failed")
             errorMessage = "Please fill in all required fields."
             showAlert = true
-            // 누락된 필드 로그 출력
         }
+    }
+    
+    
+    // MARK: - User Verification and Data Loading
+    private func verifyUserAndLoadData() {
+        print("\n🔐 Verifying user credentials...")
+        
+        guard let savedUsername = KeychainWrapper.standard.string(forKey: "username") else {
+            print("❌ No username found in Keychain")
+            alertMessage = "User verification failed. Please login again."
+            showAlert = true
+            return
+        }
+        
+        print("📝 Current username: \(savedUsername)")
+        
+        if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
+            do {
+                let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
+                print("✅ Found saved data for user")
+                
+                // UI 업데이트
+                DispatchQueue.main.async {
+                    updateUIWithData(myInfoData)
+                }
+                
+            } catch {
+                print("❌ Error decoding saved data: \(error)")
+                alertMessage = "Error loading saved data"
+                showAlert = true
+            }
+        } else {
+            
+            
+        }
+    }
+    
+    // createMyInfo 함수 추가
+    private func createMyInfo() {
+        guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ Access token not available")
+            alertMessage = "Access token not available"
+            showAlert = true
+            return
+        }
+        
+        let myInfoDict: [String: Any] = [
+            "phoneNumber": phoneNumber,
+            "annualIncome": incomeAmount,
+            "workplaceName": originalWorkplaceName,
+            "workplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "workplacePhoneNumber": originalWorkplacePhoneNumber,
+            "futureWorkplaceName": futureWorkplaceName,
+            "futureWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+            "profileImageUrl": profileImageUrl as Any,
+            "signatureUrl": signatureUrl as Any,
+            "koreaAddress": koreaAddress,
+            "telephoneNumber": telephoneNumber,
+            "homelandAddress": homelandAddress,
+            "homelandPhoneNumber": homelandPhoneNumber,
+            "schoolStatus": schoolStatus,
+            "schoolName": schoolName,
+            "schoolPhoneNumber": schoolPhoneNumber,
+            "schoolType": schoolType,
+            "originalWorkplaceName": originalWorkplaceName,
+            "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
+            "incomeAmount": String(incomeAmount),
+            "job": job,
+            "refundAccountNumber": refundAccountNumber
+        ]
+        
+        print("\n📤 Creating MyInfo with data:")
+        myInfoDict.forEach { key, value in
+            print("  \(key): \(value)")
+        }
+        
+        let url = URL(string: "http://43.203.237.202:18080/api/v1/members/details")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: myInfoDict)
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("❌ Error creating MyInfo: \(error.localizedDescription)")
+                        self.alertMessage = "Error creating MyInfo: \(error.localizedDescription)"
+                        self.showAlert = true
+                        return
+                    }
+                    
+                    if let httpResponse = response as? HTTPURLResponse,
+                       (200...299).contains(httpResponse.statusCode) {
+                        print("✅ MyInfo created successfully")
+                        self.saveData()
+                        self.showContentView = true
+                    } else {
+                        print("❌ Failed to create MyInfo")
+                        self.alertMessage = "Failed to create MyInfo"
+                        self.showAlert = true
+                    }
+                }
+            }.resume()
+            
+        } catch {
+            print("❌ Error encoding data: \(error.localizedDescription)")
+            alertMessage = "Error encoding data"
+            showAlert = true
+        }
+    }
+    // UI 업데이트 함수
+    private func updateUIWithData(_ data: [String: String]) {
+        koreaAddress = data["koreaAddress"] ?? ""
+        telephoneNumber = data["telephoneNumber"] ?? ""
+        phoneNumber = data["phoneNumber"] ?? ""
+        homelandAddress = data["homelandAddress"] ?? ""
+        homelandPhoneNumber = data["homelandPhoneNumber"] ?? ""
+        schoolStatus = data["schoolStatus"] ?? ""
+        schoolName = data["schoolName"] ?? ""
+        schoolPhoneNumber = data["schoolPhoneNumber"] ?? ""
+        schoolType = data["schoolType"] ?? ""
+        originalWorkplaceName = data["originalWorkplaceName"] ?? ""
+        originalWorkplaceRegistrationNumber = data["originalWorkplaceRegistrationNumber"] ?? ""
+        originalWorkplacePhoneNumber = data["originalWorkplacePhoneNumber"] ?? ""
+        futureWorkplaceName = data["futureWorkplaceName"] ?? ""
+        futureWorkplacePhoneNumber = data["futureWorkplacePhoneNumber"] ?? ""
+        incomeAmount = Int(data["incomeAmount"] ?? "0") ?? 0
+        job = data["job"] ?? ""
+        refundAccountNumber = data["refundAccountNumber"] ?? ""
+        
+        print("✅ UI updated with loaded data")
     }
     
     private func validateFields() -> Bool {
         let isValid = !koreaAddress.isEmpty &&
-                      !telephoneNumber.isEmpty &&
-                      !phoneNumber.isEmpty &&
-                      !homelandAddress.isEmpty &&
-                      !homelandPhoneNumber.isEmpty &&
-                      !schoolStatus.isEmpty &&
-                      !schoolName.isEmpty &&
-                      !schoolPhoneNumber.isEmpty &&
-                      !schoolType.isEmpty &&
-                      !originalWorkplaceName.isEmpty &&
-                      !originalWorkplaceRegistrationNumber.isEmpty &&
-                      !originalWorkplacePhoneNumber.isEmpty &&
-                      !futureWorkplaceName.isEmpty &&
-                      !futureWorkplacePhoneNumber.isEmpty &&
-                      incomeAmount > 0 &&
-                      !job.isEmpty &&
-                      !refundAccountNumber.isEmpty
-
+        !telephoneNumber.isEmpty &&
+        !phoneNumber.isEmpty &&
+        !homelandAddress.isEmpty &&
+        !homelandPhoneNumber.isEmpty &&
+        !schoolStatus.isEmpty &&
+        !schoolName.isEmpty &&
+        !schoolPhoneNumber.isEmpty &&
+        !schoolType.isEmpty &&
+        !originalWorkplaceName.isEmpty &&
+        !originalWorkplaceRegistrationNumber.isEmpty &&
+        !originalWorkplacePhoneNumber.isEmpty &&
+        !futureWorkplaceName.isEmpty &&
+        !futureWorkplacePhoneNumber.isEmpty &&
+        incomeAmount > 0 &&
+        !job.isEmpty &&
+        !refundAccountNumber.isEmpty
+        
         print("🔍 Field validation result: \(isValid)")
         if !isValid {
             print("Missing fields:")
@@ -432,10 +572,10 @@ struct MyInfoView: View {
             if job.isEmpty { print("- Occupation") }
             if refundAccountNumber.isEmpty { print("- Refund Account Number") }
         }
-
+        
         return isValid
     }
-
+    
     // MARK: - Data Operations
     private func updateMyInfo() {
         guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
@@ -472,21 +612,21 @@ struct MyInfoView: View {
             "job": job,
             "refundAccountNumber": refundAccountNumber
         ]
-
+        
         print("\n📤 Updating MyInfo with data:")
         myInfoDict.forEach { key, value in
             print("  \(key): \(value)")
         }
-
+        
         var request = URLRequest(url: URL(string: endpoint)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: myInfoDict)
             request.httpBody = jsonData
-
+            
             URLSession.shared.dataTask(with: request) { data, response, error in
                 DispatchQueue.main.async {
                     if let error = error {
@@ -495,14 +635,14 @@ struct MyInfoView: View {
                         showAlert = true
                         return
                     }
-
+                    
                     guard let httpResponse = response as? HTTPURLResponse else {
                         print("❌ Invalid server response")
                         alertMessage = "Invalid server response"
                         showAlert = true
                         return
                     }
-
+                    
                     if (200...299).contains(httpResponse.statusCode) {
                         print("✅ Information updated successfully")
                         alertMessage = "Information updated successfully"
@@ -522,7 +662,7 @@ struct MyInfoView: View {
             showAlert = true
         }
     }
-
+    
     private func fetchData() {
         guard let accessToken = KeychainWrapper.standard.string(forKey: "accessToken") else {
             print("❌ Access token not available")
@@ -605,17 +745,17 @@ struct MyInfoView: View {
             "profileImageUrl": profileImageUrl ?? "",
             "signatureUrl": signatureUrl ?? ""
         ]
-
+        
         print("\n📝 Attempting to save MyInfo data:")
         myInfoData.forEach { key, value in
             print("  \(key): \(value)")
         }
-
+        
         do {
             let encodedData = try JSONEncoder().encode(myInfoData)
             UserDefaults.standard.set(encodedData, forKey: "SavedmyInfoData")
             myInfoDataSaved = true
-
+            
             // Verify saved data
             if let verificationData = UserDefaults.standard.data(forKey: "SavedmyInfoData"),
                let decodedData = try? JSONDecoder().decode([String: String].self, from: verificationData) {
@@ -624,7 +764,7 @@ struct MyInfoView: View {
                     print("  \(key): \(value)")
                 }
             }
-
+            
             alertMessage = "Your information has been saved successfully."
             print("✅ Save operation completed successfully")
         } catch {
@@ -634,15 +774,15 @@ struct MyInfoView: View {
         showAlert = true
         print("--------------------------------")
     }
-
+    
     private func loadMyInfoData() -> [String: String]? {
         print("\n🔄 Starting loadMyInfoData process...")
-
+        
         guard let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") else {
             print("❌ No MyInfo data found in UserDefaults")
             return nil
         }
-
+        
         do {
             let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
             print("\n📦 Successfully loaded MyInfo data:")
@@ -655,7 +795,7 @@ struct MyInfoView: View {
             return nil
         }
     }
-
+    
     private func resetFields() {
         print("\n🔄 Resetting all fields...")
         koreaAddress = ""
@@ -678,7 +818,7 @@ struct MyInfoView: View {
         signatureImage = nil
         print("✅ All fields reset successfully")
     }
-
+    
     private func saveImageToAlbum(_ image: UIImage) {
         print("\n📸 Saving signature image to album...")
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
@@ -686,248 +826,228 @@ struct MyInfoView: View {
         showAlert = true
         print("✅ Signature image saved to album")
     }
-
-    private func logStorageState() {
-        // Check myInfoDataSaved flag
-        let savedFlag = UserDefaults.standard.bool(forKey: "myInfoDataSaved")
-        print("Current myInfoDataSaved flag: \(savedFlag)")
-
-        // Check saved MyInfo data
-        if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
-            do {
-                let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
-                print("\n📦 Saved MyInfo Data Contents:")
-                myInfoData.forEach { key, value in
-                    print("  \(key): \(value)")
-                }
-            } catch {
-                print("❌ Error decoding saved MyInfo data: \(error)")
-            }
-        } else {
-            print("❌ No saved MyInfo data found")
-        }
-    }
-}
-
-struct SectionInfoView: View {
-    var title: String
-    @Binding var text: String
-    var showError: Bool = false
-    var placeholder: String = ""
-    var isRequired: Bool = false
-    @FocusState var isFocused: Bool
     
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(title)
-                    .font(.system(size: 16))
-                    .opacity(0.7)
-                if isRequired { Text("*").foregroundColor(.red) }
-            }
-            ZStack(alignment: .leading) {
-                TextField(placeholder, text: $text)
-                    .font(.system(size: 16))
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .focused($isFocused)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(isFocused || !text.isEmpty ? Color.blue : Color.gray, lineWidth: 1)
-                    )
-                    .foregroundColor(text.isEmpty ? Color.gray : Color.black)
+    
+    struct SectionInfoView: View {
+        var title: String
+        @Binding var text: String
+        var showError: Bool = false
+        var placeholder: String = ""
+        var isRequired: Bool = false
+        @FocusState var isFocused: Bool
+        
+        var body: some View {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(title)
+                        .font(.system(size: 16))
+                        .opacity(0.7)
+                    if isRequired { Text("*").foregroundColor(.red) }
+                }
+                ZStack(alignment: .leading) {
+                    TextField(placeholder, text: $text)
+                        .font(.system(size: 16))
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .focused($isFocused)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(isFocused || !text.isEmpty ? Color.blue : Color.gray, lineWidth: 1)
+                        )
+                        .foregroundColor(text.isEmpty ? Color.gray : Color.black)
+                }
             }
         }
     }
-}
-
-struct DropdownInfoField: View {
-    var title: String
-    @Binding var selectedValue: String
-    var options: [String]
-    var placeholder: String
-    var isRequired: Bool = false
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.gray)
-                if isRequired { Text("*").foregroundColor(.red) }
-            }
-            Menu {
-                ForEach(options, id: \.self) { option in
-                    Button(action: {
-                        selectedValue = option
-                    }) {
-                        Text(option)
-                    }
-                }
-            } label: {
+    
+    struct DropdownInfoField: View {
+        var title: String
+        @Binding var selectedValue: String
+        var options: [String]
+        var placeholder: String
+        var isRequired: Bool = false
+        
+        var body: some View {
+            VStack(alignment: .leading) {
                 HStack {
-                    Text(selectedValue.isEmpty ? placeholder : selectedValue)
-                        .foregroundColor(selectedValue.isEmpty ? .gray : .black)
-                    Spacer()
-                    Image(systemName: "chevron.down")
+                    Text(title)
+                        .font(.headline)
                         .foregroundColor(.gray)
+                    if isRequired { Text("*").foregroundColor(.red) }
+                }
+                Menu {
+                    ForEach(options, id: \.self) { option in
+                        Button(action: {
+                            selectedValue = option
+                        }) {
+                            Text(option)
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedValue.isEmpty ? placeholder : selectedValue)
+                            .foregroundColor(selectedValue.isEmpty ? .gray : .black)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Signature Related Views
+    struct SignatureMyInfoPadView: View {
+        @Binding var signatureImage: UIImage?
+        var onSave: (UIImage) -> Void
+        @State private var drawingPath = DrawingMyInfoPath()
+        @Environment(\.presentationMode) var presentationMode
+        
+        var body: some View {
+            VStack {
+                Text("Enter Signature")
+                    .font(.headline)
+                    .padding()
+                
+                SignatureMyInfoDrawView(drawing: $drawingPath)
+                    .frame(height: 200)
+                    .background(Color(UIColor.systemGray5))
+                    .cornerRadius(10)
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
+                    .padding()
+                
+                HStack {
+                    Button(action: {
+                        print("🔄 Resetting signature pad")
+                        drawingPath = DrawingMyInfoPath()
+                    }) {
+                        Text("Reset")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+                    }
+                    
+                    Button(action: {
+                        print("✅ Saving signature")
+                        let image = drawingPath.toImage()
+                        onSave(image)
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Done")
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
                 }
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
             }
         }
     }
+    
+    struct SignatureMyInfoDrawView: View {
+        @Binding var drawing: DrawingMyInfoPath
+        
+        var body: some View {
+            ZStack {
+                Color.white
+                if drawing.isEmpty {
+                    Text("Please enter the signature to be used for document creation.")
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                } else {
+                    DrawMyInfoShape(drawingPath: drawing)
+                        .stroke(lineWidth: 2)
+                        .foregroundColor(.black)
+                }
+            }
+            .gesture(DragGesture()
+                .onChanged { value in
+                    drawing.addPoint(value.location)
+                }
+                .onEnded { _ in
+                    drawing.addBreak()
+                })
+        }
+    }
+    
+    struct DrawMyInfoShape: Shape {
+        let drawingPath: DrawingMyInfoPath
+        
+        func path(in rect: CGRect) -> Path {
+            drawingPath.path
+        }
+    }
+    
+    struct DrawingMyInfoPath {
+        private(set) var points = [CGPoint]()
+        private var breaks = [Int]()
+        
+        var isEmpty: Bool {
+            points.isEmpty
+        }
+        
+        mutating func addPoint(_ point: CGPoint) {
+            points.append(point)
+        }
+        
+        mutating func addBreak() {
+            breaks.append(points.count)
+        }
+        
+        var path: Path {
+            var path = Path()
+            guard let firstPoint = points.first else { return path }
+            path.move(to: firstPoint)
+            for i in 1..<points.count {
+                if breaks.contains(i) {
+                    path.move(to: points[i])
+                } else {
+                    path.addLine(to: points[i])
+                }
+            }
+            return path
+        }
+        
+        func toImage() -> UIImage {
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 200))
+            return renderer.image { ctx in
+                ctx.cgContext.setStrokeColor(UIColor.black.cgColor)
+                ctx.cgContext.setLineWidth(2)
+                ctx.cgContext.addPath(path.cgPath)
+                ctx.cgContext.drawPath(using: .stroke)
+            }
+        }
+    }
+
 }
 
-                    // MARK: - Signature Related Views
-                    struct SignatureMyInfoPadView: View {
-                        @Binding var signatureImage: UIImage?
-                        var onSave: (UIImage) -> Void
-                        @State private var drawingPath = DrawingMyInfoPath()
-                        @Environment(\.presentationMode) var presentationMode
-                        
-                        var body: some View {
-                            VStack {
-                                Text("Enter Signature")
-                                    .font(.headline)
-                                    .padding()
-                                
-                                SignatureMyInfoDrawView(drawing: $drawingPath)
-                                    .frame(height: 200)
-                                    .background(Color(UIColor.systemGray5))
-                                    .cornerRadius(10)
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 2))
-                                    .padding()
-                                
-                                HStack {
-                                    Button(action: {
-                                        print("🔄 Resetting signature pad")
-                                        drawingPath = DrawingMyInfoPath()
-                                    }) {
-                                        Text("Reset")
-                                            .frame(maxWidth: .infinity)
-                                            .padding()
-                                            .background(Color.white)
-                                            .cornerRadius(10)
-                                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
-                                    }
-                                    
-                                    Button(action: {
-                                        print("✅ Saving signature")
-                                        let image = drawingPath.toImage()
-                                        onSave(image)
-                                        presentationMode.wrappedValue.dismiss()
-                                    }) {
-                                        Text("Done")
-                                            .foregroundColor(.white)
-                                            .frame(maxWidth: .infinity)
-                                            .padding()
-                                            .background(Color.blue)
-                                            .cornerRadius(10)
-                                    }
-                                }
-                                .padding()
-                            }
-                        }
-                    }
-
-                    struct SignatureMyInfoDrawView: View {
-                        @Binding var drawing: DrawingMyInfoPath
-                        
-                        var body: some View {
-                            ZStack {
-                                Color.white
-                                if drawing.isEmpty {
-                                    Text("Please enter the signature to be used for document creation.")
-                                        .foregroundColor(.gray)
-                                        .multilineTextAlignment(.center)
-                                } else {
-                                    DrawMyInfoShape(drawingPath: drawing)
-                                        .stroke(lineWidth: 2)
-                                        .foregroundColor(.black)
-                                }
-                            }
-                            .gesture(DragGesture()
-                                .onChanged { value in
-                                    drawing.addPoint(value.location)
-                                }
-                                .onEnded { _ in
-                                    drawing.addBreak()
-                                })
-                        }
-                    }
-
-                    struct DrawMyInfoShape: Shape {
-                        let drawingPath: DrawingMyInfoPath
-                        
-                        func path(in rect: CGRect) -> Path {
-                            drawingPath.path
-                        }
-                    }
-
-                    struct DrawingMyInfoPath {
-                        private(set) var points = [CGPoint]()
-                        private var breaks = [Int]()
-                        
-                        var isEmpty: Bool {
-                            points.isEmpty
-                        }
-                        
-                        mutating func addPoint(_ point: CGPoint) {
-                            points.append(point)
-                        }
-                        
-                        mutating func addBreak() {
-                            breaks.append(points.count)
-                        }
-                        
-                        var path: Path {
-                            var path = Path()
-                            guard let firstPoint = points.first else { return path }
-                            path.move(to: firstPoint)
-                            for i in 1..<points.count {
-                                if breaks.contains(i) {
-                                    path.move(to: points[i])
-                                } else {
-                                    path.addLine(to: points[i])
-                                }
-                            }
-                            return path
-                        }
-                        
-                        func toImage() -> UIImage {
-                            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 200))
-                            return renderer.image { ctx in
-                                ctx.cgContext.setStrokeColor(UIColor.black.cgColor)
-                                ctx.cgContext.setLineWidth(2)
-                                ctx.cgContext.addPath(path.cgPath)
-                                ctx.cgContext.drawPath(using: .stroke)
-                            }
-                        }
-                    }
-
-                    extension Path {
-                        var cgPath: CGPath {
-                            let path = CGMutablePath()
-                            forEach { element in
-                                switch element {
-                                case .move(let p):
-                                    path.move(to: p)
-                                case .line(let p):
-                                    path.addLine(to: p)
-                                case .quadCurve(let p1, let p2):
-                                    path.addQuadCurve(to: p2, control: p1)
-                                case .curve(let p1, let p2, let p3):
-                                    path.addCurve(to: p3, control1: p1, control2: p2)
-                                case .closeSubpath:
-                                    path.closeSubpath()
-                                }
-                            }
-                            return path
-                        }
-                    }
-
+extension Path {
+    var cgPath: CGPath {
+        let path = CGMutablePath()
+        forEach { element in
+            switch element {
+            case .move(let p):
+                path.move(to: p)
+            case .line(let p):
+                path.addLine(to: p)
+            case .quadCurve(let p1, let p2):
+                path.addQuadCurve(to: p2, control: p1)
+            case .curve(let p1, let p2, let p3):
+                path.addCurve(to: p3, control1: p1, control2: p2)
+            case .closeSubpath:
+                path.closeSubpath()
+            }
+        }
+        return path
+    }
+}
                     // MARK: - Preview
                     struct MyInfoView_Previews: PreviewProvider {
                         static var previews: some View {
