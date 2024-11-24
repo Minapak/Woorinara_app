@@ -125,7 +125,7 @@ struct MyInfoView: View {
             print("\n📢 myInfoDataSaved changed from \(oldValue) to \(myInfoDataSaved)")
         }
     }
-    
+    @AppStorage(Constants.isFirstLogin) private var isFirstLogin = true
     // State Properties
     @State private var koreaAddress: String = ""
     @State private var telephoneNumber: String = ""
@@ -155,7 +155,11 @@ struct MyInfoView: View {
     @State private var errorMessage: String = ""
     // Update API endpoint
     let endpoint = "http://43.203.237.202:18080/api/v1/members/details/update"
-    
+    @State private var currentUsername: String = KeychainWrapper.standard.string(forKey: "username") ?? ""
+      @State private var ocrUserId: String = ""
+    @AppStorage("SavedarcData") private var savedARCData: Data?
+    @AppStorage("SavedpassportData") private var savedpassportData: Data?
+    @AppStorage("SavedmyInfoData") private var savedMyInfoData: Data?
     // MARK: - Body
     var body: some View {
         NavigationStack {
@@ -312,7 +316,8 @@ struct MyInfoView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue, lineWidth: 2))
                         
                         Button("Done") {
-                            handleDoneButton()                        }
+                            handleDoneButton()
+                            isFirstLogin = false}
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
@@ -397,39 +402,54 @@ struct MyInfoView: View {
     }
     
     
-    // MARK: - User Verification and Data Loading
-    private func verifyUserAndLoadData() {
-        print("\n🔐 Verifying user credentials...")
-        
-        guard let savedUsername = KeychainWrapper.standard.string(forKey: "username") else {
-            print("❌ No username found in Keychain")
-            alertMessage = "User verification failed. Please login again."
-            showAlert = true
-            return
-        }
-        
-        print("📝 Current username: \(savedUsername)")
-        
-        if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
-            do {
-                let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
-                print("✅ Found saved data for user")
-                
-                // UI 업데이트
-                DispatchQueue.main.async {
-                    updateUIWithData(myInfoData)
-                }
-                
-            } catch {
-                print("❌ Error decoding saved data: \(error)")
-                alertMessage = "Error loading saved data"
-                showAlert = true
-            }
-        } else {
-            
-            
-        }
-    }
+    // verifyUserAndLoadData 함수 수정
+     private func verifyUserAndLoadData() {
+         print("\n🔐 Verifying user credentials...")
+         
+         // 저장된 OCR 데이터에서 userId 확인
+         if let arcData = savedARCData,
+            let arcResult = try? JSONDecoder().decode(OCRNaverResponse.self, from: arcData),
+            let userId = arcResult.data?.userId {
+             ocrUserId = userId
+         }
+         
+         if let passportData = savedpassportData,
+            let passportResult = try? JSONDecoder().decode(PassportNaverResponse.self, from: passportData),
+            let userId = passportResult.data?.userId {
+             // 만약 ARC에서 userId를 못 가져왔다면 passport에서 가져옴
+             if ocrUserId.isEmpty {
+                 ocrUserId = userId
+             }
+         }
+         
+         print("📝 Current username: \(currentUsername)")
+         print("📝 OCR userId: \(ocrUserId)")
+         
+         // username과 ocrUserId가 일치하는지 확인
+         guard !ocrUserId.isEmpty && ocrUserId == currentUsername else {
+             print("❌ User verification failed - Username mismatch")
+             alertMessage = "User verification failed. Data cannot be loaded."
+             showAlert = true
+             return
+         }
+         
+         // 사용자 검증이 성공하면 데이터 로드
+         if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
+             do {
+                 let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
+                 print("✅ Found saved data for user")
+                 
+                 // UI 업데이트
+                 DispatchQueue.main.async {
+                     updateUIWithData(myInfoData)
+                 }
+             } catch {
+                 print("❌ Error decoding saved data: \(error)")
+                 alertMessage = "Error loading saved data"
+                 showAlert = true
+             }
+         }
+     }
     
     // createMyInfo 함수 추가
     private func createMyInfo() {
@@ -510,27 +530,33 @@ struct MyInfoView: View {
         }
     }
     // UI 업데이트 함수
-    private func updateUIWithData(_ data: [String: String]) {
-        koreaAddress = data["koreaAddress"] ?? ""
-        telephoneNumber = data["telephoneNumber"] ?? ""
-        phoneNumber = data["phoneNumber"] ?? ""
-        homelandAddress = data["homelandAddress"] ?? ""
-        homelandPhoneNumber = data["homelandPhoneNumber"] ?? ""
-        schoolStatus = data["schoolStatus"] ?? ""
-        schoolName = data["schoolName"] ?? ""
-        schoolPhoneNumber = data["schoolPhoneNumber"] ?? ""
-        schoolType = data["schoolType"] ?? ""
-        originalWorkplaceName = data["originalWorkplaceName"] ?? ""
-        originalWorkplaceRegistrationNumber = data["originalWorkplaceRegistrationNumber"] ?? ""
-        originalWorkplacePhoneNumber = data["originalWorkplacePhoneNumber"] ?? ""
-        futureWorkplaceName = data["futureWorkplaceName"] ?? ""
-        futureWorkplacePhoneNumber = data["futureWorkplacePhoneNumber"] ?? ""
-        incomeAmount = Int(data["incomeAmount"] ?? "0") ?? 0
-        job = data["job"] ?? ""
-        refundAccountNumber = data["refundAccountNumber"] ?? ""
-        
-        print("✅ UI updated with loaded data")
-    }
+       private func updateUIWithData(_ data: [String: String]) {
+           // username과 ocrUserId가 일치할 때만 데이터 업데이트
+           if ocrUserId == currentUsername {
+               koreaAddress = data["koreaAddress"] ?? ""
+               telephoneNumber = data["telephoneNumber"] ?? ""
+               phoneNumber = data["phoneNumber"] ?? ""
+               homelandAddress = data["homelandAddress"] ?? ""
+               homelandPhoneNumber = data["homelandPhoneNumber"] ?? ""
+               schoolStatus = data["schoolStatus"] ?? ""
+               schoolName = data["schoolName"] ?? ""
+               schoolPhoneNumber = data["schoolPhoneNumber"] ?? ""
+               schoolType = data["schoolType"] ?? ""
+               originalWorkplaceName = data["originalWorkplaceName"] ?? ""
+               originalWorkplaceRegistrationNumber = data["originalWorkplaceRegistrationNumber"] ?? ""
+               originalWorkplacePhoneNumber = data["originalWorkplacePhoneNumber"] ?? ""
+               futureWorkplaceName = data["futureWorkplaceName"] ?? ""
+               futureWorkplacePhoneNumber = data["futureWorkplacePhoneNumber"] ?? ""
+               incomeAmount = Int(data["incomeAmount"] ?? "0") ?? 0
+               job = data["job"] ?? ""
+               refundAccountNumber = data["refundAccountNumber"] ?? ""
+               
+               print("✅ UI updated with loaded data for user: \(currentUsername)")
+           } else {
+               print("❌ User verification failed - Cannot update UI")
+               resetFields()  // 일치하지 않으면 필드 초기화
+           }
+       }
     
     private func validateFields() -> Bool {
         let isValid = !koreaAddress.isEmpty &&

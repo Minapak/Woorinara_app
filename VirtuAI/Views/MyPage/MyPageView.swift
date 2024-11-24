@@ -143,7 +143,6 @@ struct MyPageView: View {
 //                                            .foregroundColor(.gray)
 //                                    }
 //                                }
-                                
  //                           }
                             .padding(.horizontal)
                         }

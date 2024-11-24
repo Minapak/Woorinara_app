@@ -607,7 +607,7 @@ struct AFInfoView: View {
         group.enter()
         updateARCData { success in
             if !success {
-             //   errorMessages.append("Failed to update Identity Card information")
+              errorMessages.append("Failed to update Identity Card information")
             }
             group.leave()
         }
@@ -616,7 +616,7 @@ struct AFInfoView: View {
         group.enter()
         updatePassportData { success in
             if !success {
-             //   errorMessages.append("Failed to update Passport information")
+             errorMessages.append("Failed to update Passport information")
             }
             group.leave()
         }
@@ -625,7 +625,7 @@ struct AFInfoView: View {
         group.enter()
         updateMyInfoData { success in
             if !success {
-            //    errorMessages.append("Failed to update Personal information")
+            errorMessages.append("Failed to update Personal information")
             }
             group.leave()
         }
@@ -634,7 +634,7 @@ struct AFInfoView: View {
             isLoading = false
             if !errorMessages.isEmpty {
                 // 구체적인 에러 메시지 표시
-              //  showError(message: errorMessages.joined(separator: "\n"))
+              showError(message: errorMessages.joined(separator: "\n"))
             } else {
                 // AFAutoView로 이동
                     NotificationCenter.default.post(name: Notification.Name("AFDataUpdated"), object: nil)

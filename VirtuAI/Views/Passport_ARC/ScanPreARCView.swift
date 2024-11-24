@@ -65,7 +65,7 @@ struct OCRNaverData: Codable {
     let message: String?       // 추가 메시지
     let alienRegNum: String?   // 외국인등록번호
     let foreignRegistrationNumber: String? // 추가 필드
-    let userId: String? = KeychainWrapper.standard.string(forKey: "username") ?? ""        // 사용자 ID
+    let userId: String?         // 사용자 ID
     
     // JSON 매핑을 위한 코딩키
     enum CodingKeys: String, CodingKey {

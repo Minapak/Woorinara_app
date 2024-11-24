@@ -286,6 +286,7 @@ class WooriChatAPI: ObservableObject {
 struct StartChatView: View {
     private let tokenManager = TokenManager.shared // 싱글톤 인스턴스 접근
     @StateObject private var locationManager = LocationManager()
+    @Binding var selectedIndex: Int  // ContentView의 selectedIndex와 바인딩하기 위해 추가
     @State private var isFetchingLocation = false // 위치 정보 가져오는 중 여부
     @State private var navigateToTranslateView = false
     @State private var safariViewURL: URL? // Safari URL을 열기 위한 상태 변수
@@ -499,9 +500,9 @@ struct StartChatView: View {
                 sendMessage("Extend Visa", isButtonClicked: true)
             case "Application Form":
                 locationManager.requestLocation()
-                navigateToTranslateView = true
+                selectedIndex = 1
             case "Fill Application":
-                navigateToTranslateView = true
+                selectedIndex = 1
                 locationManager.requestLocation()
             case "Hikorea Website":
                 locationManager.requestLocation()
@@ -764,12 +765,14 @@ struct SafariView: UIViewControllerRepresentable {
 
 
 
-// Preview 설정
 struct StartChatView_Previews: PreviewProvider {
     @State static var typingMessage: String = ""
-        
+    @State static var selectedIndex: Int = 0  // selectedIndex를 위한 static state 추가
+    
     static var previews: some View {
-        StartChatView(typingMessage: $typingMessage)
-            .environmentObject(AppChatState())
+        StartChatView(
+            selectedIndex: $selectedIndex, typingMessage: $typingMessage  // selectedIndex 바인딩 전달
+        )
+        .environmentObject(AppChatState())
     }
 }

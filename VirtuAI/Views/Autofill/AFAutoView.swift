@@ -20,7 +20,11 @@ struct AFAutoView: View {
     @State private var signatureImage1: UIImage?
     @State private var signatureImage2: UIImage?
     @State private var dataUpdated: Bool = false  // Changed to @State
-     
+    @State var selectedIndex = 0
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var appChatState: AppChatState
+    @Environment(\.presentationMode) var presentationMode
+    
     // API Endpoints
     private static let baseARC = "http://43.203.237.202:18080/api/v1/idcard/update"
     private static let basePass = "http://43.203.237.202:18080/api/v1/passport/update"
@@ -108,7 +112,7 @@ struct AFAutoView: View {
        
        var body: some View {
            NavigationStack {
-              
+               
                VStack(spacing: 0) {
                    Spacer()
                    Text("You should edit or delete the red texts before submitting")
@@ -120,7 +124,7 @@ struct AFAutoView: View {
                        .padding(5) // 프레임에 12씩 패딩 추가
                        .background(Color.red.opacity(0.1))
                        .cornerRadius(8)
-
+                   
                    Spacer()
                    GeometryReader { geometry in
                        let canvasWidth: CGFloat = 298 * scaleFactor
@@ -131,22 +135,22 @@ struct AFAutoView: View {
                                .resizable()
                                .scaledToFit()
                                .frame(width: canvasWidth, height: canvasHeight)
-                               .offset(y: -30)
+                               .offset(y: -20)
                                .scaleEffect(zoomScale)
                            
                            ForEach(boxes.indices, id: \.self) { index in
                                BoxAutoView(
-                                   title: boxes[index].title,
-                                   width: boxes[index].width * scaleFactor,
-                                   height: boxes[index].height * scaleFactor,
-                                   xPosition: boxes[index].x * scaleFactor,
-                                   yPosition: boxes[index].y * scaleFactor - 20,
-                                   text: boxes[index].text,
-                                   selectedImage: getSignatureImage(for: boxes[index].title),
-                                   isSelected: selectedBox?.title == boxes[index].title,
-                                   onSelect: {
-                                       selectedBox = boxes[index]
-                                   }
+                                title: boxes[index].title,
+                                width: boxes[index].width * scaleFactor,
+                                height: boxes[index].height * scaleFactor,
+                                xPosition: boxes[index].x * scaleFactor,
+                                yPosition: boxes[index].y * scaleFactor - 10,
+                                text: boxes[index].text,
+                                selectedImage: getSignatureImage(for: boxes[index].title),
+                                isSelected: selectedBox?.title == boxes[index].title,
+                                onSelect: {
+                                    selectedBox = boxes[index]
+                                }
                                )
                            }
                        }
@@ -189,6 +193,12 @@ struct AFAutoView: View {
                    .padding(.bottom, 20)
                }
                .navigationBarBackButtonHidden(true)
+               .navigationBarItems(leading: Button(action: {
+                   presentationMode.wrappedValue.dismiss()
+               }) {
+                   Image(systemName: "chevron.left")
+                       .foregroundColor(.black)
+               })
                .background(Color.white)
                .onAppear {
                    loadSavedData()
@@ -214,13 +224,13 @@ struct AFAutoView: View {
                }
                .actionSheet(isPresented: $showFileTypeSelection) {
                    ActionSheet(
-                       title: Text("Save file"),
-                       message: Text("Choose file format"),
-                       buttons: [
-                           .default(Text("PDF"), action: { saveFile(as: "pdf") }),
-                           .default(Text("PNG"), action: { saveFile(as: "png") }),
-                           .cancel()
-                       ]
+                    title: Text("Save file"),
+                    message: Text("Choose file format"),
+                    buttons: [
+                        .default(Text("PDF"), action: { saveFile(as: "pdf") }),
+                        .default(Text("PNG"), action: { saveFile(as: "png") }),
+                        .cancel()
+                    ]
                    )
                }
                .sheet(isPresented: $showShareSheet, content: {
@@ -228,6 +238,7 @@ struct AFAutoView: View {
                        ShareSheet(activityItems: [fileURL])
                    }
                })
+               
            }
        }
     
@@ -294,22 +305,23 @@ struct AFAutoView: View {
     }
     
     private func loadSavedData() {
-        if let arcData = savedARCData,
-           let arcResult = try? JSONDecoder().decode(ARCResult.self, from: arcData),
-           let data = arcResult.data {
-            updateBoxesWithARCData(data)
-        }
-        
-        if let passData = savedPassportData,
-           let passResult = try? JSONDecoder().decode(PassportResult.self, from: passData),
-           let data = passResult.data {
-            updateBoxesWithPassportData(data)
-        }
-        
-        if let myInfoData = savedMyInfoData,
-           let myInfoDict = try? JSONDecoder().decode([String: String].self, from: myInfoData) {
-            updateBoxesWithMyInfoData(myInfoDict)
-        }
+        // ARC Data
+             if let arcData = savedARCData,
+                let arcResult = try? JSONDecoder().decode(ARCResult.self, from: arcData) {
+                 updateBoxesWithARCData(arcResult.data)
+             }
+             
+             // Passport Data
+             if let passData = savedPassportData,
+                let passResult = try? JSONDecoder().decode(PassportResult.self, from: passData) {
+                 updateBoxesWithPassportData(passResult.data)
+             }
+             
+             // MyInfo Data
+             if let myInfoData = savedMyInfoData,
+                let myInfoDict = try? JSONDecoder().decode([String: String].self, from: myInfoData) {
+                 updateBoxesWithMyInfoData(myInfoDict)
+             }
         
         if dataUpdated {
             if let arcData = self.arcData {
@@ -377,138 +389,123 @@ struct AFAutoView: View {
          }
          return nil
      }
-    private func updateBoxesWithARCData(_ data: ARCData) {
-            boxes = boxes.map { box in
-                var newBox = box
-                switch box.title {
-                case "외국인 등록 번호 1":
-                    newBox.text = String(data.foreignRegistrationNumber?.prefix(1) ?? "")
-                case "외국인 등록 번호 2":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst().prefix(1) ?? "")
-                case "외국인 등록 번호 3":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(2).prefix(1) ?? "")
-                case "외국인 등록 번호 4":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(3).prefix(1) ?? "")
-                case "외국인 등록 번호 5":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(4).prefix(1) ?? "")
-                case "외국인 등록 번호 6":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(5).prefix(1) ?? "")
-                case "외국인 등록 번호 7":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(6).prefix(1) ?? "")
-                case "외국인 등록 번호 8":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(7).prefix(1) ?? "")
-                case "외국인 등록 번호 9":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(8).prefix(1) ?? "")
-                case "외국인 등록 번호 10":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(9).prefix(1) ?? "")
-                case "외국인 등록 번호 11":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(10).prefix(1) ?? "")
-                case "외국인 등록 번호 12":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(11).prefix(1) ?? "")
-                case "외국인 등록 번호 13":
-                    newBox.text = String(data.foreignRegistrationNumber?.dropFirst(12).prefix(1) ?? "")
-                default:
-                    break
+    private func updateBoxesWithARCData(_ data: ARCData?) {
+        guard let data = data else { return }
+        boxes = boxes.map { box in
+            var newBox = box
+            switch box.title {
+            case "외국인 등록 번호 1", "외국인 등록 번호 2", "외국인 등록 번호 3",
+                 "외국인 등록 번호 4", "외국인 등록 번호 5", "외국인 등록 번호 6",
+                 "외국인 등록 번호 7", "외국인 등록 번호 8", "외국인 등록 번호 9",
+                 "외국인 등록 번호 10", "외국인 등록 번호 11", "외국인 등록 번호 12",
+                 "외국인 등록 번호 13":
+                let index = Int(box.title.split(separator: " ").last!)! - 1
+                if let regNum = data.foreignRegistrationNumber,
+                   index < regNum.count {
+                    let strIndex = regNum.index(regNum.startIndex, offsetBy: index)
+                    newBox.text = String(regNum[strIndex])
                 }
-                return newBox
+            default:
+                break
             }
+            return newBox
         }
+    }
         
-        private func updateBoxesWithPassportData(_ data: PassportData) {
-            boxes = boxes.map { box in
-                var newBox = box
-                switch box.title {
-                case "성 Surname":
-                    newBox.text = data.surName ?? ""
-                case "명 Given names":
-                    newBox.text = data.givenName ?? ""
-                case "여권 번호 Passport No.":
-                    newBox.text = data.documentNumber ?? ""
-                case "여권 발급 일자 Passport Issue Date":
-                    newBox.text = data.dateOfIssue ?? ""
-                case "여권 유효 기간 Passport Expiry Date":
-                    newBox.text = data.dateOfExpiry ?? ""
-                case "국적 Nationality":
-                    newBox.text = data.nationality ?? ""
-                case "년 yyyy":
-                    if let birthDate = data.dateOfBirth {
-                        newBox.text = String(birthDate.prefix(4))
-                    }
-                case "월 mm":
-                    if let birthDate = data.dateOfBirth {
-                        let startIndex = birthDate.index(birthDate.startIndex, offsetBy: 4)
-                        let endIndex = birthDate.index(startIndex, offsetBy: 2)
-                        newBox.text = String(birthDate[startIndex..<endIndex])
-                    }
-                case "일 dd":
-                    if let birthDate = data.dateOfBirth {
-                        newBox.text = String(birthDate.suffix(2))
-                    }
-                case "남 M":
-                    newBox.text = data.gender == "M" ? "✓" : ""
-                case "여 F":
-                    newBox.text = data.gender == "F" ? "✓" : ""
-                default:
-                    break
+
+    private func updateBoxesWithPassportData(_ data: PassportData?) {
+        guard let data = data else { return }
+        boxes = boxes.map { box in
+            var newBox = box
+            switch box.title {
+            case "성 Surname":
+                newBox.text = data.surName ?? ""
+            case "명 Given names":
+                newBox.text = data.givenName ?? ""
+            case "여권 번호 Passport No.":
+                newBox.text = data.documentNumber ?? ""
+            case "여권 발급 일자 Passport Issue Date":
+                newBox.text = data.dateOfIssue ?? ""
+            case "여권 유효 기간 Passport Expiry Date":
+                newBox.text = data.dateOfExpiry ?? ""
+            case "국적 Nationality":
+                newBox.text = data.nationality ?? ""
+            case "년 yyyy":
+                newBox.text = String(data.dateOfBirth?.prefix(4) ?? "")
+            case "월 mm":
+                if let birthDate = data.dateOfBirth {
+                    let start = birthDate.index(birthDate.startIndex, offsetBy: 4)
+                    let end = birthDate.index(start, offsetBy: 2)
+                    newBox.text = String(birthDate[start..<end])
                 }
-                return newBox
+            case "일 dd":
+                newBox.text = String(data.dateOfBirth?.suffix(2) ?? "")
+            case "남 M":
+                newBox.text = data.gender == "M" ? "✓" : ""
+            case "여 F":
+                newBox.text = data.gender == "F" ? "✓" : ""
+            default:
+                break
             }
+            return newBox
         }
+    }
+
         
-        private func updateBoxesWithMyInfoData(_ data: [String: String]) {
-            boxes = boxes.map { box in
-                var newBox = box
-                switch box.title {
-                case "대한민국 내 주소":
-                    newBox.text = data["koreaAddress"] ?? ""
-                case "전화번호":
-                    newBox.text = data["telephoneNumber"] ?? ""
-                case "휴대전화":
-                    newBox.text = data["phoneNumber"] ?? ""
-                case "본국 주소":
-                    newBox.text = data["homelandAddress"] ?? ""
-                case "전화번호1":
-                    newBox.text = data["homelandPhoneNumber"] ?? ""
-                case "미취학":
-                    newBox.text = data["schoolStatus"] == "NonSchool" ? "✓" : ""
-                case "초":
-                    newBox.text = data["schoolStatus"] == "Elementary" ? "" : ""
-                case "중":
-                    newBox.text = data["schoolStatus"] == "Middle" ? "" : ""
-                case "고":
-                    newBox.text = data["schoolStatus"] == "High" ? "" : ""
-                case "학교이름":
-                    newBox.text = data["schoolName"] ?? ""
-                case "전화번호2":
-                    newBox.text = data["schoolPhoneNumber"] ?? ""
-                case "교욱청인가":
-                    newBox.text = data["schoolType"] == "Accredited" ? "✓" : ""
-                case "교육청비인가":
-                    newBox.text = data["schoolType"] == "NonAccredited" ? "" : ""
-                case "원 근무처":
-                    newBox.text = data["originalWorkplaceName"] ?? ""
-                case "사업자 등록 번호1":
-                    newBox.text = data["originalWorkplaceRegistrationNumber"] ?? ""
-                case "전화 번호3":
-                    newBox.text = data["originalWorkplacePhoneNumber"] ?? ""
-                case "예정 근무처":
-                    newBox.text = data["futureWorkplaceName"] ?? ""
-                case "사업자 등록 번호2":
-                    newBox.text = data["futureWorkplaceRegistrationNumber"] ?? ""
-                case "전화 번호4":
-                    newBox.text = data["futureWorkplacePhoneNumber"] ?? ""
-                case "연소득금액":
-                    newBox.text = data["incomeAmount"] ?? ""
-                case "직업":
-                    newBox.text = data["job"] ?? ""
-                case "반환용계좌번호":
-                    newBox.text = data["refundAccountNumber"] ?? ""
-                default:
-                    break
-                }
-                return newBox
+    private func updateBoxesWithMyInfoData(_ data: [String: String]) {
+        boxes = boxes.map { box in
+            var newBox = box
+            switch box.title {
+            case "대한민국 내 주소":
+                newBox.text = data["koreaAddress"] ?? ""
+            case "전화번호":
+                newBox.text = data["telephoneNumber"] ?? ""
+            case "휴대전화":
+                newBox.text = data["phoneNumber"] ?? ""
+            case "본국 주소":
+                newBox.text = data["homelandAddress"] ?? ""
+            case "전화번호1":
+                newBox.text = data["homelandPhoneNumber"] ?? ""
+            case "미취학":
+                newBox.text = data["schoolStatus"] == "NonSchool" ? "✓" : ""
+            case "초":
+                newBox.text = data["schoolStatus"] == "Elementary" ? "✓" : ""
+            case "중":
+                newBox.text = data["schoolStatus"] == "Middle" ? "✓" : ""
+            case "고":
+                newBox.text = data["schoolStatus"] == "High" ? "✓" : ""
+            case "학교이름":
+                newBox.text = data["schoolName"] ?? ""
+            case "전화번호2":
+                newBox.text = data["schoolPhoneNumber"] ?? ""
+            case "교욱청인가":
+                newBox.text = data["schoolType"] == "Accredited" ? "✓" : ""
+            case "교육청비인가":
+                newBox.text = data["schoolType"] == "NonAccredited" ? "✓" : ""
+            case "원 근무처":
+                newBox.text = data["originalWorkplaceName"] ?? ""
+            case "사업자 등록 번호1":
+                newBox.text = data["originalWorkplaceRegistrationNumber"] ?? ""
+            case "전화 번호3":
+                newBox.text = data["originalWorkplacePhoneNumber"] ?? ""
+            case "예정 근무처":
+                newBox.text = data["futureWorkplaceName"] ?? ""
+            case "사업자 등록 번호2":
+                newBox.text = data["futureWorkplaceRegistrationNumber"] ?? ""
+            case "전화 번호4":
+                newBox.text = data["futureWorkplacePhoneNumber"] ?? ""
+            case "연소득금액":
+                newBox.text = data["incomeAmount"] ?? ""
+            case "직업":
+                newBox.text = data["job"] ?? ""
+            case "반환용계좌번호":
+                newBox.text = data["refundAccountNumber"] ?? ""
+            default:
+                break
             }
+            return newBox
         }
+    }
         
     private func snapshotViewAsImage() -> UIImage? {
         DispatchQueue.main.async {

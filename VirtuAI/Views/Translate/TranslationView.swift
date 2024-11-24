@@ -17,7 +17,11 @@ struct TranslationView: View {
      @AppStorage("arcDataSaved") private var arcDataSaved: Bool = false
      @AppStorage("passportDataSaved") private var passportDataSaved: Bool = false
      @AppStorage("myInfoSaved") private var myInfoSaved: Bool = false
-
+    // AppStorage
+    @AppStorage("SavedarcData") private var savedARCData: Data?
+    @AppStorage("SavedpassportData") private var savedPassportData: Data?
+    @AppStorage("SavedmyInfoData") private var savedMyInfoData: Data?
+    
     var body: some View {
            NavigationStack {
                ZStack {
@@ -58,8 +62,7 @@ struct TranslationView: View {
 
                        HStack {
                            Button("Translation") {
-                              // handleAutoFillNavigation()
-                               navigateToTranslateView = true
+                               handleTranslateNavigation()
                            }
                            .frame(width: 150, height: 50)
                            .font(.system(size: 16, weight: .bold))
@@ -68,8 +71,8 @@ struct TranslationView: View {
                            .cornerRadius(16)
 
                            Button("Auto-Fill") {
-                              navigateToARCInfoView = true
-                            //handleAutoFillNavigation()
+                               handleAutoFillNavigation()
+                       
                            }
                            .frame(width: 150, height: 50)
                            .font(.system(size: 16, weight: .bold))
@@ -90,7 +93,7 @@ struct TranslationView: View {
                    }
                }
                .navigationDestination(isPresented: $navigateToTranslateView) {
-                   ScanARCView()
+                            TranslateView() // 여기를 새로운 TranslateView로 변경
                         }
                   
             .navigationDestination(isPresented: $navigateToScanARCView) {
@@ -118,32 +121,33 @@ struct TranslationView: View {
     }
     
     private func handleAutoFillNavigation() {
-        if !arcDataSaved || !passportDataSaved || !myInfoSaved {
+        if (savedARCData == nil) || (savedPassportData == nil) || (savedMyInfoData == nil) {
             showAlertInfo = true
         }
-//        else if arcDataSaved && !passportDataSaved {
-//            navigateToScanPrePassView = true
-//        }
-//        else if arcDataSaved && passportDataSaved && !myInfoSaved {
-//            navigateToMyInfoView = true
-//        }
-        else if arcDataSaved || passportDataSaved || myInfoSaved{
+
+        else if (savedARCData != nil) && (savedPassportData != nil) && (savedMyInfoData != nil) {
             navigateToAFAutoView = true
         }
     }
 
     // Handles Scan Button Logic
     private func handleScanNavigation() {
-        if !arcDataSaved || !passportDataSaved || !myInfoSaved {
-            navigateToScanPreARCView = true
+        if  (savedARCData == nil) || (savedPassportData == nil) || (savedMyInfoData == nil){
+            navigateToARCInfoView = true
         }
-//        else if arcDataSaved && !passportDataSaved {
-//            navigateToScanPrePassView = true
-//        } else if arcDataSaved && passportDataSaved && !myInfoSaved {
-//            navigateToMyInfoView = true
-//        }
-        else if arcDataSaved && passportDataSaved && myInfoSaved {
+
+        else if (savedARCData != nil) && (savedPassportData != nil) && (savedMyInfoData != nil) {
             navigateToAFAutoView = true
+        }
+    }
+    // Translation 버튼을 눌렀을 때의 네비게이션 처리
+    private func handleTranslateNavigation() {
+        if (savedARCData != nil) || (savedPassportData != nil) || (savedMyInfoData != nil) {
+            // 데이터가 하나라도 있으면 TranslateView로 이동
+            navigateToTranslateView = true
+        } else {
+          
+            navigateToARCInfoView = true
         }
     }
 }

@@ -27,14 +27,14 @@ struct ContentView: View {
                                 .environmentObject(appChatState)
                                 .environmentObject(locationManager)
                                 .tag(0)
-                        } else if isFirstLogin{
+                        } else if isFirstLogin == true{
                             ARCInfoView()
                                 .environmentObject(appState)
                                 .environmentObject(appChatState)
                                 .tag(0)
                         } else {
                             StartChatView(
-                                appState: _appState,
+                                selectedIndex: $selectedIndex, appState: _appState,
                                 appChatState: _appChatState,
                                 typingMessage: ContentView.$typingMessageCurrent
                             )

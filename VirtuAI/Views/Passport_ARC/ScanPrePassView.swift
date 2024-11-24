@@ -68,7 +68,7 @@ struct PassportNaverData: Codable {
     let middleName: String?      // 중간이름
     let dateOfBirth: String?     // 생년월일
     let message: String?         // 처리 메시지
-    let userId: String? = KeychainWrapper.standard.string(forKey: "username") ?? ""          // 사용자 ID
+    let userId: String?           // 사용자 ID
     // JSON 매핑을 위한 코딩키
     enum CodingKeys: String, CodingKey {
         case dateOfExpiry
