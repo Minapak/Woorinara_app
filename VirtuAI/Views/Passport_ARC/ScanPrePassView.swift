@@ -344,12 +344,12 @@ struct ScanPrePassView: View {
         request.httpBody = body
         
         print("📤 OCR 요청 전송 중...")
-        isLoading = true
+      
         
         // API 요청 실행
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                self.isLoading = false
+                self.isLoading = true
             }
             
             // 에러 처리
@@ -358,6 +358,7 @@ struct ScanPrePassView: View {
                 DispatchQueue.main.async {
                     self.errorMessage = "Network error: \(error.localizedDescription)"
                     self.showErrorAlert = true
+                    self.isLoading = false // 로딩 종료
                 }
                                 return
                             }
@@ -368,6 +369,7 @@ struct ScanPrePassView: View {
                                 DispatchQueue.main.async {
                                     self.errorMessage = "No data received from server."
                                     self.showErrorAlert = true
+                                    self.isLoading = false // 로딩 종료
                                 }
                                 return
                             }
@@ -380,6 +382,11 @@ struct ScanPrePassView: View {
                                 
                                 // OCR 응답 디코딩 및 변환
                                 let passportResponse = try JSONDecoder().decode(PassportNaverResponse.self, from: data)
+                                // OCR에서 받은 userId를 Keychain에 저장
+                                          if let userId = passportResponse.data?.userId {
+                                              print("📝 passport OCR에서 받은 userId: \(userId)")
+                                              KeychainWrapper.standard.set(userId, forKey: "passuserId")
+                                          }
                                 let result = passportResponse.toPassportResult()
                                 
                                 print("✅ OCR 응답 수신:")
@@ -388,15 +395,37 @@ struct ScanPrePassView: View {
                                 
                                     if result.status == 200 {
                                         print("✅ 여권 OCR 성공")
+                                        
+                                        // ARC 데이터 저장
+                                        if let encoded = try? JSONEncoder().encode(result) {
+                                            self.savedpassportData = encoded
+                                            
+                                            // 현재 사용자 ID와 함께 타임스탬프 저장
+                                            if let currentUserId = KeychainWrapper.standard.string(forKey: "username") {
+                                                let arcMetadata = [
+                                                    "userId": currentUserId,
+                                                    "timestamp": Date().timeIntervalSince1970
+                                                ] as [String : Any]
+                                                KeychainWrapper.standard.set(currentUserId, forKey: "passuserId")
+                                                print("✅ Passport 메타데이터 저장됨 - 사용자 ID: \(currentUserId)")
+                                            }
+                                        }
+                                        
                                         self.passportResult = result
-                                        self.passportDataSaved = true
-                                        self.navigateToResultPassView = true
+                                        DispatchQueue.main.async {
+                                            self.passportDataSaved = true
+                                            self.navigateToResultPassView = true
+                                            self.isLoading = false // 로딩 종료
+                                        }
                                     } else {
-                                        print("❌ OCR 실패: \(result.message)")
-                                        self.errorMessage = result.message
-                                        self.showErrorAlert = true
-                                      
+                                        DispatchQueue.main.async {
+                                            self.isLoading = false // 로딩 종료
+                                        }
                                     }
+                                        
+                                        
+    
+                               
 
                             } catch {
                                 print("❌ 디코딩 에러: \(error)")

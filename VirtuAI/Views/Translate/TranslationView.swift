@@ -1,4 +1,6 @@
 import SwiftUI
+import VComponents
+import SwiftKeychainWrapper
 
 struct TranslationView: View {
     // 화면 이동을 위한 상태 변수
@@ -121,6 +123,16 @@ struct TranslationView: View {
     }
     
     private func handleAutoFillNavigation() {
+        if let savedARCUserId = KeychainWrapper.standard.string(forKey: "arcUserId"),
+           let savedPassportUserId = KeychainWrapper.standard.string(forKey: "passportUserId"),
+           let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+           (savedARCUserId == currentUsername || savedPassportUserId == currentUsername) {
+            navigateToAFAutoView = true
+        } else {
+            print("❌ 사용자 검증 실패")
+            showAlertInfo = true
+        }
+        
         if (savedARCData == nil) || (savedPassportData == nil) || (savedMyInfoData == nil) {
             showAlertInfo = true
         }
@@ -142,6 +154,16 @@ struct TranslationView: View {
     }
     // Translation 버튼을 눌렀을 때의 네비게이션 처리
     private func handleTranslateNavigation() {
+        if let savedARCUserId = KeychainWrapper.standard.string(forKey: "arcUserId"),
+           let savedPassportUserId = KeychainWrapper.standard.string(forKey: "passportUserId"),
+           let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+           (savedARCUserId == currentUsername || savedPassportUserId == currentUsername) {
+            navigateToTranslateView = true
+        } else {
+            print("❌ 사용자 검증 실패")
+            showAlertInfo = true
+         
+        }
         if (savedARCData != nil) || (savedPassportData != nil) || (savedMyInfoData != nil) {
             // 데이터가 하나라도 있으면 TranslateView로 이동
             navigateToTranslateView = true

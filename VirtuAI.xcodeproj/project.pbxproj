@@ -165,6 +165,7 @@
 		54A43CDA2CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 54A43CD92CC679C700A64B86 /* FloatingLabelTextFieldSwiftUI */; };
 		54AC04AA2CDDC09A0035387D /* iActivityIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 54AC04A92CDDC09A0035387D /* iActivityIndicator */; };
 		54AC04AD2CDDC1FA0035387D /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 54AC04AC2CDDC1FA0035387D /* MijickPopups */; };
+		54CB70772CF2E98D0028A5EE /* DataUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CB70762CF2E98D0028A5EE /* DataUpdateManager.swift */; };
 		54DCC6962CDCAF7E002AA420 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 54DCC6952CDCAF7E002AA420 /* Mixpanel */; };
 		54DCC6992CDD946A002AA420 /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 54DCC6982CDD946A002AA420 /* ActivityIndicatorView */; };
 		54DCC69C2CDD95BA002AA420 /* SystemNotification in Frameworks */ = {isa = PBXBuildFile; productRef = 54DCC69B2CDD95BA002AA420 /* SystemNotification */; };
@@ -385,6 +386,7 @@
 		54A43CC72CC6695900A64B86 /* ContentSignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSignView.swift; sourceTree = "<group>"; };
 		54A43CC82CC6695900A64B86 /* TemporaryLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryLinkView.swift; sourceTree = "<group>"; };
 		54A43CCA2CC6695900A64B86 /* ContentMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMapView.swift; sourceTree = "<group>"; };
+		54CB70762CF2E98D0028A5EE /* DataUpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataUpdateManager.swift; sourceTree = "<group>"; };
 		54E0BE2A2CC7ABE800D41163 /* WooriChatAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooriChatAPI.swift; sourceTree = "<group>"; };
 		54E0BE2E2CC8789900D41163 /* ContentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentResultView.swift; sourceTree = "<group>"; };
 		54E0BE322CC892FE00D41163 /* PDFPractice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPractice.swift; sourceTree = "<group>"; };
@@ -766,6 +768,7 @@
 				54EA3C4D2CE73C640039A2ED /* SavedDocView.swift */,
 				54EA3C4F2CE73D5D0039A2ED /* TrashDocView.swift */,
 				54EA3C532CEBD37F0039A2ED /* AFInfoView.swift */,
+				54CB70762CF2E98D0028A5EE /* DataUpdateManager.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -1107,6 +1110,7 @@
 				54EA3C522CE73ECB0039A2ED /* ChangePWView.swift in Sources */,
 				54F1CD3B2CCB57F00018B30E /* ContentWebView.swift in Sources */,
 				27F296682A2CE6C5002470C5 /* StartChatViewModel.swift in Sources */,
+				54CB70772CF2E98D0028A5EE /* DataUpdateManager.swift in Sources */,
 				54EA3C4C2CE6DD920039A2ED /* AlertInfoView.swift in Sources */,
 				276E06A62B1672F800E75DF5 /* Models.swift in Sources */,
 				54E0BE2F2CC8789900D41163 /* ContentResultView.swift in Sources */,

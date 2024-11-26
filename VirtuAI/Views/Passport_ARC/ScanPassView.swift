@@ -207,7 +207,7 @@ struct ScanPassView: View {
                                                  placeholder: "SMITH",
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("surName", into: $surname) }
+                                             
                                              
                                              Spacer()
                                              
@@ -218,7 +218,7 @@ struct ScanPassView: View {
                                                  placeholder: "JOHN",
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("givenName", into: $givenName) }
+                                           
                                              
                                              Spacer()
                                              
@@ -237,7 +237,7 @@ struct ScanPassView: View {
                                                  placeholder: "19820201",
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("dateOfBirth", into: $dateOfBirth) }
+                                           
                                          }
                                          
                                          // Gender Selection with initial data loading
@@ -253,8 +253,7 @@ struct ScanPassView: View {
                                                  RadioPassButton(text: "Male", isSelected: $gender, tag: "M", showError: showError && gender == nil)
                                              }
                                          }
-                                         .onAppear { loadGenderData() }
-                                         
+                                       
                                          Group {
                                              DropdownPassField(
                                                  title: "Country / Region",
@@ -263,8 +262,7 @@ struct ScanPassView: View {
                                                  showError: showError && countryRegion.isEmpty,
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("issueCountry", into: $countryRegion) }
-                                             
+                                           
                                              Spacer()
                                              
                                              InputPassField(
@@ -274,8 +272,7 @@ struct ScanPassView: View {
                                                  placeholder: "M12345678",
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("documentNumber", into: $passportNumber) }
-                                             
+                                           
                                              Spacer()
                                              
                                              InputPassField(
@@ -285,8 +282,7 @@ struct ScanPassView: View {
                                                  placeholder: "20301231",
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("dateOfExpiry", into: $passportExpirationDate) }
-                                             
+                                        
                                              Spacer()
                                              
                                              InputPassField(
@@ -295,7 +291,7 @@ struct ScanPassView: View {
                                                  showError: false,
                                                  placeholder: "20201231"
                                              )
-                                             .onAppear { loadFieldData("dateOfIssue", into: $dateOfIssue) }
+                                          
                                              
                                              Spacer()
                                              
@@ -306,7 +302,7 @@ struct ScanPassView: View {
                                                  showError: showError && passportNationality.isEmpty,
                                                  isRequired: true
                                              )
-                                             .onAppear { loadFieldData("nationality", into: $passportNationality) }
+                                           
                                          }
                                      }
                        
@@ -382,12 +378,16 @@ struct ScanPassView: View {
            }
        }
     private func loadSavedPassData() {
-        // 현재 로그인한 사용자의 토큰 확인
-        guard let currentUserToken = KeychainWrapper.standard.string(forKey: "accessToken"),
-              currentUserToken == accessToken else {
-            print("❌ User token mismatch or not available")
-            return
-        }
+        // OCR에서 저장된 userId와 현재 로그인한 username 비교
+          guard let savedUserId = KeychainWrapper.standard.string(forKey: "passuserId"),
+                let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+                savedUserId == currentUsername else {
+              print("❌ 사용자 검증 실패")
+              print("저장된 passuserId: \(KeychainWrapper.standard.string(forKey: "passuserId") ?? "없음")")
+              print("현재 username: \(KeychainWrapper.standard.string(forKey: "username") ?? "없음")")
+              setDefaultPlaceholders()
+              return
+          }
 
         if let savedData = savedpassportData,
            let decodedResult = try? JSONDecoder().decode(PassportResult.self, from: savedData),
@@ -396,7 +396,7 @@ struct ScanPassView: View {
             surname = data.surName ?? ""
             givenName = data.givenName ?? ""
             dateOfBirth = data.dateOfBirth ?? ""
-            gender = data.gender
+            gender = data.gender ?? ""
             countryRegion = data.issueCountry ?? ""
             passportNumber = data.documentNumber ?? ""
             passportExpirationDate = data.dateOfExpiry ?? ""
@@ -416,7 +416,7 @@ struct ScanPassView: View {
        surname = ""
        givenName = ""
        dateOfBirth = ""
-       gender = nil
+       gender = ""
        countryRegion = ""
        passportNumber = ""
        passportExpirationDate = ""

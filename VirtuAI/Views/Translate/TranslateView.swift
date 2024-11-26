@@ -123,7 +123,7 @@ struct TranslateView: View {
                         }
                         .frame(width: 350, height: 50)
                         .font(.system(size: 16, weight: .bold))
-                        .background(translationCompleted ? Color.blue : Color.gray)
+                        .background(translationCompleted ? Color.blue : Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(16)
                     }

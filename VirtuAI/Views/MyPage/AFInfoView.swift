@@ -14,7 +14,9 @@ struct AFInfoView: View {
     // Navigation State
     @State private var navigateToAFAutoView = false
     @Environment(\.presentationMode) var presentationMode
-    
+    // Add ObservableObject to manage data updates
+    @StateObject private var dataManager = DataUpdateManager.shared
+      
     // Form Fields States
     @State private var formData = FormData()
     @State private var isLoading = false
@@ -24,11 +26,11 @@ struct AFInfoView: View {
     @State private var profileImageUrl: String? = nil
     @State private var signatureUrl: String? = nil
     // API Endpoints
-    private static let baseARC = "http://43.203.237.202:18080/api/v1/idcard/update"
+    private static let baseARC = "http://43.203.237.202:18080/api/v1/identity/update"
     private static let basePass = "http://43.203.237.202:18080/api/v1/passport/update"
     private static let baseMyInfo = "http://43.203.237.202:18080/api/v1/members/details/update"
     private let endpoint = "http://43.203.237.202:18080/api/v1/members/applicationForm"
-    
+  
     // Form Data Structure
     struct FormData {
         // Identity Data
@@ -607,7 +609,7 @@ struct AFInfoView: View {
         group.enter()
         updateARCData { success in
             if !success {
-              errorMessages.append("Failed to update Identity Card information")
+              //errorMessages.append("Failed to update Identity Card information")
             }
             group.leave()
         }
@@ -616,7 +618,7 @@ struct AFInfoView: View {
         group.enter()
         updatePassportData { success in
             if !success {
-             errorMessages.append("Failed to update Passport information")
+            // errorMessages.append("Failed to update Passport information")
             }
             group.leave()
         }
@@ -625,7 +627,7 @@ struct AFInfoView: View {
         group.enter()
         updateMyInfoData { success in
             if !success {
-            errorMessages.append("Failed to update Personal information")
+            //errorMessages.append("Failed to update Personal information")
             }
             group.leave()
         }
@@ -634,22 +636,44 @@ struct AFInfoView: View {
             isLoading = false
             if !errorMessages.isEmpty {
                 // 구체적인 에러 메시지 표시
-              showError(message: errorMessages.joined(separator: "\n"))
+              //showError(message: errorMessages.joined(separator: "\n"))
             } else {
                 // AFAutoView로 이동
                     NotificationCenter.default.post(name: Notification.Name("AFDataUpdated"), object: nil)
+                dataManager.triggerDataUpdate() // 전체 데이터 업데이트 알림
                     navigateToAFAutoView = true
             }
         }
     }
         
     private func updateARCData(completion: @escaping (Bool) -> Void) {
+        // 먼저 토큰 갱신 시도
+        TokenManager.shared.checkAndRefreshTokenIfNeeded { isSuccess in
+            if isSuccess {
+                print("✅ Token refreshed successfully")
+                self.performARCUpdate(completion: completion)
+            } else {
+                print("❌ Token refresh failed")
+                completion(false)
+            }
+        }
+    }
+
+    private func performARCUpdate(completion: @escaping (Bool) -> Void) {
         guard let token = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ ARC Update - Token missing")
             completion(false)
             return
         }
         
-        // Using the same format as ScanARCView's createARCIdentity
+        print("🔑 Current Token:", token)
+        
+        let headers = [
+            "Authorization": "Bearer \(token)",
+            "Content-Type": "application/json"
+        ]
+        print("📋 Request Headers:", headers)
+        
         let arcData: [String: Any] = [
             "foreignRegistrationNumber": formData.foreignRegistrationNumber,
             "birthDate": formData.dateOfBirth,
@@ -666,6 +690,8 @@ struct AFInfoView: View {
             "residence": "1234 Elm St, Los Angeles, CA"
         ]
         
+        print("📤 ARC Update - Request Data:", arcData)
+        
         var request = URLRequest(url: URL(string: Self.baseARC)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -673,35 +699,81 @@ struct AFInfoView: View {
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: arcData)
+            // Request body 출력
+            if let requestBody = String(data: request.httpBody!, encoding: .utf8) {
+                print("📤 Request Body:", requestBody)
+            }
         } catch {
+            print("❌ ARC Update - JSON Serialization Error:", error)
             completion(false)
             return
         }
         
-        URLSession.shared.dataTask(with: request) { _, response, error in
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("ARC Update Error:", error.localizedDescription)
+                print("❌ ARC Update - Network Error:", error.localizedDescription)
                 completion(false)
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ ARC Update - Invalid Response")
                 completion(false)
                 return
             }
             
+            print("🔄 ARC Update - Response Status Code:", httpResponse.statusCode)
+            
+            // 응답 헤더 출력
+            print("📥 Response Headers:", httpResponse.allHeaderFields)
+            
+            if let data = data {
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("📥 ARC Update - Response Data:", responseString)
+                }
+                
+                // JSON 파싱 시도
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        print("📥 Parsed Response:", json)
+                    }
+                } catch {
+                    print("❌ JSON Parsing Error:", error)
+                }
+            }
+            
+            if !(200...299).contains(httpResponse.statusCode) {
+                print("❌ ARC Update - Failed with status code:", httpResponse.statusCode)
+                
+                // 401이나 403 에러시 토큰 갱신 후 재시도
+                if httpResponse.statusCode == 401 || httpResponse.statusCode == 403 {
+                    TokenManager.shared.checkAndRefreshTokenIfNeeded { success in
+                        if success {
+                            print("🔄 Token refreshed, retrying request...")
+                            self.performARCUpdate(completion: completion)
+                        } else {
+                            completion(false)
+                        }
+                    }
+                    return
+                }
+                
+                completion(false)
+                return
+            }
+            
+            print("✅ ARC Update - Success")
             completion(true)
         }.resume()
     }
 
     private func updatePassportData(completion: @escaping (Bool) -> Void) {
         guard let token = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ Passport Update - Token missing")
             completion(false)
             return
         }
         
-        // Using the same format as ScanPassView's createPassportData
         let passportData: [String: Any] = [
             "documentNumber": formData.passportNumber,
             "surName": formData.surname,
@@ -714,6 +786,8 @@ struct AFInfoView: View {
             "issueCountry": formData.nationality
         ]
         
+        print("📤 Passport Update - Request Data:", passportData)
+        
         var request = URLRequest(url: URL(string: Self.basePass)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -722,34 +796,49 @@ struct AFInfoView: View {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: passportData)
         } catch {
+            print("❌ Passport Update - JSON Serialization Error:", error)
             completion(false)
             return
         }
         
-        URLSession.shared.dataTask(with: request) { _, response, error in
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Passport Update Error:", error.localizedDescription)
+                print("❌ Passport Update - Network Error:", error.localizedDescription)
                 completion(false)
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Passport Update - Invalid Response")
                 completion(false)
                 return
             }
             
+            print("🔄 Passport Update - Response Status Code:", httpResponse.statusCode)
+            
+            // 응답 데이터 출력
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("📥 Passport Update - Response Data:", responseString)
+            }
+            
+            if !(200...299).contains(httpResponse.statusCode) {
+                print("❌ Passport Update - Failed with status code:", httpResponse.statusCode)
+                completion(false)
+                return
+            }
+            
+            print("✅ Passport Update - Success")
             completion(true)
         }.resume()
     }
 
     private func updateMyInfoData(completion: @escaping (Bool) -> Void) {
         guard let token = KeychainWrapper.standard.string(forKey: "accessToken") else {
+            print("❌ MyInfo Update - Token missing")
             completion(false)
             return
         }
         
-        // Using the same format as MyInfoView's createMyInfo
         let myInfoData: [String: Any] = [
             "phoneNumber": formData.phoneNumber,
             "annualIncome": Int(formData.incomeAmount) ?? 0,
@@ -759,8 +848,8 @@ struct AFInfoView: View {
             "futureWorkplaceName": formData.futureWorkplaceName,
             "futureWorkplaceRegistrationNumber": formData.originalWorkplaceRegistrationNumber,
             "futureWorkplacePhoneNumber": formData.futureWorkplacePhoneNumber,
-            "profileImageUrl": "",  // Optional
-            "signatureUrl": signatureUrl ?? "",     // Optional
+            "profileImageUrl": "",
+            "signatureUrl": signatureUrl ?? "",
             "koreaAddress": formData.koreaAddress,
             "telephoneNumber": formData.telephoneNumber,
             "homelandAddress": formData.homelandAddress,
@@ -777,6 +866,8 @@ struct AFInfoView: View {
             "refundAccountNumber": formData.refundAccountNumber
         ]
         
+        print("📤 MyInfo Update - Request Data:", myInfoData)
+        
         var request = URLRequest(url: URL(string: Self.baseMyInfo)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -785,23 +876,38 @@ struct AFInfoView: View {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: myInfoData)
         } catch {
+            print("❌ MyInfo Update - JSON Serialization Error:", error)
             completion(false)
             return
         }
         
-        URLSession.shared.dataTask(with: request) { _, response, error in
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("MyInfo Update Error:", error.localizedDescription)
+                print("❌ MyInfo Update - Network Error:", error.localizedDescription)
                 completion(false)
                 return
             }
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ MyInfo Update - Invalid Response")
                 completion(false)
                 return
             }
             
+            print("🔄 MyInfo Update - Response Status Code:", httpResponse.statusCode)
+            
+            // 응답 데이터 출력
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("📥 MyInfo Update - Response Data:", responseString)
+            }
+            
+            if !(200...299).contains(httpResponse.statusCode) {
+                print("❌ MyInfo Update - Failed with status code:", httpResponse.statusCode)
+                completion(false)
+                return
+            }
+            
+            print("✅ MyInfo Update - Success")
             completion(true)
         }.resume()
     }

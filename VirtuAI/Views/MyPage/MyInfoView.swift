@@ -406,48 +406,72 @@ struct MyInfoView: View {
      private func verifyUserAndLoadData() {
          print("\n🔐 Verifying user credentials...")
          
-         // 저장된 OCR 데이터에서 userId 확인
-         if let arcData = savedARCData,
-            let arcResult = try? JSONDecoder().decode(OCRNaverResponse.self, from: arcData),
-            let userId = arcResult.data?.userId {
-             ocrUserId = userId
+         guard let savedUserId = KeychainWrapper.standard.string(forKey: "userId"),
+               let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+               savedUserId == currentUsername else {
+             print("❌ 사용자 검증 실패")
+             print("저장된 userId: \(KeychainWrapper.standard.string(forKey: "userId") ?? "없음")")
+             print("현재 username: \(KeychainWrapper.standard.string(forKey: "username") ?? "없음")")
+             return
          }
+         guard let savedUserId = KeychainWrapper.standard.string(forKey: "passuserId"),
+               let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+               savedUserId == currentUsername else {
+             print("❌ 사용자 검증 실패")
+             print("저장된 passuserId: \(KeychainWrapper.standard.string(forKey: "passuserId") ?? "없음")")
+             print("현재 username: \(KeychainWrapper.standard.string(forKey: "username") ?? "없음")")
          
-         if let passportData = savedpassportData,
-            let passportResult = try? JSONDecoder().decode(PassportNaverResponse.self, from: passportData),
-            let userId = passportResult.data?.userId {
-             // 만약 ARC에서 userId를 못 가져왔다면 passport에서 가져옴
-             if ocrUserId.isEmpty {
-                 ocrUserId = userId
-             }
-         }
-         
-         print("📝 Current username: \(currentUsername)")
-         print("📝 OCR userId: \(ocrUserId)")
-         
-         // username과 ocrUserId가 일치하는지 확인
-         guard !ocrUserId.isEmpty && ocrUserId == currentUsername else {
-             print("❌ User verification failed - Username mismatch")
-             alertMessage = "User verification failed. Data cannot be loaded."
-             showAlert = true
              return
          }
          
+
+         
+         print("📝 Current username: \(currentUsername)")
+
+      
+         
          // 사용자 검증이 성공하면 데이터 로드
-         if let savedData = UserDefaults.standard.data(forKey: "SavedmyInfoData") {
-             do {
-                 let myInfoData = try JSONDecoder().decode([String: String].self, from: savedData)
-                 print("✅ Found saved data for user")
-                 
-                 // UI 업데이트
-                 DispatchQueue.main.async {
-                     updateUIWithData(myInfoData)
+         if let savedData = savedMyInfoData {
+                 do {
+                     // MyInfoData 타입으로 디코딩
+                     let myInfoData = try JSONDecoder().decode(MyInfoData.self, from: savedData)
+                     print("✅ Found saved data for user")
+                     
+                     // UI 업데이트
+                     DispatchQueue.main.async {
+                         // 데이터로 UI 업데이트
+                         koreaAddress = myInfoData.koreaAddress
+                         telephoneNumber = myInfoData.telephoneNumber
+                         phoneNumber = myInfoData.phoneNumber
+                         homelandAddress = myInfoData.homelandAddress
+                         homelandPhoneNumber = myInfoData.homelandPhoneNumber
+                         schoolStatus = myInfoData.schoolStatus
+                         schoolName = myInfoData.schoolName
+                         schoolPhoneNumber = myInfoData.schoolPhoneNumber
+                         schoolType = myInfoData.schoolType
+                         originalWorkplaceName = myInfoData.originalWorkplaceName
+                         originalWorkplaceRegistrationNumber = myInfoData.originalWorkplaceRegistrationNumber
+                         originalWorkplacePhoneNumber = myInfoData.originalWorkplacePhoneNumber
+                         futureWorkplaceName = myInfoData.futureWorkplaceName
+                         futureWorkplacePhoneNumber = myInfoData.futureWorkplacePhoneNumber
+                         incomeAmount = Int(myInfoData.incomeAmount) ?? 0
+                         job = myInfoData.job
+                         refundAccountNumber = myInfoData.refundAccountNumber
+                         signatureUrl = myInfoData.signatureUrl
+                         profileImageUrl = myInfoData.profileImageUrl
+                         
+                         print("✅ UI updated with saved data")
+                         print("Loaded data:")
+                         print("- Korea Address: \(koreaAddress)")
+                         print("- Phone Number: \(phoneNumber)")
+                         print("- School Name: \(schoolName)")
+                         // ... 기타 필드 로깅
+                     }
+                 } catch {
+                     print("❌ Error decoding saved data: \(error)")
+                     alertMessage = "Error loading saved data: \(error.localizedDescription)"
+                     showAlert = true
                  }
-             } catch {
-                 print("❌ Error decoding saved data: \(error)")
-                 alertMessage = "Error loading saved data"
-                 showAlert = true
-             }
          }
      }
     
@@ -750,10 +774,19 @@ struct MyInfoView: View {
         }.resume()
     }
     private func saveData() {
-        let myInfoData: [String: String] = [
+        let myInfoData = MyInfoData(dictionary: [
+            "phoneNumber": phoneNumber,
+            "annualIncome": incomeAmount,
+            "workplaceName": originalWorkplaceName,
+            "workplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "workplacePhoneNumber": originalWorkplacePhoneNumber,
+            "futureWorkplaceName": futureWorkplaceName,
+            "futureWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
+            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
+            "profileImageUrl": profileImageUrl as Any,
+            "signatureUrl": signatureUrl as Any,
             "koreaAddress": koreaAddress,
             "telephoneNumber": telephoneNumber,
-            "phoneNumber": phoneNumber,
             "homelandAddress": homelandAddress,
             "homelandPhoneNumber": homelandPhoneNumber,
             "schoolStatus": schoolStatus,
@@ -763,39 +796,68 @@ struct MyInfoView: View {
             "originalWorkplaceName": originalWorkplaceName,
             "originalWorkplaceRegistrationNumber": originalWorkplaceRegistrationNumber,
             "originalWorkplacePhoneNumber": originalWorkplacePhoneNumber,
-            "futureWorkplaceName": futureWorkplaceName,
-            "futureWorkplacePhoneNumber": futureWorkplacePhoneNumber,
             "incomeAmount": String(incomeAmount),
             "job": job,
-            "refundAccountNumber": refundAccountNumber,
-            "profileImageUrl": profileImageUrl ?? "",
-            "signatureUrl": signatureUrl ?? ""
-        ]
-        
-        print("\n📝 Attempting to save MyInfo data:")
-        myInfoData.forEach { key, value in
-            print("  \(key): \(value)")
-        }
+            "refundAccountNumber": refundAccountNumber
+        ])
+    
         
         do {
             let encodedData = try JSONEncoder().encode(myInfoData)
+            savedMyInfoData = encodedData
             UserDefaults.standard.set(encodedData, forKey: "SavedmyInfoData")
             myInfoDataSaved = true
-            
-            // Verify saved data
-            if let verificationData = UserDefaults.standard.data(forKey: "SavedmyInfoData"),
-               let decodedData = try? JSONDecoder().decode([String: String].self, from: verificationData) {
-                print("\n✅ Data saved and verified in UserDefaults:")
-                decodedData.forEach { key, value in
-                    print("  \(key): \(value)")
-                }
-            }
-            
-            alertMessage = "Your information has been saved successfully."
-            print("✅ Save operation completed successfully")
+                  
+                  print("\n✅ MyInfo data saved successfully")
+                  print("\n📋 Saved data details:")
+                  print("==========================================")
+                  print("Contact Information:")
+                  print("- Korea Address: \(koreaAddress)")
+                  print("- Telephone Number: \(telephoneNumber)")
+                  print("- Phone Number: \(phoneNumber)")
+                  
+                  print("\nHome Country Information:")
+                  print("- Home Country Address: \(homelandAddress)")
+                  print("- Home Country Phone: \(homelandPhoneNumber)")
+                  
+                  print("\nEducation Information:")
+                  print("- School Status: \(schoolStatus)")
+                  print("- School Name: \(schoolName)")
+                  print("- School Phone: \(schoolPhoneNumber)")
+                  print("- School Type: \(schoolType)")
+                  
+                  print("\nPrevious Employment:")
+                  print("- Workplace Name: \(originalWorkplaceName)")
+                  print("- Registration Number: \(originalWorkplaceRegistrationNumber)")
+                  print("- Phone Number: \(originalWorkplacePhoneNumber)")
+                  
+                  print("\nFuture Employment:")
+                  print("- Workplace Name: \(futureWorkplaceName)")
+                  print("- Phone Number: \(futureWorkplacePhoneNumber)")
+                  
+                  print("\nFinancial Information:")
+                  print("- Annual Income: \(incomeAmount)")
+                  print("- Occupation: \(job)")
+                  print("- Refund Account: \(refundAccountNumber)")
+                  
+                  print("\nAdditional Information:")
+                  print("- Profile Image URL: \(profileImageUrl ?? "Not set")")
+                  print("- Signature URL: \(signatureUrl ?? "Not set")")
+                  print("==========================================")
+                  
+                  alertMessage = "Your information has been saved successfully."
+                  
+                  // 저장된 데이터 검증
+                  if let verificationData = savedMyInfoData,
+                     let decodedData = try? JSONDecoder().decode(MyInfoData.self, from: verificationData) {
+                      print("\n✅ Data verification successful")
+                  }
+           
         } catch {
-            alertMessage = "Failed to save your information: \(error.localizedDescription)"
-            print("❌ Save operation failed: \(error.localizedDescription)")
+            print("\n❌ Failed to save MyInfo data:")
+                 print("Error: \(error.localizedDescription)")
+                 print("==========================================")
+                 alertMessage = "Failed to save your information: \(error.localizedDescription)"
         }
         showAlert = true
         print("--------------------------------")
@@ -881,7 +943,7 @@ struct MyInfoView: View {
                             RoundedRectangle(cornerRadius: 16)
                                 .stroke(isFocused || !text.isEmpty ? Color.blue : Color.gray, lineWidth: 1)
                         )
-                        .foregroundColor(text.isEmpty ? Color.gray : Color.black)
+                        .foregroundColor(Color.black)
                 }
             }
         }

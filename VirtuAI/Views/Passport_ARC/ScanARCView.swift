@@ -171,9 +171,9 @@ struct ScanARCView: View {
                 self._visaType = State(initialValue: visaType)
             } else {
                 // 기본값 설정
-                self._residenceCategory1 = State(initialValue: "A")
-                self._residenceCategory2 = State(initialValue: "1")
-                self._visaType = State(initialValue: "A-1")
+                self._residenceCategory1 = State(initialValue: "D")
+                self._residenceCategory2 = State(initialValue: "2")
+                self._visaType = State(initialValue: "D-2")
             }
             
             print("✅ OCR data initialization completed")
@@ -366,12 +366,19 @@ struct ScanARCView: View {
         }
     }
     private func loadSavedData() {
-        // 현재 로그인한 사용자의 토큰 확인
-        guard let currentUserToken = KeychainWrapper.standard.string(forKey: "accessToken"),
-              currentUserToken == accessToken else {
-            print("❌ User token mismatch or not available")
-            return
-        }
+        
+        // OCR에서 저장된 userId와 현재 로그인한 username 비교
+          guard let savedUserId = KeychainWrapper.standard.string(forKey: "userId"),
+                let currentUsername = KeychainWrapper.standard.string(forKey: "username"),
+                savedUserId == currentUsername else {
+              print("❌ 사용자 검증 실패")
+              print("저장된 userId: \(KeychainWrapper.standard.string(forKey: "userId") ?? "없음")")
+              print("현재 username: \(KeychainWrapper.standard.string(forKey: "username") ?? "없음")")
+              setDefaultPlaceholders()
+              return
+          }
+          
+          print("✅ 사용자 검증 성공")
 
         if let savedData = savedARCData,
            let decodedResult = try? JSONDecoder().decode(ARCResult.self, from: savedData),
@@ -388,10 +395,14 @@ struct ScanARCView: View {
                 residenceCategory2 = String(visaType.suffix(1))
                 self.visaType = visaType
             }
-            print("✅ Successfully loaded saved data")
-        } else {
-            print("❌ No saved data found or decoding failed")
-            setDefaultPlaceholders()
+            print("✅ 데이터 로드 완료")
+             print("- 이름: \(name)")
+             print("- 생년월일: \(dateOfBirth)")
+             print("- 성별: \(gender ?? "없음")")
+             
+         } else {
+             print("❌ 저장된 데이터 없음 또는 디코딩 실패")
+             setDefaultPlaceholders()
         }
     }
     
@@ -572,8 +583,8 @@ struct ScanARCView: View {
         region = "California"
         residenceStatus = "Permanent Resident"
         residenceCategory1 = "D"
-        residenceCategory2 = "8"
-        visaType = "D-8"
+        residenceCategory2 = "2"
+        visaType = "D-2"
         permitDate = "20220115"
         expirationDate = "20320115"
         issueCity = "Los Angeles"

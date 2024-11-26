@@ -33,7 +33,7 @@ class WebViewStore: NSObject, ObservableObject, WKHTTPCookieStoreObserver, WKScr
         // AccessToken 및 RefreshToken을 헤더에 추가
         if let accessToken = KeychainWrapper.standard.string(forKey: "accessToken"),
            let refreshToken = KeychainWrapper.standard.string(forKey: "refreshToken") {
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            request.setValue(accessToken, forHTTPHeaderField: "Authorization")
             request.setValue(refreshToken, forHTTPHeaderField: "Refresh-Token")
             print("🔐 Tokens added to headers:")
             print("📝 Authorization: Bearer \(accessToken)")

@@ -350,12 +350,12 @@ struct ScanPreARCView: View {
         request.httpBody = body
         
         print("📤 OCR 요청 전송 중...")
-        isLoading = true
+      
         
         // API 요청 실행
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                self.isLoading = false
+                self.isLoading = true // 로딩 시작
             }
             
             // 에러 처리
@@ -364,6 +364,7 @@ struct ScanPreARCView: View {
                 DispatchQueue.main.async {
                     self.errorMessage = "네트워크 에러: \(error.localizedDescription)"
                     self.showErrorAlert = true
+                    self.isLoading = false // 로딩 종료
                 }
                 return
             }
@@ -374,6 +375,7 @@ struct ScanPreARCView: View {
                 DispatchQueue.main.async {
                     self.errorMessage = "서버로부터 데이터를 받지 못했습니다."
                     self.showErrorAlert = true
+                    self.isLoading = false // 로딩 종료
                 }
                 return
             }
@@ -381,32 +383,54 @@ struct ScanPreARCView: View {
             do {
                 // OCR 응답 디코딩 및 변환
                 let ocrResponse = try JSONDecoder().decode(OCRNaverResponse.self, from: data)
+                // OCR에서 받은 userId를 Keychain에 저장
+                          if let userId = ocrResponse.data?.userId {
+                              print("📝 OCR에서 받은 userId: \(userId)")
+                              KeychainWrapper.standard.set(userId, forKey: "userId")
+                          }
                 let result = ocrResponse.toARCResult()
                 
                 print("✅ OCR 응답 수신:")
                 print("상태: \(result.status)")
                 print("메시지: \(result.message)")
                 
-                // 결과 처리
-         
-                    if result.status == 200 {
-                        print("✅ 유효한 OCR 데이터 수신, 결과 뷰로 이동")
-                        if let encoded = try? JSONEncoder().encode(result) {
-                                                   savedARCData = encoded
-                                               }
-                        self.arcResult = result
-                        self.arcDataSaved = true
-                        self.navigateToResultView = true
-                    } else {
-                        print("❌ 유효하지 않은 OCR 데이터")
-                        self.errorMessage = "유효한 OCR 데이터를 받지 못했습니다."
-                        self.showErrorAlert = true
-                    }
+                
+                     if result.status == 200 {
+                         print("✅ 유효한 OCR 데이터 수신, 결과 뷰로 이동")
+                         
+                         // ARC 데이터 저장
+                         if let encoded = try? JSONEncoder().encode(result) {
+                             self.savedARCData = encoded
+                             
+                             // 현재 사용자 ID와 함께 타임스탬프 저장
+                             if let currentUserId = KeychainWrapper.standard.string(forKey: "username") {
+                                 let arcMetadata = [
+                                     "userId": currentUserId,
+                                     "timestamp": Date().timeIntervalSince1970
+                                 ] as [String : Any]
+                                 KeychainWrapper.standard.set(currentUserId, forKey: "userId")
+                                 print("✅ ARC 메타데이터 저장됨 - 사용자 ID: \(currentUserId)")
+                             }
+                         }
+                         
+                         self.arcResult = result
+                                     DispatchQueue.main.async {
+                                         self.navigateToResultView = true
+                                         self.isLoading = false // 로딩 종료
+                                     }
+                                 } else {
+                                     DispatchQueue.main.async {
+                                         self.isLoading = false // 로딩 종료
+                                     }
+                                 }
                 
             } catch {
                 print("❌ 디코딩 에러: \(error)")
-                    self.errorMessage = "응답 디코딩 실패: \(error)"
-                    self.showErrorAlert = true
+                           self.errorMessage = "응답 디코딩 실패: \(error)"
+                           DispatchQueue.main.async {
+                               self.showErrorAlert = true
+                               self.isLoading = false // 로딩 종료
+                           }
                 
             }
         }.resume()

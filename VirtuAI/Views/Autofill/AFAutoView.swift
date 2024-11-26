@@ -115,15 +115,15 @@ struct AFAutoView: View {
                
                VStack(spacing: 0) {
                    Spacer()
-                   Text("You should edit or delete the red texts before submitting")
-                       .font(.system(size: 12))
-                       .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
-                       .frame(maxWidth: .infinity, alignment: .center)
-                       .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
-                       .foregroundColor(.red)
-                       .padding(5) // 프레임에 12씩 패딩 추가
-                       .background(Color.red.opacity(0.1))
-                       .cornerRadius(8)
+//                   Text("You should edit or delete the red texts before submitting")
+//                       .font(.system(size: 12))
+//                       .multilineTextAlignment(.leading) // 텍스트는 왼쪽 정렬
+//                       .frame(maxWidth: .infinity, alignment: .center)
+//                       .multilineTextAlignment(.center) // 여러 줄을 가운데 정렬
+//                       .foregroundColor(.red)
+//                       .padding(5) // 프레임에 12씩 패딩 추가
+//                       .background(Color.red.opacity(0.1))
+//                       .cornerRadius(8)
                    
                    Spacer()
                    GeometryReader { geometry in
