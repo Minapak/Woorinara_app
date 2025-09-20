@@ -126,9 +126,15 @@ The project maintains >70% code coverage for business logic components.
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="Screenshots/home.png" width="250" alt="Home Screen">
-  <img src="Screenshots/chat.png" width="250" alt="Chat Interface">
-  <img src="Screenshots/settings.png" width="250" alt="Settings">
+  <img src="Screenshots/splash.png" width="200" alt="Splash Screen" />
+  <img src="Screenshots/id_verification.png" width="200" alt="ID Verification" />
+  <img src="Screenshots/form_fill.png" width="200" alt="Form Fill" />
+  <img src="Screenshots/auto_fill.png" width="200" alt="Auto Fill" />
+  <img src="Screenshots/form_selection.png" width="200" alt="Form Selection" />
+</p>
+
+<p align="center">
+  <sub>Foreign Resident Civil Service Helper - Simplifying bureaucratic processes for foreigners in Korea</sub>
 </p>
 
 ## 🛠 Technical Skills Demonstrated
