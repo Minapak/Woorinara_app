@@ -348,13 +348,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - SwiftUI Community
 - Stack Overflow Community
 
-## 📚 Resources
-
-- [Project Documentation](Documentation/)
-- [API Documentation](Documentation/API.md)
-- [Architecture Decision Records](Documentation/ADR/)
-
----
 
 <p align="center">
   Made with ❤️ using Swift and SwiftUI
