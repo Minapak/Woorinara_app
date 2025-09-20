@@ -1,0 +1,12 @@
+# Sensitive files
+*.env
+.env.*
+config.json
+credentials.json
+*.key
+*.pem
+secrets.*
+*.sql
+*.db
+node_modules/
+.DS_Store
