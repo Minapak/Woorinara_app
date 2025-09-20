@@ -1,52 +1,108 @@
-# Sensitive files
-*.env
-.env.*
-config.json
-credentials.json
-*.key
-*.pem
-secrets.*
-*.sql
-*.db
-node_modules/
-.DS_Store
+# Xcode
+#
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-cat >> .gitignore << 'EOF'
+## User settings
+xcuserdata/
 
-# === CRITICAL SECURITY ===
-# NEVER commit these files
+## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
+*.xcscmblueprint
+*.xccheckout
+
+## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## Obj-C/Swift specific
+*.hmap
+
+## App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+Package.resolved
+.swiftpm
+
+# CocoaPods
+Pods/
+*.xcworkspace
+
+# Carthage
+Carthage/Build/
+Carthage/Checkouts
+
+# Accio dependency management
+Dependencies/
+.accio/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection
+*.xcconfig
+!Example.xcconfig
+
+# Security - NEVER commit these
+Config.plist
 *.env
 .env.*
 !.env.example
+Secrets.swift
 *apikey*
 *api_key*
 *secret*
-*token*
 *credential*
-
-# API Keys and Secrets
-Constants_Local.swift
-OpenAIAPI_Local.swift
-Config.plist
-Secrets.plist
-
-# Certificates and Keys
 *.p12
-*.pem
-*.key
-*.cer
-*.certSigningRequest
 *.mobileprovision
+*.cer
 
-# === Swift/iOS ===
-*.xcuserstate
-*.xcscmblueprint
-xcuserdata/
-DerivedData/
-*.playground
-timeline.xctimeline
-
-# === macOS ===
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Other
+*.log
+logs/
+tmp/
+temp/
