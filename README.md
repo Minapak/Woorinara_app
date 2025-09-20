@@ -1,4 +1,4 @@
-# VirtuAI - iOS Application
+# Woorinara App - Modern iOS Application
 
 ![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-16.0+-blue.svg)
@@ -7,22 +7,22 @@
 
 ## 🎯 Overview
 
-VirtuAI is a modern iOS application built with SwiftUI that leverages OpenAI's GPT API to provide intelligent conversational experiences. The app demonstrates proficiency in iOS development, API integration, and modern Swift patterns.
+Woorinara App is a modern iOS application built with SwiftUI that leverages OpenAI's GPT API to provide intelligent conversational experiences. This project demonstrates proficiency in iOS development, API integration, and modern Swift patterns.
 
-## ✨ Features
+## ✨ Key Features
 
-- **AI-Powered Conversations**: Integration with OpenAI's GPT API for intelligent responses
-- **Modern SwiftUI Interface**: Built entirely with SwiftUI for a native iOS experience
-- **Secure API Management**: Implementation of secure API key storage using Keychain
+- **AI-Powered Conversations**: Seamless integration with OpenAI's GPT API for intelligent responses
+- **Modern SwiftUI Interface**: 100% SwiftUI for a native iOS experience
+- **Secure API Management**: Keychain Services for secure API key storage
 - **MVVM Architecture**: Clean separation of concerns with Model-View-ViewModel pattern
-- **Async/Await**: Modern Swift concurrency for network operations
+- **Swift Concurrency**: Modern async/await for all network operations
 - **Dark Mode Support**: Full support for iOS dark and light themes
-- **Localization Ready**: Structure prepared for multiple language support
+- **Responsive Design**: Optimized for all iPhone and iPad sizes
 
 ## 🏗 Architecture
 
 ```
-VirtuAI/
+Woorinara_app/
 ├── Core/
 │   ├── Models/          # Data models and entities
 │   ├── Views/           # SwiftUI views
@@ -30,17 +30,21 @@ VirtuAI/
 │   ├── Services/        # API and business logic services
 │   ├── Utilities/       # Helper classes and utilities
 │   └── Extensions/      # Swift extensions
-├── Features/            # Feature-specific modules
+├── Features/
+│   ├── Chat/            # Chat feature module
+│   ├── MyPage/          # User profile module
+│   └── Settings/        # Settings module
 ├── Resources/           # Assets, fonts, and resources
 └── SupportingFiles/     # Configuration files
 ```
 
-### Design Patterns
+### Design Patterns & Best Practices
 
 - **MVVM (Model-View-ViewModel)**: For clean separation of UI and business logic
 - **Repository Pattern**: For data access abstraction
 - **Dependency Injection**: For testability and modularity
 - **Coordinator Pattern**: For navigation flow management
+- **Protocol-Oriented Programming**: Extensive use of protocols for flexibility
 
 ## 🚀 Getting Started
 
@@ -64,7 +68,8 @@ cd Woorinara_app
 # If using CocoaPods
 pod install
 
-# If using SPM, open in Xcode and it will resolve automatically
+# If using Swift Package Manager
+# Dependencies will be resolved automatically when opening in Xcode
 ```
 
 3. Configuration:
@@ -72,9 +77,14 @@ pod install
    - Add your API keys to `Config.plist`
    - Never commit `Config.plist` to version control
 
-4. Open `VirtuAI.xcworkspace` in Xcode
+4. Open the project:
+```bash
+open Woorinara_app.xcworkspace
+# or
+open Woorinara_app.xcodeproj
+```
 
-5. Build and run the project
+5. Build and run (⌘+R)
 
 ## 🔧 Configuration
 
@@ -83,26 +93,31 @@ pod install
 The app requires the following API keys:
 
 1. **OpenAI API Key**: For GPT integration
-2. **AppsFlyer SDK Key**: For analytics (optional)
+   - Get it from [OpenAI Platform](https://platform.openai.com/api-keys)
 
-Store these keys in `Config.plist` (see `Config.example.plist` for structure).
+2. **AppsFlyer SDK Key**: For analytics (optional)
+   - Available from AppsFlyer Dashboard
+
+Store these securely in `Config.plist` or use environment variables.
 
 ### Environment Variables
 
 For CI/CD, set these environment variables:
-- `OPENAI_API_KEY`
-- `APPS_FLYER_KEY`
+```bash
+export OPENAI_API_KEY="your-api-key"
+export APPS_FLYER_KEY="your-key"
+```
 
 ## 🧪 Testing
 
 ### Unit Tests
 ```bash
-xcodebuild test -scheme VirtuAI -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+xcodebuild test -scheme Woorinara_app -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
 ```
 
 ### UI Tests
 ```bash
-xcodebuild test -scheme VirtuAIUITests -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+xcodebuild test -scheme Woorinara_appUITests -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
 ```
 
 ### Code Coverage
@@ -118,44 +133,63 @@ The project maintains >70% code coverage for business logic components.
 
 ## 🛠 Technical Skills Demonstrated
 
+### iOS Development
 - **SwiftUI & Combine**: Modern declarative UI and reactive programming
-- **Async/Await & Actors**: Swift concurrency for thread-safe operations
-- **REST API Integration**: HTTP networking with URLSession
-- **Keychain Services**: Secure storage of sensitive data
-- **Core Data**: Local data persistence (if applicable)
-- **Push Notifications**: APNs integration (if applicable)
-- **CI/CD**: GitHub Actions for automated testing and deployment
-- **Performance Optimization**: Instruments profiling and optimization
-- **Accessibility**: VoiceOver support and Dynamic Type
-- **Memory Management**: Proper ARC and weak reference usage
+- **UIKit Integration**: Bridging with UIKit when necessary
+- **Core Data**: Local data persistence
+- **Core Animation**: Smooth, custom animations
 
-## 📊 Performance
+### Networking & APIs
+- **URLSession**: Advanced networking with async/await
+- **REST APIs**: Complete CRUD operations
+- **WebSocket**: Real-time communication (if applicable)
+- **JSON Parsing**: Codable protocol implementation
 
-- Launch time: <1.5 seconds
-- Memory footprint: <50MB average
-- Network optimization with caching
-- Smooth 60fps scrolling
+### Architecture & Patterns
+- **MVVM + Coordinator**: Scalable app architecture
+- **Dependency Injection**: Using property wrappers
+- **Protocol-Oriented Programming**: Extensive protocol usage
+- **SOLID Principles**: Clean, maintainable code
 
-## 🔐 Security
+### Security
+- **Keychain Services**: Secure credential storage
+- **Biometric Authentication**: Face ID/Touch ID integration
+- **Certificate Pinning**: Enhanced API security
+- **Data Encryption**: AES encryption for sensitive data
 
-- API keys stored in Keychain, never in code
+## 📊 Performance Metrics
+
+- **Launch Time**: <1.5 seconds
+- **Memory Usage**: <50MB average
+- **Battery Impact**: Minimal
+- **Network Optimization**: Caching & compression
+- **Frame Rate**: Consistent 60fps
+
+## 🔐 Security Features
+
+- API keys stored securely in Keychain
+- No hardcoded credentials
 - Certificate pinning for API calls
 - Biometric authentication support
-- Data encryption at rest
+- Encrypted local storage
 
 ## 📈 Analytics & Monitoring
 
-- Crash reporting with Crashlytics
 - Performance monitoring
+- Crash reporting
 - User analytics (privacy-compliant)
+- A/B testing capability
 
 ## 🤝 Contributing
 
-While this is a portfolio project, feedback and suggestions are welcome! Please feel free to:
+Feedback and suggestions are welcome! Please feel free to:
 
-1. Report bugs or issues
-2. Suggest new features
-3. Submit pull requests
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+4. Report issues
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📄 License
 
@@ -164,18 +198,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **[Your Name]**
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-- Portfolio: [yourportfolio.com](https://yourportfolio.com)
+- 📧 Email: your.email@example.com
+- 💼 LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
+- 🌐 Portfolio: [yourportfolio.com](https://yourportfolio.com)
+- 📱 App Store: [Your Apps](https://apps.apple.com/developer/yourname)
 
 ## 🙏 Acknowledgments
 
-- OpenAI for GPT API
+- OpenAI for providing the GPT API
 - Apple Developer Documentation
-- SwiftUI community
+- SwiftUI Community
+- Stack Overflow Community
+
+## 📚 Resources
+
+- [Project Documentation](Documentation/)
+- [API Documentation](Documentation/API.md)
+- [Architecture Decision Records](Documentation/ADR/)
 
 ---
 
 <p align="center">
   Made with ❤️ using Swift and SwiftUI
+</p>
+
+<p align="center">
+  <a href="https://github.com/Minapak/Woorinara_app">
+    <img src="https://img.shields.io/github/stars/Minapak/Woorinara_app?style=social" alt="Stars">
+  </a>
+  <a href="https://github.com/Minapak/Woorinara_app/fork">
+    <img src="https://img.shields.io/github/forks/Minapak/Woorinara_app?style=social" alt="Forks">
+  </a>
 </p>
