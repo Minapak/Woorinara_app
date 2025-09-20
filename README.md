@@ -151,17 +151,18 @@ Woorinara App is an innovative iOS application designed specifically for foreign
 ```
 Woorinara_app/
 ├── Core/
-│   ├── Models/          # Data models and entities
-│   ├── Views/           # SwiftUI views
-│   ├── ViewModels/      # View models for MVVM
-│   ├── Services/        # API and business logic services
-│   ├── Utilities/       # Helper classes and utilities
-│   └── Extensions/      # Swift extensions
+│   ├── Models/          # Data models
+│   ├── Views/           # SwiftUI views  
+│   ├── ViewModels/      # MVVM view models
+│   ├── Services/        # API and business logic
+│   └── Utilities/       # Helpers and extensions
 ├── Features/
-│   ├── Chat/            # Chat feature module
-│   ├── MyPage/          # User profile module
-│   └── Settings/        # Settings module
-├── Resources/           # Assets, fonts, and resources
+│   ├── Chat/            # AI assistant module
+│   ├── Scanner/         # Document scanning
+│   ├── Forms/           # Form processing
+│   ├── Translation/     # Translation services
+│   └── Community/       # Forum features
+└── Resources/           # Assets and localization
 └── SupportingFiles/     # Configuration files
 ```
 
@@ -253,13 +254,18 @@ The project maintains >70% code coverage for business logic components.
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="Screenshots/splash.png" width="200" alt="Splash Screen" />
-  <img src="Screenshots/id_verification.png" width="200" alt="ID Verification" />
-  <img src="Screenshots/form_fill.png" width="200" alt="Form Fill" />
-  <img src="Screenshots/auto_fill.png" width="200" alt="Auto Fill" />
-  <img src="Screenshots/form_selection.png" width="200" alt="Form Selection" />
+  <img src="Screenshots/passport_scan.png" width="250" alt="Passport Scan" />
+  <img src="Screenshots/form_selection.png" width="250" alt="Form Selection" />
+  <img src="Screenshots/splash.png" width="250" alt="Splash Screen" />
+  <br>
+  <img src="Screenshots/chat_assistant.png" width="250" alt="Chat Assistant" />
+  <img src="Screenshots/form_translation.png" width="250" alt="Translation" />
+  <img src="Screenshots/user_info.png" width="250" alt="User Info" />
+  <br>
+  <img src="Screenshots/auto_fill.png" width="250" alt="Auto Fill" />
+  <img src="Screenshots/community.png" width="250" alt="Community" />
+  <img src="Screenshots/id_selection.png" width="250" alt="ID Selection" />
 </p>
-
 <p align="center">
   <sub>Foreign Resident Civil Service Helper - Simplifying bureaucratic processes for foreigners in Korea</sub>
 </p>
