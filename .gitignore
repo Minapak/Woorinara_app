@@ -10,3 +10,43 @@ secrets.*
 *.db
 node_modules/
 .DS_Store
+
+cat >> .gitignore << 'EOF'
+
+# === CRITICAL SECURITY ===
+# NEVER commit these files
+*.env
+.env.*
+!.env.example
+*apikey*
+*api_key*
+*secret*
+*token*
+*credential*
+
+# API Keys and Secrets
+Constants_Local.swift
+OpenAIAPI_Local.swift
+Config.plist
+Secrets.plist
+
+# Certificates and Keys
+*.p12
+*.pem
+*.key
+*.cer
+*.certSigningRequest
+*.mobileprovision
+
+# === Swift/iOS ===
+*.xcuserstate
+*.xcscmblueprint
+xcuserdata/
+DerivedData/
+*.playground
+timeline.xctimeline
+
+# === macOS ===
+.DS_Store
+.AppleDouble
+.LSOverride
