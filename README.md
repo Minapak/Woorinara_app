@@ -7,8 +7,7 @@
 
 ## 🎯 Overview
 
-Woorinara App is a modern iOS application built with SwiftUI that leverages OpenAI's GPT API to provide intelligent conversational experiences. This project demonstrates proficiency in iOS development, API integration, and modern Swift patterns.
-
+Woorinara App is an innovative iOS application designed specifically for foreign residents in Korea. The app streamlines complex bureaucratic processes by providing intelligent document processing, real-time translation, and automated form filling capabilities.
 ## ✨ Features
 
 ### 🎯 Core Functionality
