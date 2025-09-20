@@ -1,2 +1,1 @@
-# Woorinara
 # Woorinara-ios
