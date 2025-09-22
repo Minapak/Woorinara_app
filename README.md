@@ -35,19 +35,14 @@ A comprehensive mobile platform providing:
 
 ## 🏆 Achievements
 
-🏆 Achievements
-
-🥇 Excellence Award - 2024 Open Data Forum Public Data Utilization Project
-
-Winner of NIA (Korea Intelligence Information Society Agency) President's Award
-Selected as one of top 2 teams among 4 finalists
-November 29, 2024 at Seoul Startup Hub
-
-
-🏛️ Government Selected Project - Adopted by Korean government agency
-📊 Government API Integration - Korea Public Data Portal
-⚡ High Performance - <1s launch time, 99.9% crash-free
-🎯 Production Ready - Clean architecture, comprehensive testing
+- 🥇 **Excellence Award** - [2024 Open Data Forum Public Data Utilization Project](https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?cbIdx=90549&bcIdx=27494)
+  - Winner of NIA (Korea Intelligence Information Society Agency) President's Award
+  - Selected as one of top 2 teams among 4 finalists
+  - November 29, 2024 at Seoul Startup Hub
+- 🏛️ **Government Selected Project** - Adopted by Korean government agency
+- 📊 **Government API Integration** - Korea Public Data Portal
+- ⚡ **High Performance** - <1s launch time, 99.9% crash-free
+- 🎯 **Production Ready** - Clean architecture, comprehensive testing
 
 
 ## ✨ Key Features
